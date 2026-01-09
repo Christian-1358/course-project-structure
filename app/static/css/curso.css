@@ -1,0 +1,571 @@
+    /*
+    * Estilos gerais e do curso (mantidos)
+    */
+
+    * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: 'Inter', sans-serif;
+            }
+
+            body {
+                min-height: 100vh;
+                
+                background: #0d0d0d;
+                color: #e6e6e6;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 20px;
+            }
+
+            .container {
+                width: 90%;
+                max-width: 1300px; 
+                background: #111;
+                padding: 40px;
+                border-radius: 16px;
+                box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                animation: fadeIn 0.4s ease;
+            }
+
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+
+            h2 {
+                text-align: center;
+                margin-bottom: 10px;
+                font-weight: 800;
+                color: #777;
+                letter-spacing: 0.5px;
+                font-size: 36px;
+            }
+            
+            .header-controls {
+                display: flex;
+                justify-content: flex-end;
+                margin-bottom: 20px;
+            }
+
+            .logout-btn {
+                background: #2e2e2e;
+                color: #ccc;
+                border: 1px solid #444;
+                padding: 10px 15px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-weight: 500;
+                transition: background 0.3s, color 0.3s;
+                text-decoration: none; 
+                font-size: 14px;
+            }
+
+            .logout-btn:hover {
+                background: #777;
+                color: #111;
+                border-color: #777;
+            }
+
+
+            .welcome-message {
+                text-align: center;
+                margin-bottom: 40px;
+                font-size: 18px;
+                font-weight: 500;
+                color: #aaa;
+            }
+
+            .global-progress-dashboard {
+                background: #1a1a1a;
+                padding: 20px;
+                border-radius: 12px;
+                margin-bottom: 30px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-left: 5px solid #777;
+            }
+
+            .status-item {
+                text-align: center;
+                padding: 0 20px;
+            }
+
+            .status-item h4 {
+                font-size: 14px;
+                color: #aaa;
+                margin-bottom: 5px;
+                font-weight: 500;
+            }
+
+            .status-item span {
+                font-size: 24px;
+                font-weight: 700;
+                color: #e6e6e6;
+            }
+
+            .status-item .completed-text {
+                color: #00ff88;
+            }
+
+            .course-grid-wrapper {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .course-grid {
+                display: grid;
+                gap: 20px;
+                grid-template-columns: repeat(4, 1fr); 
+                margin-bottom: 10px;
+                transition: opacity 0.3s ease;
+            }
+
+            .course-card {
+                background: #1a1a1a;
+                padding: 25px;
+                border-radius: 12px;
+                position: relative;
+                transition: transform 0.3s, box-shadow 0.3s;
+                border: 1px solid #222;
+                display: flex; 
+                flex-direction: column; 
+            }
+
+            .course-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            }
+
+            .course-card h3 {
+                margin-bottom: 8px;
+                font-size: 20px;
+                color: #ffffff;
+            }
+
+            .course-card p {
+                font-size: 14px;
+                color: #aaa;
+                margin-bottom: 15px;
+                min-height: 40px; 
+            }
+
+            .lesson-list, .activity-list {
+                padding-bottom: 15px;
+            }
+            
+            .lesson-list {
+                border-bottom: 1px solid #222;
+                margin-bottom: 15px;
+            }
+            
+            .activity-list-title {
+                font-size: 16px;
+                font-weight: 600;
+                color: #777;
+                margin-bottom: 10px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            
+            .lesson-item-wrapper {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 8px;
+                font-size: 15px;
+                padding: 5px 0;
+            }
+
+            .lesson-list a, .activity-list a {
+                display: flex;
+                align-items: center;
+                color: #ffffff;
+                text-decoration: none;
+                transition: 0.2s;
+                cursor: pointer;
+                flex-grow: 1;
+            }
+
+            .lesson-list a:hover, .activity-list a:hover {
+                color: #777;
+            }
+            
+            .lesson-list a.watched, .activity-list a.watched {
+                color: #00ff88;
+                opacity: 0.8;
+                font-weight: 500;
+            }
+            
+            .lesson-icon {
+                margin-right: 8px;
+                width: 15px;
+                text-align: center;
+            }
+            
+            .unwatch-btn {
+                background: none;
+                border: 1px solid #333;
+                color: #aaa;
+                padding: 2px 5px;
+                border-radius: 4px;
+                font-size: 10px;
+                font-weight: 600;
+                cursor: pointer;
+                margin-left: 10px;
+                opacity: 0.5;
+                transition: opacity 0.2s, color 0.2s, border-color 0.2s;
+                display: none; 
+            }
+
+            .unwatch-btn:hover {
+                opacity: 1;
+                color: #ff5757;
+                border-color: #ff5757;
+            }
+
+
+            .progress-container {
+                margin-top: auto; 
+                padding-top: 15px;
+            }
+            
+            .progress-bar-container {
+                height: 8px;
+                background: #333;
+                border-radius: 4px;
+                margin-top: 12px;
+            }
+
+            .progress-bar {
+                height: 100%;
+                background: linear-gradient(90deg, #777, #777);
+                border-radius: 4px;
+                transition: width 0.5s ease;
+            }
+
+            .progress-bar.completed {
+                background: linear-gradient(90deg, #00ff88, #00b362);
+            }
+
+            .progress-label {
+                font-size: 14px;
+                color: #e6e6e6;
+                text-align: right;
+                margin-top: 5px;
+                font-weight: 600;
+            }
+            
+            .progress-label.completed {
+                color: #00ff88;
+            }
+            
+            .pagination {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 15px;
+                margin-top: 30px;
+            }
+
+            .page-button {
+                background: #1a1a1a;
+                color: #777;
+                border: 1px solid #ffffff;
+                padding: 10px 15px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-weight: 600;
+                transition: background 0.3s, color 0.3s;
+            }
+
+            .page-button:hover:not(:disabled) {
+                background: #ffffff;
+                color: #111;
+            }
+            
+            .page-button:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+                border-color: #333;
+                color: #777;
+                background: #111;
+            }
+
+            .page-indicator {
+                font-size: 18px;
+                font-weight: 500;
+            }
+            
+            .page {
+                display: none;
+            }
+            
+            .page.active-page {
+                display: grid;
+            }
+
+            .modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.9); 
+                display: none; 
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                overflow-y: auto; 
+            }
+
+            .modal-overlay.open {
+                display: flex;
+                opacity: 1;
+            }
+
+            .modal-content {
+                background: #1a1a1a;
+                padding: 30px;
+                border-radius: 12px;
+                width: 90%;
+                max-width: 700px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+                transform: scale(0.9);
+                transition: transform 0.3s ease;
+                position: relative;
+                margin: 20px 0; 
+            }
+            
+            #video-modal .modal-content {
+                max-width: 1000px; 
+                padding: 20px;
+            }
+
+
+            .modal-overlay.open .modal-content {
+                transform: scale(1);
+            }
+
+            .modal-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 1px solid #2e2e2e;
+                padding-bottom: 15px;
+                margin-bottom: 20px;
+            }
+
+            .modal-header h3 {
+                color: #ffffff;
+                font-size: 24px;
+            }
+
+            .modal-body p {
+                font-size: 16px;
+                line-height: 1.6;
+                margin-bottom: 25px;
+                color: #ccc;
+            }
+            
+            .modal-close-btn {
+                background: none;
+                border: none;
+                color: #aaa;
+                font-size: 24px;
+                cursor: pointer;
+                transition: color 0.2s;
+            }
+
+            .modal-close-btn:hover {
+                color: #ffffff;
+            }
+            
+            .complete-activity-btn, .complete-video-btn { 
+                display: block;
+                width: 100%;
+                padding: 15px;
+                background: #777; 
+                color: #111;
+                border: none;
+                border-radius: 8px;
+                font-size: 18px;
+                font-weight: 700;
+                cursor: pointer;
+                transition: background 0.2s, opacity 0.2s;
+                margin-top: 20px;
+            }
+            
+            .complete-activity-btn:hover:not(.completed), .complete-video-btn:hover:not(.completed) {
+                background: #ffffff;
+            }
+            
+            .complete-activity-btn.completed, .complete-video-btn.completed {
+                background: #00ff88; 
+                color: #111;
+                cursor: default;
+            }
+            
+            .activity-input-area {
+                margin-top: 15px;
+                margin-bottom: 25px;
+            }
+            
+            .activity-input-area h4 {
+                color: #e6e6e6;
+                margin-bottom: 10px;
+            }
+
+            .activity-input-area textarea {
+                width: 100%;
+                min-height: 150px;
+                padding: 15px;
+                border-radius: 8px;
+                border: 1px solid #333;
+                background: #222;
+                color: #e6e6e6;
+                font-size: 16px;
+                resize: vertical;
+            }
+            
+            .activity-feedback-area {
+                margin-top: 20px;
+                padding: 15px;
+                border-radius: 8px;
+                background: #0d0d0d;
+                border: 1px solid #333;
+                white-space: pre-wrap;
+                font-family: monospace;
+                font-size: 14px;
+                min-height: 50px;
+            }
+            
+            .feedback-success {
+                border-color: #00ff88;
+                color: #00ff88;
+            }
+
+            .feedback-failure {
+                border-color: #ff5757;
+                color: #ff5757;
+            }
+
+            .video-player-container {
+                position: relative;
+                width: 100%;
+                padding-bottom: 56.25%; 
+                height: 0;
+                overflow: hidden;
+                background: #000;
+                border-radius: 8px;
+            }
+
+            .video-player-container iframe {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                border: none;
+            }
+
+            /* NOVO CSS PARA .course-actions */
+            /* Estilos para centralizar e formatar as ações da página */
+            .course-actions {
+                display: flex;
+                justify-content: center; /* Centraliza os botões horizontalmente */
+                gap: 20px; /* Espaço entre os botões */
+                margin-top: 20px;
+                margin-bottom: 40px; /* Espaço após o bloco de ações, antes do dashboard */
+            }
+
+            .course-actions a {
+                /* Estilo de botão genérico */
+                text-decoration: none;
+                padding: 12px 20px;
+                border-radius: 8px;
+                font-weight: 600;
+                transition: all 0.3s;
+                
+                /* Alinhamento de conteúdo (ícone + texto) */
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 16px;
+                min-width: 200px; /* Para garantir que tenham uma largura mínima e uniforme */
+                justify-content: center; /* Centraliza o texto dentro do botão */
+            }
+
+            /* Estilo do botão de "Voltar ao Login" (Secundário) */
+            .course-actions a[href="/login"] {
+                background: #1a1a1a;
+                color: #aaa;
+                border: 1px solid #333;
+            }
+
+            .course-actions a[href="/login"]:hover {
+                background: #2e2e2e;
+                color: #e6e6e6;
+                border-color: #555;
+            }
+
+            /* Estilo do botão de "Página de Pagamentos" (Primário) */
+            .course-actions a[href="/pagamento"] {
+                background: #777; /* Cor de destaque (do tema do progresso) */
+                color: #111;
+                border: 1px solid #777;
+            }
+
+            .course-actions a[href="/pagamento"]:hover {
+                background: #ffffff;
+                border-color: #ffffff;
+            }
+
+            /* FIM DO NOVO CSS */
+
+            @media (max-width: 1200px) {
+                .course-grid {
+                    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                }
+            }
+            
+            @media (max-width: 600px) {
+                /* Adicionado responsividade para os botões em telas pequenas */
+                .course-actions {
+                    flex-direction: column;
+                    gap: 10px;
+                }
+                .course-actions a {
+                    min-width: 100%;
+                }
+                /* Fim da responsividade para botões */
+
+                .container {
+                    padding: 30px 20px;
+                    width: 100%;
+                }
+                h2 {
+                    font-size: 26px;
+                }
+                .course-grid {
+                    grid-template-columns: 1fr;
+                }
+                .global-progress-dashboard {
+                    flex-direction: column;
+                    gap: 15px;
+                }
+                .modal-content {
+                    padding: 20px;
+                }
+                .modal-header h3 {
+                    font-size: 20px;
+                }
+            }

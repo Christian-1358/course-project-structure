@@ -1,0 +1,1963 @@
+
+<!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Curso de Python — Plataforma de Aprendizado Avançada</title>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <link rel="stylesheet" href="/static/css/curso.css">]
+
+        
+    </head>
+    <style>
+
+
+
+
+.lock-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    margin-left: 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #bbb;
+}
+.locked {
+    background: rgba(255,90,90,0.06);
+    color: #ff6b6b;
+    border: 1px solid rgba(255,90,90,0.12);
+}
+.unlocked {
+    background: rgba(0,200,120,0.06);
+    color: #7ef5b7;
+    border: 1px solid rgba(0,200,120,0.12);
+}
+.lock-overlay {
+    pointer-events: none; /* just visual */
+    opacity: 0.95;
+}
+
+
+
+
+
+
+    * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: 'Inter', sans-serif;
+            }
+
+            body {
+                min-height: 100vh;
+                
+                background: #0d0d0d;
+                color: #e6e6e6;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 20px;
+            }
+
+            .container {
+                width: 90%;
+                max-width: 1300px; 
+                background: #111;
+                padding: 40px;
+                border-radius: 16px;
+                box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                animation: fadeIn 0.4s ease;
+            }
+
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+
+            h2 {
+                text-align: center;
+                margin-bottom: 10px;
+                font-weight: 800;
+                color: #777;
+                letter-spacing: 0.5px;
+                font-size: 36px;
+            }
+            
+            .header-controls {
+                display: flex;
+                justify-content: flex-end;
+                margin-bottom: 20px;
+            }
+
+            .logout-btn {
+                background: #2e2e2e;
+                color: #ccc;
+                border: 1px solid #444;
+                padding: 10px 15px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-weight: 500;
+                transition: background 0.3s, color 0.3s;
+                text-decoration: none; 
+                font-size: 14px;
+            }
+
+            .logout-btn:hover {
+                background: #777;
+                color: #111;
+                border-color: #777;
+            }
+
+
+            .welcome-message {
+                text-align: center;
+                margin-bottom: 40px;
+                font-size: 18px;
+                font-weight: 500;
+                color: #aaa;
+            }
+
+            .global-progress-dashboard {
+                background: #1a1a1a;
+                padding: 20px;
+                border-radius: 12px;
+                margin-bottom: 30px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-left: 5px solid #777;
+            }
+
+            .status-item {
+                text-align: center;
+                padding: 0 20px;
+            }
+
+            .status-item h4 {
+                font-size: 14px;
+                color: #aaa;
+                margin-bottom: 5px;
+                font-weight: 500;
+            }
+
+            .status-item span {
+                font-size: 24px;
+                font-weight: 700;
+                color: #e6e6e6;
+            }
+
+            .status-item .completed-text {
+                color: #00ff88;
+            }
+
+            .course-grid-wrapper {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .course-grid {
+                display: grid;
+                gap: 20px;
+                grid-template-columns: repeat(4, 1fr); 
+                margin-bottom: 10px;
+                transition: opacity 0.3s ease;
+            }
+
+            .course-card {
+                background: #1a1a1a;
+                padding: 25px;
+                border-radius: 12px;
+                position: relative;
+                transition: transform 0.3s, box-shadow 0.3s;
+                border: 1px solid #222;
+                display: flex; 
+                flex-direction: column; 
+            }
+
+            .course-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            }
+
+            .course-card h3 {
+                margin-bottom: 8px;
+                font-size: 20px;
+                color: #ffffff;
+            }
+
+            .course-card p {
+                font-size: 14px;
+                color: #aaa;
+                margin-bottom: 15px;
+                min-height: 40px; 
+            }
+
+            .lesson-list, .activity-list {
+                padding-bottom: 15px;
+            }
+            
+            .lesson-list {
+                border-bottom: 1px solid #222;
+                margin-bottom: 15px;
+            }
+            
+            .activity-list-title {
+                font-size: 16px;
+                font-weight: 600;
+                color: #777;
+                margin-bottom: 10px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            
+            .lesson-item-wrapper {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 8px;
+                font-size: 15px;
+                padding: 5px 0;
+            }
+
+            .lesson-list a, .activity-list a {
+                display: flex;
+                align-items: center;
+                color: #ffffff;
+                text-decoration: none;
+                transition: 0.2s;
+                cursor: pointer;
+                flex-grow: 1;
+            }
+
+            .lesson-list a:hover, .activity-list a:hover {
+                color: #777;
+            }
+            
+            .lesson-list a.watched, .activity-list a.watched {
+                color: #00ff88;
+                opacity: 0.8;
+                font-weight: 500;
+            }
+            
+            .lesson-icon {
+                margin-right: 8px;
+                width: 15px;
+                text-align: center;
+            }
+            
+            .unwatch-btn {
+                background: none;
+                border: 1px solid #333;
+                color: #aaa;
+                padding: 2px 5px;
+                border-radius: 4px;
+                font-size: 10px;
+                font-weight: 600;
+                cursor: pointer;
+                margin-left: 10px;
+                opacity: 0.5;
+                transition: opacity 0.2s, color 0.2s, border-color 0.2s;
+                display: none; 
+            }
+
+            .unwatch-btn:hover {
+                opacity: 1;
+                color: #ff5757;
+                border-color: #ff5757;
+            }
+
+
+            .progress-container {
+                margin-top: auto; 
+                padding-top: 15px;
+            }
+            
+            .progress-bar-container {
+                height: 8px;
+                background: #333;
+                border-radius: 4px;
+                margin-top: 12px;
+            }
+
+            .progress-bar {
+                height: 100%;
+                background: linear-gradient(90deg, #777, #777);
+                border-radius: 4px;
+                transition: width 0.5s ease;
+            }
+
+            .progress-bar.completed {
+                background: linear-gradient(90deg, #00ff88, #00b362);
+            }
+
+            .progress-label {
+                font-size: 14px;
+                color: #e6e6e6;
+                text-align: right;
+                margin-top: 5px;
+                font-weight: 600;
+            }
+            
+            .progress-label.completed {
+                color: #00ff88;
+            }
+            
+            .pagination {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 15px;
+                margin-top: 30px;
+            }
+
+            .page-button {
+                background: #1a1a1a;
+                color: #777;
+                border: 1px solid #ffffff;
+                padding: 10px 15px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-weight: 600;
+                transition: background 0.3s, color 0.3s;
+            }
+
+            .page-button:hover:not(:disabled) {
+                background: #ffffff;
+                color: #111;
+            }
+            
+            .page-button:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+                border-color: #333;
+                color: #777;
+                background: #111;
+            }
+
+            .page-indicator {
+                font-size: 18px;
+                font-weight: 500;
+            }
+            
+            .page {
+                display: none;
+            }
+            
+            .page.active-page {
+                display: grid;
+            }
+
+            .modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.9); 
+                display: none; 
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                overflow-y: auto; 
+            }
+
+            .modal-overlay.open {
+                display: flex;
+                opacity: 1;
+            }
+
+            .modal-content {
+                background: #1a1a1a;
+                padding: 30px;
+                border-radius: 12px;
+                width: 90%;
+                max-width: 700px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+                transform: scale(0.9);
+                transition: transform 0.3s ease;
+                position: relative;
+                margin: 20px 0; 
+            }
+            
+            #video-modal .modal-content {
+                max-width: 1000px; 
+                padding: 20px;
+            }
+
+
+            .modal-overlay.open .modal-content {
+                transform: scale(1);
+            }
+
+            .modal-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 1px solid #2e2e2e;
+                padding-bottom: 15px;
+                margin-bottom: 20px;
+            }
+
+            .modal-header h3 {
+                color: #ffffff;
+                font-size: 24px;
+            }
+
+            .modal-body p {
+                font-size: 16px;
+                line-height: 1.6;
+                margin-bottom: 25px;
+                color: #ccc;
+            }
+            
+            .modal-close-btn {
+                background: none;
+                border: none;
+                color: #aaa;
+                font-size: 24px;
+                cursor: pointer;
+                transition: color 0.2s;
+            }
+
+            .modal-close-btn:hover {
+                color: #ffffff;
+            }
+            
+            .complete-activity-btn, .complete-video-btn { 
+                display: block;
+                width: 100%;
+                padding: 15px;
+                background: #777; 
+                color: #111;
+                border: none;
+                border-radius: 8px;
+                font-size: 18px;
+                font-weight: 700;
+                cursor: pointer;
+                transition: background 0.2s, opacity 0.2s;
+                margin-top: 20px;
+            }
+            
+            .complete-activity-btn:hover:not(.completed), .complete-video-btn:hover:not(.completed) {
+                background: #ffffff;
+            }
+            
+            .complete-activity-btn.completed, .complete-video-btn.completed {
+                background: #00ff88; 
+                color: #111;
+                cursor: default;
+            }
+            
+            .activity-input-area {
+                margin-top: 15px;
+                margin-bottom: 25px;
+            }
+            
+            .activity-input-area h4 {
+                color: #e6e6e6;
+                margin-bottom: 10px;
+            }
+
+            .activity-input-area textarea {
+                width: 100%;
+                min-height: 150px;
+                padding: 15px;
+                border-radius: 8px;
+                border: 1px solid #333;
+                background: #222;
+                color: #e6e6e6;
+                font-size: 16px;
+                resize: vertical;
+            }
+            
+            .activity-feedback-area {
+                margin-top: 20px;
+                padding: 15px;
+                border-radius: 8px;
+                background: #0d0d0d;
+                border: 1px solid #333;
+                white-space: pre-wrap;
+                font-family: monospace;
+                font-size: 14px;
+                min-height: 50px;
+            }
+            
+            .feedback-success {
+                border-color: #00ff88;
+                color: #00ff88;
+            }
+
+            .feedback-failure {
+                border-color: #ff5757;
+                color: #ff5757;
+            }
+
+            .video-player-container {
+                position: relative;
+                width: 100%;
+                padding-bottom: 56.25%; 
+                height: 0;
+                overflow: hidden;
+                background: #000;
+                border-radius: 8px;
+            }
+
+            .video-player-container iframe {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                border: none;
+            }
+
+            /* NOVO CSS PARA .course-actions */
+            /* Estilos para centralizar e formatar as ações da página */
+            .course-actions {
+                display: flex;
+                justify-content: center; /* Centraliza os botões horizontalmente */
+                gap: 20px; /* Espaço entre os botões */
+                margin-top: 20px;
+                margin-bottom: 40px; /* Espaço após o bloco de ações, antes do dashboard */
+            }
+
+            .course-actions a {
+                /* Estilo de botão genérico */
+                text-decoration: none;
+                padding: 12px 20px;
+                border-radius: 8px;
+                font-weight: 600;
+                transition: all 0.3s;
+                
+                /* Alinhamento de conteúdo (ícone + texto) */
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 16px;
+                min-width: 200px; /* Para garantir que tenham uma largura mínima e uniforme */
+                justify-content: center; /* Centraliza o texto dentro do botão */
+            }
+
+            /* Estilo do botão de "Voltar ao Login" (Secundário) */
+            .course-actions a[href="/login"] {
+                background: #1a1a1a;
+                color: #aaa;
+                border: 1px solid #333;
+            }
+
+            .course-actions a[href="/login"]:hover {
+                background: #2e2e2e;
+                color: #e6e6e6;
+                border-color: #555;
+            }
+
+            /* Estilo do botão de "Página de Pagamentos" (Primário) */
+            .course-actions a[href="/pagamento"] {
+                background: #777; /* Cor de destaque (do tema do progresso) */
+                color: #111;
+                border: 1px solid #777;
+            }
+
+            .course-actions a[href="/pagamento"]:hover {
+                background: #ffffff;
+                border-color: #ffffff;
+            }
+
+            /* FIM DO NOVO CSS */
+
+            @media (max-width: 1200px) {
+                .course-grid {
+                    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                }
+            }
+            
+            @media (max-width: 600px) {
+                /* Adicionado responsividade para os botões em telas pequenas */
+                .course-actions {
+                    flex-direction: column;
+                    gap: 10px;
+                }
+                .course-actions a {
+                    min-width: 100%;
+                }
+                /* Fim da responsividade para botões */
+
+                .container {
+                    padding: 30px 20px;
+                    width: 100%;
+                }
+                h2 {
+                    font-size: 26px;
+                }
+                .course-grid {
+                    grid-template-columns: 1fr;
+                }
+                .global-progress-dashboard {
+                    flex-direction: column;
+                    gap: 15px;
+                }
+                .modal-content {
+                    padding: 20px;
+                }
+                .modal-header h3 {
+                    font-size: 20px;
+                }
+            }
+    </style>
+
+<div class="page-wrapper">
+
+    <div class="container">
+
+        <h2>Curso de Python 3 e Criação de APIs</h2>
+        <p class="subtitle">
+            Aprenda Python do zero, progredindo para se tornar um desenvolvedor backend completo.
+        </p>
+
+<div class="course-actions">
+    <a href="/login">
+        <i class="fas fa-arrow-left"></i>
+        Voltar ao Login
+    </a>
+
+    <a href="/pagamento">
+        <i class="fas fa-credit-card"></i>
+        Página de pagamentos
+    </a>
+</div>
+
+            
+
+            <div class="global-progress-dashboard">
+                <div class="status-item">
+                    <h4><i class="fas fa-list-check"></i> Itens Concluídos (Vídeos + Atividades)</h4>
+                    <span id="global-watched-count">0</span>
+                </div>
+                <div class="status-item">
+                    <h4><i class="fas fa-check-double"></i> Módulos Concluídos</h4>
+                    <span id="global-modules-count">0/20</span>
+                </div>
+                <div class="status-item">
+                    <h4><i class="fas fa-chart-line"></i> Progresso Total</h4>
+                    <span id="global-progress-percent" class="completed-text">0%</span>
+                </div>
+            </div>
+            <div class="course-grid-wrapper">
+
+                <div class="course-grid page active-page" data-page="1">
+                    
+                    <div class="course-card" data-module-id="1">
+                        <h3>Módulo 1 — Fundamentos de Python</h3>
+                        <p>Aprenda o básico da linguagem: sintaxe, variáveis e controle de fluxo.</p>
+
+                        <div class="lesson-list">
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="1-1" data-video-url="https://youtu.be/S9uPNppGsGo" data-video-title="Aula 1 — Introdução ao Python"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 1 — Introdução ao Python</a>
+                                <button class="unwatch-btn" data-lesson-id="1-1">Desmarcar</button>
+                            </div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="1-2" data-video-url="https://youtu.be/nJkVHusJp6E" data-video-title="Aula 2 — Variáveis e Tipos"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 2 — Variáveis e Tipos</a>
+                                <button class="unwatch-btn" data-lesson-id="1-2">Desmarcar</button>
+                            </div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="1-3" data-video-url="https://www.youtube.com/watch?v=VuKvR1J2LQE" data-video-title="Aula 3 — Condicionais (if/else)"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 3 — Instalando o Python3 e o IDLE</a>
+                                <button class="unwatch-btn" data-lesson-id="1-3">Desmarcar</button>
+                            </div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="1-4" data-video-url="https://youtu.be/XKHEtdqhLK8" data-video-title="Aula 4 — Loops (for/while)"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 4 — Loops (for/while)</a>
+                                <button class="unwatch-btn" data-lesson-id="1-4">Desmarcar</button>
+                            </div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="1-5" data-video-url="https://www.youtube.com/watch?v=ElRd0cbXIv4" data-video-title="Aula 5 —  Instalando o PyCharm e o QPython3"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 5 — Estruturas de Dados Básicas</a>
+                                <button class="unwatch-btn" data-lesson-id="1-5">Desmarcar</button>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-list">
+                            <div class="activity-list-title"><i class="fas fa-clipboard-list"></i> Atividades</div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-modal-activity" data-lesson-id="1-A1" data-activity-title="Mini-Desafio 1 — Calculadora de IMC" data-activity-desc="Crie uma função chamada 'calcular_imc(peso, altura)' que retorne o valor do IMC. O backend irá testar sua função com diversos inputs."><span class="lesson-icon"><i class="far fa-circle"></i></span> Mini-Desafio 1 — Calculadora de IMC</a>
+                                <button class="unwatch-btn" data-lesson-id="1-A1">Desmarcar</button>
+                            </div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-modal-activity" data-lesson-id="1-A2" data-activity-title="Desafio — Inverter String" data-activity-desc="Crie uma função chamada 'inverter_string(texto)' que receba uma string e retorne a mesma string invertida (ex: 'Python' -> 'nohtyP')."><span class="lesson-icon"><i class="far fa-circle"></i></span> Desafio — Inverter String</a>
+                                <button class="unwatch-btn" data-lesson-id="1-A2">Desmarcar</button>
+                            </div>
+                        </div>
+
+                        <div class="progress-container">
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" id="progress-bar-1" style="width: 0%;"></div>
+                            </div>
+                            <div class="progress-label" id="progress-label-1">0% concluído</div>
+                        </div>
+                    </div>
+
+                    <div class="course-card" data-module-id="2">
+                        <h3>Módulo 2 — Python Avançado</h3>
+                        <p>Se aprofunde em funções, classes, módulos e gerenciamento de erros.</p>
+
+                        <div class="lesson-list">
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="2-1" data-video-url="https://www.youtube.com/watch?v=O6vyUeDteRA&list=PLsMpSZTgkF5ANrrp31dmQoG0-hPoI-NoX&index=2" data-video-title="Aula 1 — List comprehensions"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 1 — Funções Avançadas e Lambdas</a>
+                                <button class="unwatch-btn" data-lesson-id="2-1">Desmarcar</button>
+                            </div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="2-2" data-video-url="https://www.youtube.com/watch?v=eDWc2xv_t_M&list=PLsMpSZTgkF5ANrrp31dmQoG0-hPoI-NoX&index=3" data-video-title="Aula 2 — Programação Orientada a Objetos"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 2 — Programação Orientada a Objetos</a>
+                                <button class="unwatch-btn" data-lesson-id="2-2">Desmarcar</button>
+                            </div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="2-3" data-video-url="https://youtu.be/oF6jEN4Y3as" data-video-title="Aula 3 — Tratamento de Erros (try/except)"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 3 — Tratamento de Erros (try/except)</a>
+                                <button class="unwatch-btn" data-lesson-id="2-3">Desmarcar</button>
+                            </div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="2-4" data-video-url="https://youtu.be/8p1lZUg1SqI" data-video-title="Aula 4 — Módulos e Pacotes"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 4 — Módulos e Pacotes</a>
+                                <button class="unwatch-btn" data-lesson-id="2-4">Desmarcar</button>
+                            </div>
+                        </div>
+
+                        <div class="activity-list">
+                            <div class="activity-list-title"><i class="fas fa-clipboard-list"></i> Atividades</div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-modal-activity" data-lesson-id="2-A1" data-activity-title="Desafio — Criar uma Classe de Banco" data-activity-desc="Implemente a classe 'ContaBancaria' com método 'saque(valor)' que levante uma exceção 'SaldoInsuficienteError' se o valor for maior que o saldo. (Atividade Teórica)"><span class="lesson-icon"><i class="far fa-circle"></i></span> Desafio — Criar uma Classe de Banco</a>
+                                <button class="unwatch-btn" data-lesson-id="2-A1">Desmarcar</button>
+                            </div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-modal-activity" data-lesson-id="2-A2" data-activity-title="Desafio — Contador de Palavras" data-activity-desc="Crie uma função 'contar_palavras(texto)' que retorne um dicionário com a contagem de cada palavra no texto, ignorando maiúsculas/minúsculas. (Atividade Teórica)"><span class="lesson-icon"><i class="far fa-circle"></i></span> Desafio — Contador de Palavras</a>
+                                <button class="unwatch-btn" data-lesson-id="2-A2">Desmarcar</button>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" id="progress-bar-2" style="width: 0%;"></div>
+                            </div>
+                            <div class="progress-label" id="progress-label-2">0% concluído</div>
+                        </div>
+                    </div>
+
+                    <div class="course-card" data-module-id="3">
+                        <h3>Módulo 3 — APIs com FastAPI</h3>
+                        <p>Crie APIs RESTful modernas usando o framework Python mais rápido.</p>
+
+                        <div class="lesson-list">
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="3-1" data-video-url="https://youtu.be/0sOvCWFmrtA" data-video-title="Aula 1 — Introdução e Configuração"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 1 — Introdução e Configuração</a>
+                                <button class="unwatch-btn" data-lesson-id="3-1">Desmarcar</button>
+                            </div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="3-2" data-video-url="https://youtu.be/0RS5WlH9YdQ" data-video-title="Aula 2 — Rotas, Métodos HTTP e Path Parameters"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 2 — Rotas, Métodos HTTP e Path Parameters</a>
+                                <button class="unwatch-btn" data-lesson-id="3-2">Desmarcar</button>
+                            </div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="3-3" data-video-url="https://youtu.be/G8nDxzgcj9Q" data-video-title="Aula 3 — Schema Validation com Pydantic"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 3 — Schema Validation com Pydantic</a>
+                                <button class="unwatch-btn" data-lesson-id="3-3">Desmarcar</button>
+                            </div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="3-4" data-video-url="https://youtu.be/dCJge6mKAR0" data-video-title="Aula 4 — Dependency Injection (Injeção de Dependência)"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 4 — Dependency Injection (Injeção de Dependência)</a>
+                                <button class="unwatch-btn" data-lesson-id="3-4">Desmarcar</button>
+                            </div>
+                        </div>
+
+                        <div class="activity-list">
+                            <div class="activity-list-title"><i class="fas fa-clipboard-list"></i> Atividades</div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-modal-activity" data-lesson-id="3-A1" data-activity-title="Desafio — Criar 3 Rotas CRUD básicas" data-activity-desc="Esta é uma atividade teórica/manual. Crie um arquivo Python com as rotas POST, GET e DELETE para um recurso 'Item' usando FastAPI e Pydantic. Não requer envio de código aqui."><span class="lesson-icon"><i class="far fa-circle"></i></span> Desafio — Criar 3 Rotas CRUD básicas</a>
+                                <button class="unwatch-btn" data-lesson-id="3-A1">Desmarcar</button>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" id="progress-bar-3" style="width: 0%;"></div>
+                            </div>
+                            <div class="progress-label" id="progress-label-3">0% concluído</div>
+                        </div>
+                    </div>
+                    
+                    <div class="course-card" data-module-id="4">
+                        <h3>Módulo 4 — Bancos de Dados</h3>
+                        <p>Conecte sua API com bancos de dados relacionais e não-relacionais.</p>
+
+                        <div class="lesson-list">
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="4-1" data-video-url="https://www.youtube.com/watch?v=cHLKtALWDos" data-video-title="Aula 1 — SQLite e Introdução ao SQL"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 1 — SQLite e Introdução ao SQL</a>
+                                <button class="unwatch-btn" data-lesson-id="4-1">Desmarcar</button>
+                            </div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="4-2" data-video-url="https://youtu.be/RNDFq9Q_N_Q" data-video-title="Aula 2 — Conexão com PostgreSQL"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 2 — Conexão com PostgreSQL</a>
+                                <button class="unwatch-btn" data-lesson-id="4-2">Desmarcar</button>
+                            </div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="4-3" data-video-url="https://youtu.be/y1Q_J4t_89c" data-video-title="Aula 3 — NoSQL com MongoDB"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 3 — NoSQL com MongoDB</a>
+                                <button class="unwatch-btn" data-lesson-id="4-3">Desmarcar</button>
+                            </div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="4-4" data-video-url="https://youtu.be/9P-c_L0fK7s" data-video-title="Aula 4 — Gerenciando Sessions com FastAPI"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 4 — Gerenciando Sessions com FastAPI</a>
+                                <button class="unwatch-btn" data-lesson-id="4-4">Desmarcar</button>
+                            </div>
+                        </div>
+
+                        <div class="activity-list">
+                            <div class="activity-list-title"><i class="fas fa-clipboard-list"></i> Atividades</div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-modal-activity" data-lesson-id="4-A1" data-activity-title="Desafio — Montar Querys SQL" data-activity-desc="Esta é uma atividade de texto. Escreva as queries SQL para (1) selecionar todos os usuários do Brasil e (2) atualizar o email do usuário com id=5."><span class="lesson-icon"><i class="far fa-circle"></i></span> Desafio — Montar Querys SQL</a>
+                                <button class="unwatch-btn" data-lesson-id="4-A1">Desmarcar</button>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" id="progress-bar-4" style="width: 0%;"></div>
+                            </div>
+                            <div class="progress-label" id="progress-label-4">0% concluído</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="course-grid page" data-page="2">
+
+                    <div class="course-card" data-module-id="5">
+                        <h3>Módulo 5 — ORMs e Migrações</h3>
+                        <p>Domine o uso de ORMs (Mapeadores Objeto-Relacional) para maior produtividade.</p>
+
+                        <div class="lesson-list">
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="5-1" data-video-url="https://youtu.be/wG_X_8Q8eI8" data-video-title="Aula 1 — Introdução ao SQLAlchemy"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 1 — Introdução ao SQLAlchemy</a>
+                                <button class="unwatch-btn" data-lesson-id="5-1">Desmarcar</button>
+                            </div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="5-2" data-video-url="https://youtu.be/F4d5fP-l1I4" data-video-title="Aula 2 — Definindo Models e Relationships"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 2 — Definindo Models e Relationships</a>
+                                <button class="unwatch-btn" data-lesson-id="5-2">Desmarcar</button>
+                            </div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="5-3" data-video-url="https://youtu.be/t2r1TjU_y0w" data-video-title="Aula 3 — Gerenciamento de Migrações com Alembic"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 3 — Gerenciamento de Migrações com Alembic</a>
+                                <button class="unwatch-btn" data-lesson-id="5-3">Desmarcar</button>
+                            </div>
+                        </div>
+
+                        <div class="activity-list">
+                            <div class="activity-list-title"><i class="fas fa-clipboard-list"></i> Atividades</div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-modal-activity" data-lesson-id="5-A1" data-activity-title="Desafio — Criar 2 Models Relacionais" data-activity-desc="Esta é uma atividade de texto. Implemente duas classes Pydantic, 'User' e 'Post', onde 'User' tem uma relação de 1-para-muitos com 'Post'."><span class="lesson-icon"><i class="far fa-circle"></i></span> Desafio — Criar 2 Models Relacionais</a>
+                                <button class="unwatch-btn" data-lesson-id="5-A1">Desmarcar</button>
+                            </div>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" id="progress-bar-5" style="width: 0%;"></div>
+                            </div>
+                            <div class="progress-label" id="progress-label-5">0% concluído</div>
+                        </div>
+                    </div>
+
+                    <div class="course-card" data-module-id="6">
+                        <h3>Módulo 6 — Segurança e Autenticação</h3>
+                        <p>Implemente tokens, OAuth2 e permissões seguras em suas APIs.</p>
+
+                        <div class="lesson-list">
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="6-1" data-video-url="https://youtu.be/auth1" data-video-title="Aula 1 — Autenticação via Token"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 1 — Autenticação via Token</a>
+                                <button class="unwatch-btn" data-lesson-id="6-1">Desmarcar</button>
+                            </div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="6-2" data-video-url="https://youtu.be/auth2" data-video-title="Aula 2 — Hashing de Senhas (Bcrypt)"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 2 — Hashing de Senhas (Bcrypt)</a>
+                                <button class="unwatch-btn" data-lesson-id="6-2">Desmarcar</button>
+                            </div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="6-3" data-video-url="https://youtu.be/auth3" data-video-title="Aula 3 — OAuth2 e JWT"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 3 — OAuth2 e JWT</a>
+                                <button class="unwatch-btn" data-lesson-id="6-3">Desmarcar</button>
+                            </div>
+                        </div>
+
+                        <div class="activity-list">
+                            <div class="activity-list-title"><i class="fas fa-clipboard-list"></i> Atividades</div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-modal-activity" data-lesson-id="6-A1" data-activity-title="Desafio — Validação de Credenciais" data-activity-desc="Implemente uma função de validação de usuário e senha que use 'check_password_hash'. (Atividade Teórica)"><span class="lesson-icon"><i class="far fa-circle"></i></span> Desafio — Validação de Credenciais</a>
+                                <button class="unwatch-btn" data-lesson-id="6-A1">Desmarcar</button>
+                            </div>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" id="progress-bar-6" style="width: 0%;"></div>
+                            </div>
+                            <div class="progress-label" id="progress-label-6">0% concluído</div>
+                        </div>
+                    </div>
+
+                    <div class="course-card" data-module-id="7">
+                        <h3>Módulo 7 — Testes Unitários</h3>
+                        <p>Garanta a estabilidade do seu código com testes unitários e de integração (Pytest).</p>
+
+                        <div class="lesson-list">
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="7-1" data-video-url="https://youtu.be/test1" data-video-title="Aula 1 — Introdução ao Pytest"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 1 — Introdução ao Pytest</a>
+                                <button class="unwatch-btn" data-lesson-id="7-1">Desmarcar</button>
+                            </div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="7-2" data-video-url="https://youtu.be/test2" data-video-title="Aula 2 — Testando Rotas de API"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 2 — Testando Rotas de API</a>
+                                <button class="unwatch-btn" data-lesson-id="7-2">Desmarcar</button>
+                            </div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="7-3" data-video-url="https://youtu.be/test3" data-video-title="Aula 3 — Mocking e Fixtures"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 3 — Mocking e Fixtures</a>
+                                <button class="unwatch-btn" data-lesson-id="7-3">Desmarcar</button>
+                            </div>
+                        </div>
+
+                        <div class="activity-list">
+                            <div class="activity-list-title"><i class="fas fa-clipboard-list"></i> Atividades</div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-modal-activity" data-lesson-id="7-A1" data-activity-title="Desafio — Escrever 3 Testes Básicos" data-activity-desc="Escreva 3 testes Pytest para uma função 'soma(a, b)'. (Atividade Teórica)"><span class="lesson-icon"><i class="far fa-circle"></i></span> Desafio — Escrever 3 Testes Básicos</a>
+                                <button class="unwatch-btn" data-lesson-id="7-A1">Desmarcar</button>
+                            </div>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" id="progress-bar-7" style="width: 0%;"></div>
+                            </div>
+                            <div class="progress-label" id="progress-label-7">0% concluído</div>
+                        </div>
+                    </div>
+
+                    <div class="course-card" data-module-id="8">
+                        <h3>Módulo 8 — Servidores Assíncronos</h3>
+                        <p>Explore o universo assíncrono do Python com `asyncio` e `await`.</p>
+
+                        <div class="lesson-list">
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="8-1" data-video-url="https://youtu.be/async1" data-video-title="Aula 1 — Conceitos de Assincronicidade"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 1 — Conceitos de Assincronicidade</a>
+                                <button class="unwatch-btn" data-lesson-id="8-1">Desmarcar</button>
+                            </div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="8-2" data-video-url="https://youtu.be/async2" data-video-title="Aula 2 — O uso de async/await"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 2 — O uso de async/await</a>
+                                <button class="unwatch-btn" data-lesson-id="8-2">Desmarcar</button>
+                            </div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="8-3" data-video-url="https://youtu.be/async3" data-video-title="Aula 3 — Async/Await no FastAPI"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 3 — Async/Await no FastAPI</a>
+                                <button class="unwatch-btn" data-lesson-id="8-3">Desmarcar</button>
+                            </div>
+                        </div>
+
+                        <div class="activity-list">
+                            <div class="activity-list-title"><i class="fas fa-clipboard-list"></i> Atividades</div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-modal-activity" data-lesson-id="8-A1" data-activity-title="Desafio — Refatorar Função Síncrona" data-activity-desc="Refatore uma função síncrona simples para ser assíncrona. (Atividade Teórica)"><span class="lesson-icon"><i class="far fa-circle"></i></span> Desafio — Refatorar Função Síncrona</a>
+                                <button class="unwatch-btn" data-lesson-id="8-A1">Desmarcar</button>
+                            </div>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" id="progress-bar-8" style="width: 0%;"></div>
+                            </div>
+                            <div class="progress-label" id="progress-label-8">0% concluído</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-grid page" data-page="3">
+                    <div class="course-card" data-module-id="9">
+                        <h3>Módulo 9 — Deploy e Docker</h3>
+                        <p>Aprenda a empacotar e implantar sua aplicação em contêineres Docker.</p>
+                        <div class="lesson-list">
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="9-1" data-video-url="https://youtu.be/docker1" data-video-title="Aula 1 — Introdução ao Dockerfile"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 1 — Introdução ao Dockerfile</a>
+                                <button class="unwatch-btn" data-lesson-id="9-1">Desmarcar</button>
+                            </div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="9-2" data-video-url="https://youtu.be/docker2" data-video-title="Aula 2 — Docker Compose para Serviços"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 2 — Docker Compose para Serviços</a>
+                                <button class="unwatch-btn" data-lesson-id="9-2">Desmarcar</button>
+                            </div>
+                        </div>
+                        <div class="activity-list">
+                            <div class="activity-list-title"><i class="fas fa-clipboard-list"></i> Atividades</div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-modal-activity" data-lesson-id="9-A1" data-activity-title="Desafio — Criar Dockerfile Básico" data-activity-desc="Crie um Dockerfile que instale Python e rode sua API. (Atividade Teórica)"><span class="lesson-icon"><i class="far fa-circle"></i></span> Desafio — Criar Dockerfile Básico</a>
+                                <button class="unwatch-btn" data-lesson-id="9-A1">Desmarcar</button>
+                            </div>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" id="progress-bar-9" style="width: 0%;"></div>
+                            </div>
+                            <div class="progress-label" id="progress-label-9">0% concluído</div>
+                        </div>
+                    </div>
+
+                    <div class="course-card" data-module-id="10">
+                        <h3>Módulo 10 — Mensageria (RabbitMQ/Celery)</h3>
+                        <p>Use filas e processamento assíncrono de tarefas com Celery.</p>
+                        <div class="lesson-list">
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="10-1" data-video-url="https://youtu.be/celery1" data-video-title="Aula 1 — Introdução ao Celery e RabbitMQ"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 1 — Introdução ao Celery e RabbitMQ</a>
+                                <button class="unwatch-btn" data-lesson-id="10-1">Desmarcar</button>
+                            </div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="10-2" data-video-url="https://youtu.be/celery2" data-video-title="Aula 2 — Criação de Tarefas Assíncronas"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 2 — Criação de Tarefas Assíncronas</a>
+                                <button class="unwatch-btn" data-lesson-id="10-2">Desmarcar</button>
+                            </div>
+                        </div>
+                        <div class="activity-list">
+                            <div class="activity-list-title"><i class="fas fa-clipboard-list"></i> Atividades</div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-modal-activity" data-lesson-id="10-A1" data-activity-title="Desafio — Definir uma Tarefa Simples" data-activity-desc="Escreva o código Python para definir uma tarefa Celery simples de soma. (Atividade Teórica)"><span class="lesson-icon"><i class="far fa-circle"></i></span> Desafio — Definir uma Tarefa Simples</a>
+                                <button class="unwatch-btn" data-lesson-id="10-A1">Desmarcar</button>
+                            </div>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" id="progress-bar-10" style="width: 0%;"></div>
+                            </div>
+                            <div class="progress-label" id="progress-label-10">0% concluído</div>
+                        </div>
+                    </div>
+
+                    <div class="course-card" data-module-id="11">
+                        <h3>Módulo 11 — Redis para Caching</h3>
+                        <p>Acelere sua API usando Redis como cache e banco de dados rápido.</p>
+                        <div class="lesson-list">
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="11-1" data-video-url="https://youtu.be/redis1" data-video-title="Aula 1 — Configuração e Conceitos do Redis"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 1 — Configuração e Conceitos do Redis</a>
+                                <button class="unwatch-btn" data-lesson-id="11-1">Desmarcar</button>
+                            </div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="11-2" data-video-url="https://youtu.be/redis2" data-video-title="Aula 2 — Implementando Caching de Respostas"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 2 — Implementando Caching de Respostas</a>
+                                <button class="unwatch-btn" data-lesson-id="11-2">Desmarcar</button>
+                            </div>
+                        </div>
+                        <div class="activity-list">
+                            <div class="activity-list-title"><i class="fas fa-clipboard-list"></i> Atividades</div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-modal-activity" data-lesson-id="11-A1" data-activity-title="Desafio — Usar Redis para Contagem" data-activity-desc="Proponha uma rota para contar o número de requisições por IP usando Redis. (Atividade Teórica)"><span class="lesson-icon"><i class="far fa-circle"></i></span> Desafio — Usar Redis para Contagem</a>
+                                <button class="unwatch-btn" data-lesson-id="11-A1">Desmarcar</button>
+                            </div>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" id="progress-bar-11" style="width: 0%;"></div>
+                            </div>
+                            <div class="progress-label" id="progress-label-11">0% concluído</div>
+                        </div>
+                    </div>
+
+                    <div class="course-card" data-module-id="12">
+                        <h3>Módulo 12 — WebSockets</h3>
+                        <p>Adicione comunicação em tempo real usando WebSockets com o `websockets` ou `fastapi-websocket`.</p>
+                        <div class="lesson-list">
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="12-1" data-video-url="https://youtu.be/ws1" data-video-title="Aula 1 — Introdução e Handshake"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 1 — Introdução e Handshake</a>
+                                <button class="unwatch-btn" data-lesson-id="12-1">Desmarcar</button>
+                            </div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="12-2" data-video-url="https://youtu.be/ws2" data-video-title="Aula 2 — Criação de um Chat Básico"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 2 — Criação de um Chat Básico</a>
+                                <button class="unwatch-btn" data-lesson-id="12-2">Desmarcar</button>
+                            </div>
+                        </div>
+                        <div class="activity-list">
+                            <div class="activity-list-title"><i class="fas fa-clipboard-list"></i> Atividades</div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-modal-activity" data-lesson-id="12-A1" data-activity-title="Desafio — Rota de WebSocket" data-activity-desc="Escreva uma rota WebSocket básica em FastAPI. (Atividade Teórica)"><span class="lesson-icon"><i class="far fa-circle"></i></span> Desafio — Rota de WebSocket</a>
+                                <button class="unwatch-btn" data-lesson-id="12-A1">Desmarcar</button>
+                            </div>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" id="progress-bar-12" style="width: 0%;"></div>
+                            </div>
+                            <div class="progress-label" id="progress-label-12">0% concluído</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-grid page" data-page="4">
+                    <div class="course-card" data-module-id="13">
+                        <h3>Módulo 13 — Integração com APIs Externas</h3>
+                        <p>Aprenda a consumir e interagir com serviços RESTful de terceiros de forma assíncrona.</p>
+                        <div class="lesson-list">
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="13-1" data-video-url="https://youtu.be/httpx1" data-video-title="Aula 1 — Introdução ao HTTPX (Async)"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 1 — Introdução ao HTTPX (Async)</a>
+                                <button class="unwatch-btn" data-lesson-id="13-1">Desmarcar</button>
+                            </div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="13-2" data-video-url="https://youtu.be/httpx2" data-video-title="Aula 2 — Tratamento de Erros e Timeouts"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 2 — Tratamento de Erros e Timeouts</a>
+                                <button class="unwatch-btn" data-lesson-id="13-2">Desmarcar</button>
+                            </div>
+                        </div>
+                        <div class="activity-list">
+                            <div class="activity-list-title"><i class="fas fa-clipboard-list"></i> Atividades</div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-modal-activity" data-lesson-id="13-A1" data-activity-title="Desafio — Chamar API Pública" data-activity-desc="Escreva o código para consumir uma API pública de informações de moedas. (Atividade Teórica)"><span class="lesson-icon"><i class="far fa-circle"></i></span> Desafio — Chamar API Pública</a>
+                                <button class="unwatch-btn" data-lesson-id="13-A1">Desmarcar</button>
+                            </div>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" id="progress-bar-13" style="width: 0%;"></div>
+                            </div>
+                            <div class="progress-label" id="progress-label-13">0% concluído</div>
+                        </div>
+                    </div>
+
+                    <div class="course-card" data-module-id="14">
+                        <h3>Módulo 14 — Logging e Monitoramento</h3>
+                        <p>Use bibliotecas de logging para rastrear erros e eventos na sua aplicação.</p>
+                        <div class="lesson-list">
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="14-1" data-video-url="https://youtu.be/logging1" data-video-title="Aula 1 — Configuração Básica de Logging"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 1 — Configuração Básica de Logging</a>
+                                <button class="unwatch-btn" data-lesson-id="14-1">Desmarcar</button>
+                            </div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="14-2" data-video-url="https://youtu.be/logging2" data-video-title="Aula 2 — Formatação e Handlers"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 2 — Formatação e Handlers</a>
+                                <button class="unwatch-btn" data-lesson-id="14-2">Desmarcar</button>
+                            </div>
+                        </div>
+                        <div class="activity-list">
+                            <div class="activity-list-title"><i class="fas fa-clipboard-list"></i> Atividades</div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-modal-activity" data-lesson-id="14-A1" data-activity-title="Desafio — Adicionar Logging de Erro" data-activity-desc="Adicione um bloco try/except em uma função que registre um erro de nível 'ERROR'. (Atividade Teórica)"><span class="lesson-icon"><i class="far fa-circle"></i></span> Desafio — Adicionar Logging de Erro</a>
+                                <button class="unwatch-btn" data-lesson-id="14-A1">Desmarcar</button>
+                            </div>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" id="progress-bar-14" style="width: 0%;"></div>
+                            </div>
+                            <div class="progress-label" id="progress-label-14">0% concluído</div>
+                        </div>
+                    </div>
+
+                    <div class="course-card" data-module-id="15">
+                        <h3>Módulo 15 — Performance e Otimização</h3>
+                        <p>Identifique gargalos e otimize o desempenho da sua aplicação Python.</p>
+                        <div class="lesson-list">
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="15-1" data-video-url="https://youtu.be/perf1" data-video-title="Aula 1 — Profiling (cProfile)"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 1 — Profiling (cProfile)</a>
+                                <button class="unwatch-btn" data-lesson-id="15-1">Desmarcar</button>
+                            </div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="15-2" data-video-url="https://youtu.be/perf2" data-video-title="Aula 2 — List Comprehension vs Loops"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 2 — List Comprehension vs Loops</a>
+                                <button class="unwatch-btn" data-lesson-id="15-2">Desmarcar</button>
+                            </div>
+                        </div>
+                        <div class="activity-list">
+                            <div class="activity-list-title"><i class="fas fa-clipboard-list"></i> Atividades</div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-modal-activity" data-lesson-id="15-A1" data-activity-title="Desafio — Otimizar Bloco de Código" data-activity-desc="Refatore um bloco de código ineficiente usando compreensão de lista. (Atividade Teórica)"><span class="lesson-icon"><i class="far fa-circle"></i></span> Desafio — Otimizar Bloco de Código</a>
+                                <button class="unwatch-btn" data-lesson-id="15-A1">Desmarcar</button>
+                            </div>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" id="progress-bar-15" style="width: 0%;"></div>
+                            </div>
+                            <div class="progress-label" id="progress-label-15">0% concluído</div>
+                        </div>
+                    </div>
+
+                    <div class="course-card" data-module-id="16">
+                        <h3>Módulo 16 — Arquitetura Microservices</h3>
+                        <p>Entenda como construir e manter aplicações distribuídas e escaláveis.</p>
+                        <div class="lesson-list">
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="16-1" data-video-url="https://youtu.be/micro1" data-video-title="Aula 1 — Conceitos de Microservices"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 1 — Conceitos de Microservices</a>
+                                <button class="unwatch-btn" data-lesson-id="16-1">Desmarcar</button>
+                            </div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="16-2" data-video-url="https://youtu.be/micro2" data-video-title="Aula 2 — Comunicação Síncrona vs Assíncrona"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 2 — Comunicação Síncrona vs Assíncrona</a>
+                                <button class="unwatch-btn" data-lesson-id="16-2">Desmarcar</button>
+                            </div>
+                        </div>
+                        <div class="activity-list">
+                            <div class="activity-list-title"><i class="fas fa-clipboard-list"></i> Atividades</div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-modal-activity" data-lesson-id="16-A1" data-activity-title="Desafio — Desenho de Arquitetura" data-activity-desc="Desenhe um diagrama de arquitetura de microservices para um e-commerce. (Atividade Teórica)"><span class="lesson-icon"><i class="far fa-circle"></i></span> Desafio — Desenho de Arquitetura</a>
+                                <button class="unwatch-btn" data-lesson-id="16-A1">Desmarcar</button>
+                            </div>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" id="progress-bar-16" style="width: 0%;"></div>
+                            </div>
+                            <div class="progress-label" id="progress-label-16">0% concluído</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="course-grid page" data-page="5">
+                    <div class="course-card" data-module-id="17">
+                        <h3>Módulo 17 — DevOps e CI/CD</h3>
+                        <p>Automatize o deploy e a integração contínua usando ferramentas modernas.</p>
+                        <div class="lesson-list">
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="17-1" data-video-url="https://youtu.be/cicd1" data-video-title="Aula 1 — Introdução ao GitHub Actions"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 1 — Introdução ao GitHub Actions</a>
+                                <button class="unwatch-btn" data-lesson-id="17-1">Desmarcar</button>
+                            </div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="17-2" data-video-url="https://youtu.be/cicd2" data-video-title="Aula 2 — Pipeline de Testes e Deploy"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 2 — Pipeline de Testes e Deploy</a>
+                                <button class="unwatch-btn" data-lesson-id="17-2">Desmarcar</button>
+                            </div>
+                        </div>
+                        <div class="activity-list">
+                            <div class="activity-list-title"><i class="fas fa-clipboard-list"></i> Atividades</div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-modal-activity" data-lesson-id="17-A1" data-activity-title="Desafio — Pipeline Básico" data-activity-desc="Descreva as etapas de um pipeline de CI/CD para a sua API. (Atividade Teórica)"><span class="lesson-icon"><i class="far fa-circle"></i></span> Desafio — Pipeline Básico</a>
+                                <button class="unwatch-btn" data-lesson-id="17-A1">Desmarcar</button>
+                            </div>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" id="progress-bar-17" style="width: 0%;"></div>
+                            </div>
+                            <div class="progress-label" id="progress-label-17">0% concluído</div>
+                        </div>
+                    </div>
+
+                    <div class="course-card" data-module-id="18">
+                        <h3>Módulo 18 — Cloud Computing (AWS/GCP)</h3>
+                        <p>Gerencie sua infraestrutura em nuvem, focando em serviços essenciais para APIs.</p>
+                        <div class="lesson-list">
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="18-1" data-video-url="https://youtu.be/cloud1" data-video-title="Aula 1 — Serviços de Nuvem (EC2, Lambda) [AWS]"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 1 — Serviços de Nuvem (EC2, Lambda)</a>
+                                <button class="unwatch-btn" data-lesson-id="18-1">Desmarcar</button>
+                            </div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="18-2" data-video-url="https://youtu.be/cloud2" data-video-title="Aula 2 — Banco de Dados Gerenciados (RDS) e Storage (S3)"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 2 — Banco de Dados Gerenciados (RDS) e Storage (S3)</a>
+                                <button class="unwatch-btn" data-lesson-id="18-2">Desmarcar</button>
+                            </div>
+                        </div>
+                        <div class="activity-list">
+                            <div class="activity-list-title"><i class="fas fa-clipboard-list"></i> Atividades</div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-modal-activity" data-lesson-id="18-A1" data-activity-title="Desafio — Escolha de Serviço" data-activity-desc="Para uma API de alta carga, qual serviço de computação em nuvem você escolheria (EC2 vs Lambda) e por quê? (Atividade Teórica)"><span class="lesson-icon"><i class="far fa-circle"></i></span> Desafio — Escolha de Serviço</a>
+                                <button class="unwatch-btn" data-lesson-id="18-A1">Desmarcar</button>
+                            </div>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" id="progress-bar-18" style="width: 0%;"></div>
+                            </div>
+                            <div class="progress-label" id="progress-label-18">0% concluído</div>
+                        </div>
+                    </div>
+
+                    <div class="course-card" data-module-id="19">
+                        <h3>Módulo 19 — Revisão e Melhores Práticas</h3>
+                        <p>Consolidação de conhecimento e padrões de projeto essenciais (Design Patterns).</p>
+                        <div class="lesson-list">
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="19-1" data-video-url="https://youtu.be/clean1" data-video-title="Aula 1 — Código Limpo (Clean Code)"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 1 — Código Limpo (Clean Code)</a>
+                                <button class="unwatch-btn" data-lesson-id="19-1">Desmarcar</button>
+                            </div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="19-2" data-video-url="https://youtu.be/clean2" data-video-title="Aula 2 — Padrões de Projeto (Factory, Singleton)"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 2 — Padrões de Projeto (Factory, Singleton)</a>
+                                <button class="unwatch-btn" data-lesson-id="19-2">Desmarcar</button>
+                            </div>
+                        </div>
+                        <div class="activity-list">
+                            <div class="activity-list-title"><i class="fas fa-clipboard-list"></i> Atividades</div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-modal-activity" data-lesson-id="19-A1" data-activity-title="Desafio — Reorganizar Projeto Existente" data-activity-desc="Descreva como você aplicaria o padrão Repository em um projeto com classes ORM. (Atividade Teórica)"><span class="lesson-icon"><i class="far fa-circle"></i></span> Desafio — Reorganizar Projeto Existente</a>
+                                <button class="unwatch-btn" data-lesson-id="19-A1">Desmarcar</button>
+                            </div>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" id="progress-bar-19" style="width: 0%;"></div>
+                            </div>
+                            <div class="progress-label" id="progress-label-19">0% concluído</div>
+                        </div>
+                    </div>
+
+                    <div class="course-card" data-module-id="20">
+                        <h3>Módulo 20 — Projeto Final Integrador</h3>
+                        <p>Construa um projeto completo, aplicando todos os conceitos aprendidos no curso.</p>
+                        <div class="lesson-list">
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="20-1" data-video-url="https://youtu.be/final1" data-video-title="Aula 1 — Escopo e Planejamento do Projeto"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 1 — Escopo e Planejamento do Projeto</a>
+                                <button class="unwatch-btn" data-lesson-id="20-1">Desmarcar</button>
+                            </div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-video-modal" data-lesson-id="20-2" data-video-url="https://youtu.be/final2" data-video-title="Aula 2 — Revisão do Código e Deploy Final"><span class="lesson-icon"><i class="far fa-circle"></i></span> Aula 2 — Revisão do Código e Deploy Final</a>
+                                <button class="unwatch-btn" data-lesson-id="20-2">Desmarcar</button>
+                            </div>
+                        </div>
+                        <div class="activity-list">
+                            <div class="activity-list-title"><i class="fas fa-clipboard-list"></i> Atividades</div>
+                            <div class="lesson-item-wrapper">
+                                <a href="#" class="open-modal-activity" data-lesson-id="20-A1" data-activity-title="Desafio — Apresentação do Projeto Final" data-activity-desc="Submeta o link para o repositório do seu projeto final e um vídeo de demonstração. (Atividade Teórica)"><span class="lesson-icon"><i class="far fa-circle"></i></span> Desafio — Apresentação do Projeto Final</a>
+                                <button class="unwatch-btn" data-lesson-id="20-A1">Desmarcar</button>
+                            </div>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" id="progress-bar-20" style="width: 0%;"></div>
+                            </div>
+                            <div class="progress-label" id="progress-label-20">0% concluído</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="pagination">
+                <button class="page-button" id="prev-page-btn" disabled>Anterior</button>
+                <span class="page-indicator" id="page-indicator">Página 1 de 5</span>
+                <button class="page-button" id="next-page-btn">Próxima</button>
+            </div>
+        </div>
+        
+        <div class="modal-overlay" id="activity-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="activity-modal-title">Título da Atividade</h3>
+                    <button class="modal-close-btn" data-modal="activity-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p id="activity-modal-description">Descrição da atividade...</p>
+                    
+                    <div class="activity-input-area">
+                        <h4 id="input-title">Seu Código Python:</h4>
+                        <textarea id="activity-code-input" placeholder="Insira seu código Python/SQL aqui..."></textarea>
+                    </div>
+                    
+                    <button id="check-activity-btn" class="complete-activity-btn" style="background: #3498db; color: #fff;">
+                        <i class="fas fa-check-circle"></i> CORRIGIR ATIVIDADE
+                    </button>
+
+                    <div class="activity-feedback-area" id="activity-feedback-output">
+                        O feedback do seu código aparecerá aqui.
+                    </div>
+                    
+                    <button id="complete-activity-btn" class="complete-activity-btn">
+                        Marcar como Concluído (Se Correto)
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="video-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="video-modal-title">Título do Vídeo</h3>
+                    <button class="modal-close-btn" data-modal="video-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="video-player-container">
+                        <iframe id="video-iframe" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                    </div>
+                    <button id="complete-video-btn" class="complete-video-btn">
+                        Marcar Aula como Concluída
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    // --- Helpers para persistência ---
+    const getWatchedState = () => {
+        try { return JSON.parse(localStorage.getItem('courseWatchedState') || '{}'); } catch { return {}; }
+    };
+    const setWatchedState = (s) => localStorage.setItem('courseWatchedState', JSON.stringify(s));
+
+    const getActivitiesState = () => {
+        try { return JSON.parse(localStorage.getItem('courseActivitiesState') || '{}'); } catch { return {}; }
+    };
+    const setActivitiesState = (s) => localStorage.setItem('courseActivitiesState', JSON.stringify(s));
+
+    let watchedState = getWatchedState();
+    let activitiesState = getActivitiesState();
+    let currentLessonId = null;
+
+    // --- Utilitários de UI ---
+    const isActivityId = id => /-A/i.test(id);
+
+    const updateItemUI = (lessonId) => {
+        const anchor = document.querySelector(`a[data-lesson-id="${lessonId}"]`);
+        if (!anchor) return;
+        const icon = anchor.querySelector('.lesson-icon i');
+        anchor.classList.remove('watched','wrong','pending');
+        if (isActivityId(lessonId)) {
+            const st = activitiesState[lessonId];
+            if (st && st.status === 'correct') {
+                anchor.classList.add('watched');
+                if (icon) icon.className = 'fas fa-check-circle';
+            } else if (st && st.status === 'wrong') {
+                anchor.classList.add('wrong');
+                if (icon) icon.className = 'fas fa-times-circle';
+            } else if (st && st.status === 'pending') {
+                anchor.classList.add('pending');
+                if (icon) icon.className = 'fas fa-hourglass-half';
+            } else {
+                if (icon) icon.className = 'far fa-circle';
+            }
+        } else {
+            if (watchedState[lessonId]) {
+                anchor.classList.add('watched');
+                if (icon) icon.className = 'fas fa-check-circle';
+            } else {
+                if (icon) icon.className = 'far fa-circle';
+            }
+        }
+
+        // show/hide corresponding unwatch button
+        const unwatchBtn = document.querySelector(`button.unwatch-btn[data-lesson-id="${lessonId}"]`);
+        if (unwatchBtn) {
+            if (isActivityId(lessonId)) {
+                unwatchBtn.style.display = (activitiesState[lessonId] && activitiesState[lessonId].status === 'correct') ? 'inline-block' : 'none';
+            } else {
+                unwatchBtn.style.display = watchedState[lessonId] ? 'inline-block' : 'none';
+            }
+        }
+    };
+
+    const updateAllUI = () => {
+        document.querySelectorAll('a[data-lesson-id]').forEach(a => updateItemUI(a.dataset.lessonId));
+        updateGlobalProgress();
+    };
+
+    const updateGlobalProgress = () => {
+        const anchors = Array.from(document.querySelectorAll('a[data-lesson-id]'));
+        const total = anchors.length;
+        let done = 0;
+        const modules = new Set();
+        anchors.forEach(a => {
+            const id = a.dataset.lessonId;
+            modules.add(id.split('-')[0]);
+            if (isActivityId(id)) {
+                if (activitiesState[id] && activitiesState[id].status === 'correct') done++;
+            } else {
+                if (watchedState[id]) done++;
+            }
+        });
+        const totalModules = modules.size || 1;
+        const completedModules = Array.from(document.querySelectorAll('.course-card')).reduce((acc, card) => {
+            const links = Array.from(card.querySelectorAll('a[data-lesson-id]'));
+            const allDone = links.every(l => {
+                const id = l.dataset.lessonId;
+                return isActivityId(id) ? (activitiesState[id] && activitiesState[id].status === 'correct') : !!watchedState[id];
+            });
+            return acc + (allDone ? 1 : 0);
+        }, 0);
+
+        const percent = total > 0 ? Math.round((done / total) * 100) : 0;
+        const watchedCountEl = document.getElementById('global-watched-count');
+        const modulesCountEl = document.getElementById('global-modules-count');
+        const progressPercentEl = document.getElementById('global-progress-percent');
+        if (watchedCountEl) watchedCountEl.textContent = `${done}`;
+        if (modulesCountEl) modulesCountEl.textContent = `${completedModules}/${totalModules}`;
+        if (progressPercentEl) progressPercentEl.textContent = `${percent}%`;
+
+        // update per-module progress bars
+        document.querySelectorAll('.course-card').forEach(card => {
+            const moduleId = card.dataset.moduleId;
+            const links = Array.from(card.querySelectorAll('a[data-lesson-id]'));
+            const totalItems = links.length;
+            let doneItems = 0;
+            links.forEach(l => {
+                const id = l.dataset.lessonId;
+                if (isActivityId(id)) {
+                    if (activitiesState[id] && activitiesState[id].status === 'correct') doneItems++;
+                } else {
+                    if (watchedState[id]) doneItems++;
+                }
+            });
+            const pct = totalItems ? Math.round((doneItems / totalItems) * 100) : 0;
+            const bar = document.getElementById(`progress-bar-${moduleId}`);
+            const label = document.getElementById(`progress-label-${moduleId}`);
+            if (bar) { bar.style.width = `${pct}%`; bar.classList.toggle('completed', pct === 100); }
+            if (label) { label.textContent = `${pct}% concluído`; label.classList.toggle('completed', pct === 100); }
+        });
+    };
+
+    // --- Validações heurísticas para atividades ---
+    const validators = {
+        '1-A1': (answer) => {
+            const code = answer.toLowerCase();
+            if (!/calcular_imc\s*\(/.test(code)) return { ok: false, message: "Defina função calcular_imc(peso, altura)." };
+            if (!(/\*\*2/.test(code) || /altura\s*\*\s*altura/.test(code))) return { ok: false, message: "Use 'altura**2' ou 'altura * altura' no cálculo." };
+            return { ok: true };
+        },
+        '1-A2': (answer) => {
+            const code = answer.toLowerCase();
+            if (!/inverter_string\s*\(/.test(code)) return { ok: false, message: "Defina função inverter_string(texto)." };
+            if (/\[:\-1\]/.test(code) || /reversed\(/.test(code)) return { ok: true };
+            return { ok: false, message: "Use slicing [::-1] ou reversed para inverter string." };
+        },
+        '2-A2': (answer) => {
+            const code = answer.toLowerCase();
+            if (!/contar_palavras\s*\(/.test(code)) return { ok: false, message: "Defina contar_palavras(texto)." };
+            if (/\.split\(/.test(code) || /collections\.counter/.test(code)) return { ok: true };
+            return { ok: false, message: "Use split() ou collections.Counter para contar palavras." };
+        },
+        '4-A1': (answer) => {
+            const up = answer.toUpperCase();
+            const hasSelect = /SELECT\b/.test(up);
+            const hasUpdate = /UPDATE\b/.test(up);
+            const missing = [];
+            if (!hasSelect) missing.push('SELECT');
+            if (!hasUpdate) missing.push('UPDATE');
+            if (missing.length) return { ok: false, message: 'Falta: ' + missing.join(', ') };
+            return { ok: true };
+        },
+        '6-A1': (answer) => {
+            const code = answer.toLowerCase();
+            if (!/def\s+(?:soma|somar)\s*\(/.test(code) && !/def\s+soma\s*\(/.test(code)) return { ok: false, message: "Crie função soma(a,b)." };
+            return { ok: true };
+        }
+    };
+
+    // --- Modais / Inputs ---
+    const activityModal = document.getElementById('activity-modal');
+    const activityTitleEl = document.getElementById('activity-modal-title');
+    const activityDescEl = document.getElementById('activity-modal-description');
+    const codeInput = document.getElementById('activity-code-input');
+    const checkBtn = document.getElementById('check-activity-btn');
+    const feedbackEl = document.getElementById('activity-feedback-output');
+    const completeBtn = document.getElementById('complete-activity-btn');
+
+    const videoModal = document.getElementById('video-modal');
+    const videoTitleEl = document.getElementById('video-modal-title');
+    const videoIframe = document.getElementById('video-iframe');
+    const completeVideoBtn = document.getElementById('complete-video-btn');
+
+    const openActivityModal = (title, desc, lessonId) => {
+        currentLessonId = lessonId;
+        activityTitleEl.textContent = title || 'Atividade';
+        activityDescEl.textContent = desc || '';
+        const st = activitiesState[lessonId];
+        codeInput.value = st && st.answer ? st.answer : '';
+        feedbackEl.className = 'activity-feedback-area';
+        feedbackEl.textContent = st ? (st.status === 'correct' ? 'Atividade já corrigida: correta.' : (st.status === 'wrong' ? 'Envio anterior incorreto.' : 'Resposta pendente de correção.')) : 'O feedback do seu código aparecerá aqui.';
+        activityModal.classList.add('open');
+        if (st && st.status === 'correct') {
+            completeBtn.classList.add('completed');
+            completeBtn.textContent = 'Concluído';
+        } else {
+            completeBtn.classList.remove('completed');
+            completeBtn.textContent = 'Marcar como Concluído (Se Correto)';
+        }
+    };
+
+    const closeActivityModal = () => {
+        activityModal.classList.remove('open');
+        currentLessonId = null;
+    };
+
+    // fechar modais
+    document.querySelectorAll('.modal-close-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const modalId = btn.dataset.modal;
+            if (modalId === 'video-modal') {
+                videoIframe.src = '';
+                videoModal.classList.remove('open');
+                currentLessonId = null;
+            } else if (modalId === 'activity-modal') {
+                closeActivityModal();
+            } else {
+                const el = document.getElementById(modalId);
+                if (el) el.classList.remove('open');
+            }
+        });
+    });
+
+    // --- Delegação de cliques: abrir modais e desmarcar ---
+    document.querySelector('.course-grid-wrapper').addEventListener('click', (e) => {
+        const videoAnchor = e.target.closest('a.open-video-modal');
+        if (videoAnchor) {
+            e.preventDefault();
+
+            // bloqueio por pagamento — trata cancelamento corretamente e impede outros handlers
+            const lockedFlag = String(videoAnchor.dataset.locked || '').trim();
+            const isLocked = (lockedFlag === '1' || lockedFlag === 'true');
+
+            if (isLocked) {
+                const go = confirm('Esta aula está bloqueada. Deseja ir para a página de pagamentos (R$29,99)?');
+                if (go) {
+                    window.location.href = '/pagamento';
+                    return;
+                }
+                // usuário cancelou: garantir que nenhum handler anterior/seguinte abra a aula
+                try { e.stopImmediatePropagation?.(); } catch (err) {}
+                try { e.stopPropagation?.(); } catch (err) {}
+                // fechar modal caso já tenha sido aberto por outro listener
+                if (videoIframe) videoIframe.src = '';
+                if (videoModal) videoModal.classList.remove('open');
+                return;
+            }
+
+            const url = videoAnchor.dataset.videoUrl || '';
+            const title = videoAnchor.dataset.videoTitle || '';
+            const lessonId = videoAnchor.dataset.lessonId;
+            currentLessonId = lessonId;
+            // convert youtube formats
+            let embed = url;
+            try {
+                if (url.includes('youtu.be/')) {
+                    const id = url.split('youtu.be/')[1].split('?')[0];
+                    embed = `https://www.youtube.com/embed/${id}`;
+                } else if (url.includes('youtube.com/watch')) {
+                    const v = new URL(url).searchParams.get('v');
+                    if (v) embed = `https://www.youtube.com/embed/${v}`;
+                } else if (url.includes('youtube.com/embed/')) {
+                    embed = url;
+                }
+            } catch (err) { embed = url; }
+
+            videoTitleEl.textContent = title;
+            videoIframe.src = embed + '?autoplay=1&rel=0';
+            videoModal.classList.add('open');
+            if (watchedState[lessonId]) {
+                completeVideoBtn.classList.add('completed');
+                completeVideoBtn.textContent = 'Concluído';
+            } else {
+                completeVideoBtn.classList.remove('completed');
+                completeVideoBtn.textContent = 'Marcar Aula como Concluída';
+            }
+            return;
+        }
+
+
+        const activityAnchor = e.target.closest('a.open-modal-activity');
+        if (activityAnchor) {
+            e.preventDefault();
+            openActivityModal(activityAnchor.dataset.activityTitle, activityAnchor.dataset.activityDesc, activityAnchor.dataset.lessonId);
+            return;
+        }
+
+        const unwatchBtn = e.target.closest('button.unwatch-btn');
+        if (unwatchBtn) {
+            const lessonId = unwatchBtn.dataset.lessonId;
+            if (!lessonId) return;
+            if (isActivityId(lessonId)) {
+                delete activitiesState[lessonId];
+                setActivitiesState(activitiesState);
+            } else {
+                delete watchedState[lessonId];
+                setWatchedState(watchedState);
+            }
+            updateItemUI(lessonId);
+            updateGlobalProgress();
+            return;
+        }
+    });
+
+    // botão "Corrigir Atividade"
+    if (checkBtn) {
+        checkBtn.addEventListener('click', () => {
+            if (!currentLessonId) return;
+            const answer = codeInput.value.trim();
+            if (!answer) {
+                feedbackEl.classList.add('feedback-failure');
+                feedbackEl.textContent = 'Escreva algo antes de enviar para correção.';
+                return;
+            }
+            const validator = validators[currentLessonId];
+            if (validator) {
+                const res = validator(answer);
+                if (res.ok) {
+                    activitiesState[currentLessonId] = { status: 'correct', answer };
+                    setActivitiesState(activitiesState);
+                    feedbackEl.classList.remove('feedback-failure');
+                    feedbackEl.classList.add('feedback-success');
+                    feedbackEl.textContent = 'Resposta correta — atividade marcada como correta.';
+                    completeBtn.classList.add('completed');
+                    completeBtn.textContent = 'Concluído';
+                } else {
+                    activitiesState[currentLessonId] = { status: 'wrong', answer };
+                    setActivitiesState(activitiesState);
+                    feedbackEl.classList.remove('feedback-success');
+                    feedbackEl.classList.add('feedback-failure');
+                    feedbackEl.textContent = `Resposta incorreta — ${res.message || 'Revise e tente novamente.'}`;
+                    completeBtn.classList.remove('completed');
+                    completeBtn.textContent = 'Reenviar para Correção';
+                }
+            } else {
+                activitiesState[currentLessonId] = { status: 'pending', answer };
+                setActivitiesState(activitiesState);
+                feedbackEl.classList.remove('feedback-failure','feedback-success');
+                feedbackEl.textContent = 'Resposta salva — pendente de correção manual.';
+                completeBtn.classList.remove('completed');
+                completeBtn.textContent = 'Enviar (Pendente)';
+            }
+            updateItemUI(currentLessonId);
+            updateGlobalProgress();
+        });
+    }
+
+    // marcar atividade como concluída (só se validação ok)
+    if (completeBtn) {
+        completeBtn.addEventListener('click', () => {
+            if (!currentLessonId) return;
+            const st = activitiesState[currentLessonId];
+            if (st && st.status === 'correct') {
+                updateItemUI(currentLessonId);
+                updateGlobalProgress();
+                setTimeout(closeActivityModal, 400);
+                return;
+            }
+            feedbackEl.classList.add('feedback-failure');
+            feedbackEl.textContent = 'A atividade não está correta. Use "CORRIGIR ATIVIDADE" antes de marcar como concluída.';
+        });
+    }
+
+    // marcar vídeo como concluído
+    if (completeVideoBtn) {
+        completeVideoBtn.addEventListener('click', () => {
+            if (!currentLessonId) return;
+            if (!watchedState[currentLessonId]) {
+                watchedState[currentLessonId] = true;
+                setWatchedState(watchedState);
+                updateItemUI(currentLessonId);
+                updateGlobalProgress();
+                completeVideoBtn.classList.add('completed');
+                completeVideoBtn.textContent = 'Concluído';
+                setTimeout(() => {
+                    videoIframe.src = '';
+                    videoModal.classList.remove('open');
+                    currentLessonId = null;
+                }, 500);
+            }
+        });
+    }
+
+    // --- PAGINAÇÃO ---
+    const pages = Array.from(document.querySelectorAll('.course-grid.page'));
+    const totalPages = pages.length || 1;
+    let currentPage = 1;
+    const prevBtn = document.getElementById('prev-page-btn');
+    const nextBtn = document.getElementById('next-page-btn');
+    const pageIndicator = document.getElementById('page-indicator');
+
+    const showPage = (n) => {
+        if (n < 1) n = 1;
+        if (n > totalPages) n = totalPages;
+        pages.forEach(p => p.classList.toggle('active-page', parseInt(p.dataset.page, 10) === n));
+        currentPage = n;
+        if (pageIndicator) pageIndicator.textContent = `Página ${currentPage} de ${totalPages}`;
+        if (prevBtn) prevBtn.disabled = currentPage === 1;
+        if (nextBtn) nextBtn.disabled = currentPage === totalPages;
+        const topEl = document.querySelector('.container');
+        if (topEl) topEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    if (prevBtn) prevBtn.addEventListener('click', () => showPage(currentPage - 1));
+    if (nextBtn) nextBtn.addEventListener('click', () => showPage(currentPage + 1));
+    showPage(1);
+
+    // inicializa UI
+    updateAllUI();
+
+    // pequeno hook para botões sociais / dev login (se existirem)
+    const g = document.getElementById('googleLogin');
+    if (g) g.addEventListener('click', () => window.location.href = "/auth/google");
+    const f = document.getElementById('facebookLogin');
+    if (f) f.addEventListener('click', () => window.location.href = "/auth/facebook");
+    const form = document.querySelector("form");
+    if (form) {
+        form.addEventListener("submit", function (e) {
+            const usernameInput = form.querySelector("input[name='username']");
+            const passwordInput = form.querySelector("input[name='password']");
+            if (usernameInput && passwordInput) {
+                const username = usernameInput.value;
+                const password = passwordInput.value;
+                if (username === "dev" && password === "dev") {
+                    e.preventDefault();
+                    window.location.href = "/login_dev";
+                }
+            }
+        });
+    }
+});
+
+
+</script><script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    // --- Helpers para persistência ---
+    const getWatchedState = () => {
+        try { return JSON.parse(localStorage.getItem('courseWatchedState') || '{}'); } catch { return {}; }
+    };
+    const setWatchedState = (s) => localStorage.setItem('courseWatchedState', JSON.stringify(s));
+
+    const getActivitiesState = () => {
+        try { return JSON.parse(localStorage.getItem('courseActivitiesState') || '{}'); } catch { return {}; }
+    };
+    const setActivitiesState = (s) => localStorage.setItem('courseActivitiesState', JSON.stringify(s));
+
+   const isCoursePaid = () => localStorage.getItem('course_paid') === '1';
+    const markCoursePaid = () => { localStorage.setItem('course_paid','1'); window.dispatchEvent(new Event('course-paid')); };
+
+    let watchedState = getWatchedState();
+    let activitiesState = getActivitiesState();
+    let currentLessonId = null;
+
+    // ensure first lesson always unlocked
+    const firstLessonId = '1-1';
+
+    // --- Utilitários de UI ---
+    const isActivityId = id => /-A/i.test(id);
+
+    const updateItemUI = (lessonId) => {
+        const anchor = document.querySelector(`a[data-lesson-id="${lessonId}"]`);
+        if (!anchor) return;
+        const icon = anchor.querySelector('.lesson-icon i');
+        anchor.classList.remove('watched','wrong','pending');
+        // lock handling
+        const paid = isCoursePaid();
+        const locked = (!paid && lessonId !== firstLessonId);
+        // ensure lock icon exists
+        let lockEl = anchor.querySelector('.lock-icon');
+       if (!lockEl) {
+           lockEl = document.createElement('span');
+           lockEl.className = 'lock-icon';            anchor.appendChild(lockEl);
+        }      lockEl.classList.toggle('locked', locked);
+       lockEl.classList.toggle('unlocked', !locked);
+        lockEl.title = locked ? 'Aula bloqueada. Pague R$29,99 para liberar.' : 'Aula liberada';
+       lockEl.innerHTML = locked ? '<i class=\"fas fa-lock\"></i>' : '<i class=\"fas fa-unlock\"></i>';
+        // visual pointer
+        anchor.dataset.locked = locked ? '1' : '0';
+        // hide unwatch if locked
+        const unwatchBtn = document.querySelector(`button.unwatch-btn[data-lesson-id="${lessonId}"]`);
+        if (unwatchBtn) unwatchBtn.style.display = locked ? 'none' : (isActivityId(lessonId) ? (activitiesState[lessonId] && activitiesState[lessonId].status === 'correct' ? 'inline-block' : 'none') : (watchedState[lessonId] ? 'inline-block' : 'none'));
+
+        if (isActivityId(lessonId)) {
+            const st = activitiesState[lessonId];
+            if (st && st.status === 'correct') {
+                anchor.classList.add('watched');
+                if (icon) icon.className = 'fas fa-check-circle';
+            } else if (st && st.status === 'wrong') {
+                anchor.classList.add('wrong');
+                if (icon) icon.className = 'fas fa-times-circle';
+            } else if (st && st.status === 'pending') {
+                anchor.classList.add('pending');
+                if (icon) icon.className = 'fas fa-hourglass-half';
+            } else {
+                if (icon) icon.className = 'far fa-circle';
+            }
+        } else {
+            if (watchedState[lessonId]) {
+                anchor.classList.add('watched');
+                if (icon) icon.className = 'fas fa-check-circle';
+            } else {
+                if (icon) icon.className = 'far fa-circle';
+            }
+        }
+    };
+    // listen for payment event (from payment page)
+    window.addEventListener('course-paid', () => {
+        // paid -> refresh UI
+// +        updateAllUI();
+        alert('Pagamento confirmado — todas as aulas liberadas.');
+    });
+    // also listen storage event (in case payment happens in new tab)
+    window.addEventListener('storage', (ev) => {
+       if (ev.key === 'course_paid' && ev.newValue === '1') {
+            window.dispatchEvent(new Event('course-paid'));
+        }
+  });
+
+    const updateAllUI = () => {
+        document.querySelectorAll('a[data-lesson-id]').forEach(a => updateItemUI(a.dataset.lessonId));
+        updateGlobalProgress();
+    };
+
+    // ...existing code...
+
+    // --- Delegação de cliques: abrir modais e desmarcar ---
+    document.querySelector('.course-grid-wrapper').addEventListener('click', (e) => {
+        const videoAnchor = e.target.closest('a.open-video-modal');
+        if (videoAnchor) {
+            e.preventDefault();
+        // bloqueio por pagamento
+           if (videoAnchor.dataset.locked === '1') {
+               if (confirm('Esta aula está bloqueada. Deseja ir para a página de pagamentos (R$29,99)?')) {
+                  window.location.href = '/pagamento';
+               }
+             return;
+           }
+            const url = videoAnchor.dataset.videoUrl || '';
+            const title = videoAnchor.dataset.videoTitle || '';
+            const lessonId = videoAnchor.dataset.lessonId;
+            currentLessonId = lessonId;
+            // convert youtube formats
+            let embed = url;
+            try {
+                if (url.includes('youtu.be/')) {
+                    const id = url.split('youtu.be/')[1].split('?')[0];
+                    embed = `https://www.youtube.com/embed/${id}`;
+                } else if (url.includes('youtube.com/watch')) {
+                    const v = new URL(url).searchParams.get('v');
+                    if (v) embed = `https://www.youtube.com/embed/${v}`;
+                } else if (url.includes('youtube.com/embed/')) {
+                    embed = url;
+                }
+            } catch (err) { embed = url; }
+
+            videoTitleEl.textContent = title;
+            videoIframe.src = embed + '?autoplay=1&rel=0';
+            videoModal.classList.add('open');
+            if (watchedState[lessonId]) {
+                completeVideoBtn.classList.add('completed');
+                completeVideoBtn.textContent = 'Concluído';
+            } else {
+                completeVideoBtn.classList.remove('completed');
+                completeVideoBtn.textContent = 'Marcar Aula como Concluída';
+            }
+            return;
+        }
+
+        const activityAnchor = e.target.closest('a.open-modal-activity');
+        if (activityAnchor) {
+            e.preventDefault();
+           if (activityAnchor.dataset.locked === '1') {
+              if (confirm('Esta atividade está bloqueada. Deseja ir para a página de pagamentos (R$29,99)?')) {
+                 window.location.href = '/pagamento';
+             }
+               return;
+           }
+            openActivityModal(activityAnchor.dataset.activityTitle, activityAnchor.dataset.activityDesc, activityAnchor.dataset.lessonId);
+            return;
+        }
+
+        const unwatchBtn = e.target.closest('button.unwatch-btn');
+        if (unwatchBtn) {
+            const lessonId = unwatchBtn.dataset.lessonId;
+            if (!lessonId) return;
+            if (isActivityId(lessonId)) {
+                delete activitiesState[lessonId];
+                setActivitiesState(activitiesState);
+            } else {
+                delete watchedState[lessonId];
+                setWatchedState(watchedState);
+            }
+            updateItemUI(lessonId);
+            updateGlobalProgress();
+            return;
+        }
+    });
+
+    // ...existing code...
+    // inicializa UI
+-    updateAllUI();
++    updateAllUI();
+});
+
+</script>
+    </body>
+    </html>
+<!--    <script src="{{ static_url ('js/curso.js')}}"></script>
+-->
+

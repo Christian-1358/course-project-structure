@@ -1,0 +1,347 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pagamento Mensal</title>
+
+<script src="https://sdk.mercadopago.com/js/v2"></script>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+}
+
+body {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0b0b0b, #161616);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #e0e0e0;
+  padding: 20px;
+}
+
+.container {
+  width: 100%;
+  max-width: 760px;
+  background: #121212;
+  border: 1px solid #1f1f1f;
+  border-radius: 16px;
+  padding: 36px;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.7);
+}
+
+h2 {
+  text-align: center;
+  font-size: 22px;
+  margin-bottom: 6px;
+  color: #f1f1f1;
+}
+
+.price {
+  text-align: center;
+  font-size: 14px;
+  color: #9e9e9e;
+  margin-bottom: 22px;
+}
+
+.methods {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.methods button {
+  background: #0f0f0f;
+  border: 1px solid #262626;
+  color: #e5e5e5;
+  border-radius: 14px;
+  padding: 14px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+.methods button img {
+  height: 36px;
+  filter: grayscale(100%);
+  opacity: 0.9;
+}
+
+.methods button:hover {
+  border-color: #8b8b8b;
+  background: #161616;
+  transform: translateY(-2px);
+}
+
+.methods button:hover img {
+  filter: grayscale(0%);
+  opacity: 1;
+}
+
+.methods button.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+#qr,
+#links,
+#card-area {
+  display: none;
+  margin-top: 18px;
+}
+
+#qr {
+  background: #ffffff;
+  padding: 14px;
+  border-radius: 14px;
+}
+
+#qr img {
+  width: 100%;
+  display: block;
+}
+
+.link-btn {
+  display: block;
+  width: 100%;
+  background: #1f1f1f;
+  color: #e5e5e5;
+  padding: 14px;
+  border-radius: 12px;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  border: 1px solid #2a2a2a;
+  transition: background 0.2s ease;
+}
+
+.link-btn:hover {
+  background: #2a2a2a;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #262626;
+  background: #0b0b0b;
+  color: #f1f1f1;
+  margin-bottom: 10px;
+}
+
+input::placeholder {
+  color: #6f6f6f;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 14px;
+  background: #2e2e2e;
+  border: 1px solid #3a3a3a;
+  border-radius: 12px;
+  color: #f5f5f5;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.25s ease;
+}
+
+.submit-btn:hover {
+  background: #3a3a3a;
+}
+
+.muted {
+  text-align: center;
+  font-size: 13px;
+  color: #8a8a8a;
+  margin-top: 14px;
+}
+
+.loader {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-top-color: #bdbdbd;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+  margin-left: 8px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h2>Pagamento Mensal</h2>
+<div class="price">Plano Premium — <b>R$ 29,99</b></div>
+
+<div class="methods">
+  <button id="btn-pix">
+    <img src="https://img.icons8.com/color/96/pix.png">
+    PIX
+  </button>
+  <button id="btn-card">
+    <img src="https://img.icons8.com/color/96/bank-card-back-side.png">
+    Cartão
+  </button>
+  <button id="btn-boleto">
+    <img src="https://img.icons8.com/color/96/barcode.png">
+    Boleto
+  </button>
+
+</div>
+
+<div id="qr">
+  <img id="qr-img">
+</div>
+
+<div id="links">
+  <a id="external-link" class="link-btn" target="_blank">Abrir Boleto</a>
+</div>
+
+<div id="card-area">
+  <div id="cardForm"></div>
+</div>
+
+<div class="muted">
+  Ao concluir o pagamento, o acesso será liberado automaticamente.
+</div>
+
+<a href="/curso" class="muted">Voltar para o curso</a>
+
+</div>
+
+<script>
+const ENDPOINT = "/pagamento/criar";
+
+const btnPix = document.getElementById("btn-pix");
+const btnCard = document.getElementById("btn-card");
+const btnBoleto = document.getElementById("btn-boleto");
+
+const qr = document.getElementById("qr");
+const qrImg = document.getElementById("qr-img");
+const links = document.getElementById("links");
+const externalLink = document.getElementById("external-link");
+const cardArea = document.getElementById("card-area");
+
+function hideAll(){
+  qr.style.display="none";
+  links.style.display="none";
+  cardArea.style.display="none";
+}
+
+async function createPayment(payload){
+  const r = await fetch(ENDPOINT,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(payload)
+  });
+  return r.json();
+}
+
+btnPix.onclick = async ()=>{
+  hideAll();
+  const r = await createPayment({
+    metodo:"pix",
+    transaction_amount:29.99,
+    description:"Plano Mensal"
+  });
+
+  const b64 = r.response?.point_of_interaction?.transaction_data?.qr_code_base64;
+  if(b64){
+    qrImg.src = "data:image/png;base64,"+b64;
+    qr.style.display="block";
+  }else alert("Erro ao gerar PIX");
+};
+
+btnBoleto.onclick = async ()=>{
+  hideAll();
+  const r = await createPayment({
+    metodo:"boleto",
+    transaction_amount:29.99,
+    description:"Plano Mensal"
+  });
+  const url = r.response?.payment_url;
+  if(url){
+    externalLink.href = url;
+    links.style.display="block";
+  }else alert("Erro ao gerar boleto");
+};
+
+btnCard.onclick = ()=>{
+  hideAll();
+  cardArea.style.display="block";
+
+  if(window._cardMounted) return;
+  window._cardMounted = true;
+
+  const mp = new MercadoPago("SUA_PUBLIC_KEY_AQUI",{locale:"pt-BR"});
+  const cardForm = mp.cardForm({
+    amount:"29.99",
+    autoMount:true,
+    form:{ id:"cardForm" },
+    callbacks:{
+      onSubmit: async (e)=>{
+        e.preventDefault();
+        const data = cardForm.getCardFormData();
+        await createPayment({
+          metodo:"card",
+          token:data.token,
+          payment_method_id:data.paymentMethodId,
+          transaction_amount:29.99,
+          description:"Plano Mensal"
+        });
+        alert("Pagamento enviado. Aguarde confirmação.");
+      }
+    }
+  });
+};
+
+fetch("/pagamento/fake", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+        metodo: "pix",
+        valor: 29.90
+    })
+})
+.then(r => r.json())
+.then(d => {
+    const qr = d.response.point_of_interaction.transaction_data.qr_code_base64;
+    document.getElementById("qr").src = "data:image/png;base64," + qr;
+});
+fetch("/pagamento/fake", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+        metodo: "boleto",
+        valor: 19.90
+    })
+})
+.then(r => r.json())
+.then(d => {
+    window.open(d.response.payment_url, "_blank");
+});
+
+</script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!-- deixar bonito esse meu html de recuperar senha com css moderno e dark mode <!-->
+
+<DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Recuperar Senha</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/recuperar_senha.css">
+</head> 
+<style>
+ 
+</style>
+
+<body>
+
+<div class="container">
+  <h2>Recuperar Senha</h2>
+
+  {% if erro %}
+    <div class="msg erro">{{ erro }}</div>
+  {% end %}
+
+  {% if sucesso %}
+    <div class="msg sucesso">{{ sucesso }}</div>
+  {% end %}
+
+
+  <form method="post">
+    <input type="email" name="email" placeholder="Digite seu e-mail" required>
+    <button>Gerar Token</button>
+  </form>
+
+  <hr>
+  <form method="post">
+    <input type="text" name="token" placeholder="Token recebido" required>
+    <input type="password" name="nova_senha" placeholder="Nova senha" required>
+    <button>Redefinir Senha</button>
+  </form>
+
+  <a href="/login">Voltar ao login</a>
+</div>
+
+</body>
+</html>

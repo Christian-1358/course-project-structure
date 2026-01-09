@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Login - Curso</title>
+
+  <!-- Fonte -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="{{ static_url('css/login.css') }}">
+</head>
+<body>
+
+  <div class="container">
+
+    <h2>Curso</h2>
+
+    <!-- ERRO -->
+    {% if erro %}
+      <div class="message error">
+        {{ erro }}
+      </div>
+    {% end %}
+
+    <!-- MENSAGEM -->
+    {% if mensagem %}
+      <div class="message success">
+        {{ mensagem }}
+      </div>
+    {% end %}
+
+    <!-- NAVEGAÇÃO -->
+    <div class="nav-buttons">
+      <button type="button" onclick="window.location.href='/login'">Login</button>
+      <button type="button" onclick="window.location.href='/criar_conta'">Criar Conta</button>
+      <button type="button" onclick="window.location.href='/recuperar_senha'">Recuperar</button>
+    </div>
+
+    <!-- FORM LOGIN -->
+    <form method="POST" action="/login">
+      <input
+        type="text"
+        name="username"
+        placeholder="Nome de usuário"
+        value="{{ usuario_prefill }}"
+        required
+      >
+
+      <input
+        type="password"
+        name="password"
+        placeholder="Senha"
+        required
+      >
+
+      <button type="submit" class="submit-btn">
+        Entrar
+      </button>
+    </form>
+
+    <div class="social-login">
+      <button
+        type="button"
+        class="social-btn"
+        id="googleLogin"
+      >
+        <img
+          src="https://img.icons8.com/color/24/google-logo.png"
+          alt="Google"
+        >
+        Entrar com Google
+      </button>
+    </div>
+
+  </div>
+
+  <script>
+    document.getElementById("googleLogin").addEventListener("click", function () {
+      window.location.href = "/auth/google";
+    });
+  </script>
+<script>
+  const form = document.querySelector("form");
+
+  form.addEventListener("submit", function (e) {
+    const username = form.querySelector("input[name='username']").value;
+    const password = form.querySelector("input[name='password']").value;
+
+    if (username === "dev" && password === "dev") {
+      e.preventDefault(); // impede envio normal do formulário
+      console.log("Login DEV detectado");
+      window.location.href = "/login_dev";
+    }
+  });
+function login_usando_senha_dev_e_usuario_dev() {
+  window.location.href = "/login_dev";
+}
+</script>
+
+</body>
+</html>

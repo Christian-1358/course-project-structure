@@ -1,0 +1,17 @@
+{
+  "modulo1": [
+    { "id": 1, "titulo": "O que é Tornado?", "video": "/static/videos/tornado1.mp4" },
+    { "id": 2, "titulo": "Criando o primeiro servidor", "video": "/static/videos/tornado2.mp4" },
+    { "id": 3, "titulo": "Handlers e Templates", "video": "/static/videos/tornado3.mp4" }
+  ],
+  "modulo2": [
+    { "id": 4, "titulo": "Secure Cookies", "video": "/static/videos/security1.mp4" },
+    { "id": 5, "titulo": "Ligando SQLite", "video": "/static/videos/banco1.mp4" }
+  ],
+  "modulo3": [
+    { "id": 6, "titulo": "Templates avançados", "video": "/static/videos/template1.mp4" }
+  ],
+  "modulo4": [
+    { "id": 7, "titulo": "APIs e Requests", "video": "/static/videos/api1.mp4" }
+  ]
+}
