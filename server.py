@@ -14,7 +14,7 @@ from app.handlers.curso import CursoHandler
 from app.handlers.recuperar_senha import RecuperarSenhaHandler
 from app.handlers.emails_logados import EmailsLogadosHandler
 from app.handlers.avaliacao import SubmitCodeHandler
-    
+
 from app.handlers.criar_conta import CriarContaHandler
 from app.utils.admin_tools import (
     LoginDevHandler,
@@ -64,7 +64,7 @@ def make_app():
         (r"/curso", CursoHandler),
         (r"/submit", SubmitCodeHandler),
         (r"/admin/emails_logados", EmailsLogadosHandler),
-                (r"/admin/compras", ComprasHandler),
+        (r"/admin/compras", ComprasHandler),
 
     ], **settings)
 

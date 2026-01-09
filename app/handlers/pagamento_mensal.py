@@ -55,7 +55,7 @@ def boleto_fallback(data):
         "id": pid,
         "status": "pending",
         "transaction_amount": data.get("transaction_amount", 29.99),
-        "description": data.get("description", "Plano Mensal"),
+        "description": data.get("description", "Plano Mensal"), 
         "payment_url": f"/static/boleto_{pid}.pdf"
     }
 
