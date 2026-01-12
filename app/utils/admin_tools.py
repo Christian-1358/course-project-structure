@@ -11,7 +11,7 @@ def criar_tabela_purchases():
     c = conn.cursor()
     c.execute("""
         CREATE TABLE IF NOT EXISTS purchases (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,   
             user_id INTEGER,
             email TEXT,
             metodo TEXT,

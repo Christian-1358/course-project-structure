@@ -167,7 +167,6 @@ tr:hover {
       <button id="compras-close" style="background:#222;color:#fff;border-radius:8px;padding:6px 10px;border:none;cursor:pointer">Fechar</button>
     </div>
     <div id="compras-content" style="font-size:13px;color:#ddd">
-      <!-- conteúdo será injetado -->
     </div>  </div>
 </div>
 <table>
@@ -206,7 +205,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 content.innerHTML = '<div class="message error">Erro ao buscar compras (verifique o servidor).</div>';
                 return;
             }
-            // suporta diferentes formatos: { count, purchases } ou { compradores_count, purchases }
             const purchases = data.purchases || data.rows || data.list || [];
          const count = data.count ?? data.compradores_count ?? (Array.isArray(purchases) ? purchases.length : 0);
            let html = `<p><strong>Compradores confirmados:</strong> ${count}</p>`;
@@ -235,7 +233,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeBtn = document.getElementById('compras-close');
     if (closeBtn) closeBtn.addEventListener('click', () => document.getElementById('compras-modal').style.display = 'none');
 
-    // ...existing code...
 });
     const container = document.querySelector('.container');
 
