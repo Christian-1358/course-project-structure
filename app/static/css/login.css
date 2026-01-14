@@ -136,3 +136,32 @@ input:focus {
 .social-btn:hover { background:#1d1d1d; border-color:#2b2b2b; }
 
 .social-btn img { width:22px; height:22px; }
+
+.about-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #222;
+  background: linear-gradient(135deg, #161616, #1c1c1c);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #bbb;
+  transition: all 0.25s ease;
+}
+
+.about-btn:hover {
+  background: linear-gradient(135deg, #1f8bff, #4da6ff);
+  color: #fff;
+  border-color: #4da6ff;
+  box-shadow: 0 0 15px rgba(77,166,255,0.35);
+}
+
+.about-btn img {
+  width: 20px;
+  height: 20px;
+  opacity: 0.9;
+}

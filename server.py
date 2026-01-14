@@ -8,7 +8,7 @@ GOOGLE_CLIENT_ID = "899997122020-0v0hokvnet5l9nnt1cufg071tbq60rdc.apps.googleuse
 GOOGLE_CLIENT_SECRET = "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"
 
 TORNADO_COOKIE_SECRET = "a9f3d2c1e8f74b6b9c2e0f1a7b8c6d5e123456789"
-
+from app.handlers.sobre import Sobre
 from app.handlers.login import LoginHandler, LogoutHandler, GoogleLoginHandler
 from app.handlers.curso import CursoHandler
 from app.handlers.recuperar_senha import RecuperarSenhaHandler
@@ -48,7 +48,7 @@ def make_app():
         (r"/pagamento/criar", CriarPagamentoHandler),
         (r"/pagamento/webhook", WebhookHandler),
         (r"/criar-pagamento", CriarPagamentoHandler),       
-
+        (r"/sobre", Sobre),
         (r"/login_dev", LoginDevHandler),
         (r"/admin/alterar_status", AlterarStatusHandler),
         (r"/admin/alterar_senha", AlterarSenhaHandler),

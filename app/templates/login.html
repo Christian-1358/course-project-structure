@@ -1,15 +1,14 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+  <style> </style>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Login - Curso</title>
 
-  <!-- Fonte -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- CSS -->
   <link rel="stylesheet" href="{{ static_url('css/login.css') }}">
 </head>
 <body>
@@ -18,28 +17,24 @@
 
     <h2>Curso</h2>
 
-    <!-- ERRO -->
     {% if erro %}
       <div class="message error">
         {{ erro }}
       </div>
     {% end %}
 
-    <!-- MENSAGEM -->
     {% if mensagem %}
       <div class="message success">
         {{ mensagem }}
       </div>
     {% end %}
 
-    <!-- NAVEGAÇÃO -->
     <div class="nav-buttons">
       <button type="button" onclick="window.location.href='/login'">Login</button>
       <button type="button" onclick="window.location.href='/criar_conta'">Criar Conta</button>
       <button type="button" onclick="window.location.href='/recuperar_senha'">Recuperar</button>
     </div>
 
-    <!-- FORM LOGIN -->
     <form method="POST" action="/login">
       <input
         type="text"
@@ -61,19 +56,40 @@
       </button>
     </form>
 
+
     <div class="social-login">
       <button
         type="button"
         class="social-btn"
         id="googleLogin"
       >
+      
         <img
           src="https://img.icons8.com/color/24/google-logo.png"
           alt="Google"
         >
         Entrar com Google
       </button>
+
+      <button
+        type="button"
+        class="about-btn"
+        onclick="window.location.href='/sobre'"
+      >
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/info.png" alt="Sobre">
+        Sobre o Curso
+      </button>
     </div>
+
+<div style="margin-top: 25px; text-align: center; border-top: 1px solid #eee; padding-top: 15px;">
+  <p style="font-size: 0.85rem; color: #666; margin-bottom: 8px; font-family: 'Inter', sans-serif;">
+    Dúvidas? Fale conosco:
+  </p>
+  <a href="https://wa.me/555499716973" target="_blank" style="text-decoration: none; color: #25D366; font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
+    <img src="https://img.icons8.com/color/24/whatsapp.png" alt="WhatsApp" style="width: 20px; height: 20px;">
+    (54) 9971-6973
+  </a>
+</div>
 
   </div>
 
