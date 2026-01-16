@@ -1,5 +1,6 @@
 import sqlite3
 import os
+import datetime
 
 BASE_DIR = os.path.abspath(os.getcwd())
 DB = os.path.join(BASE_DIR, "usuarios.db")
@@ -10,7 +11,7 @@ def criar_banco():
 
         c.execute("PRAGMA foreign_keys = ON;")
 
-
+        # ================= USERS =================
         c.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -21,6 +22,7 @@ def criar_banco():
         );
         """)
 
+        # ================= PROGRESSO =================
         c.execute("""
         CREATE TABLE IF NOT EXISTS progresso (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -29,6 +31,20 @@ def criar_banco():
             aula INTEGER NOT NULL,
             concluida INTEGER DEFAULT 0,
             UNIQUE(user_id, modulo, aula),
+            FOREIGN KEY (user_id)
+                REFERENCES users(id)
+                ON DELETE CASCADE
+        );
+        """)
+
+        # ================= PASSWORD RESET =================
+        c.execute("""
+        CREATE TABLE IF NOT EXISTS password_reset (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            token TEXT UNIQUE NOT NULL,
+            expires_at TEXT NOT NULL,
+            last_request TEXT NOT NULL,
             FOREIGN KEY (user_id)
                 REFERENCES users(id)
                 ON DELETE CASCADE

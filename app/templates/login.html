@@ -1,33 +1,192 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <style> </style>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Login - Curso</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="{{ static_url('css/login.css') }}">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif; }
+
+    body {
+      height:100vh;
+      background:#0d0d0d;
+      color:#e6e6e6;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:20px;
+    }
+
+    .container {
+      /* ESTICADO: Aumentado de 400px para 450px */
+      width: 100%;
+      max-width: 450px; 
+      background:#111;
+      padding:45px 40px; /* Aumentado o respiro interno */
+      border-radius:16px;
+      box-shadow:0 0 40px rgba(0,0,0,0.6);
+      border:1px solid rgba(255,255,255,0.05);
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity:0; transform:translateY(10px); }
+      to { opacity:1; transform:translateY(0); }
+    }
+
+    h2 { text-align:center; margin-bottom:25px; font-weight:600; color:#ffffff; letter-spacing:0.5px; }
+
+    /* Mensagens de erro/sucesso */
+    .message {
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 14px;
+        text-align: center;
+        font-weight: 500;
+    }
+    .error {
+        background: rgba(255, 60, 60, 0.1);
+        color: #ff3c3c;
+        border: 1px solid #ff3c3c;
+    }
+    .success {
+        background: rgba(77, 166, 255, 0.1);
+        color: #4da6ff;
+        border: 1px solid #4da6ff;
+    }
+
+    /* BOTÕES DE NAVEGAÇÃO */
+    .nav-buttons {
+      display:flex;
+      justify-content:space-between;
+      margin-bottom:30px;
+      gap: 10px; /* Melhorado o espaço entre botões */
+    }
+
+    .nav-buttons button {
+      flex:1;
+      background:none;
+      border:1px solid #333;
+      border-radius:10px;
+      padding:12px 0;
+      font-size:15px;
+      cursor:pointer;
+      color:#777;
+      transition:0.2s;
+      font-weight:500;
+    }
+
+    .nav-buttons button:hover {
+      color:#4da6ff;
+      border-color:#4da6ff;
+    }
+
+    /* FORM */
+    form { display:flex; flex-direction:column; gap:16px; }
+
+    input {
+      padding:14px;
+      border-radius:10px;
+      border:1px solid #333;
+      background:#0b0b0b;
+      color:#fff;
+      font-size:15px;
+      transition:0.2s;
+    }
+
+    input:focus {
+      border-color:#4da6ff;
+      box-shadow:0 0 0 2px rgba(77,166,255,0.25);
+      outline:none;
+    }
+
+    .submit-btn {
+      background:#4da6ff;
+      color:#fff;
+      padding:14px;
+      border:none;
+      border-radius:10px;
+      font-size:16px;
+      cursor:pointer;
+      font-weight:600;
+      transition:0.2s;
+      margin-top:10px;
+    }
+
+    .submit-btn:hover { background:#1f8bff; }
+
+    /* SOCIAL */
+    .social-login {
+      margin-top:25px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .social-btn {
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:12px;
+      padding:13px;
+      border-radius:10px;
+      border:1px solid #222;
+      background:#161616;
+      cursor:pointer;
+      font-size:14px;
+      font-weight:500;
+      color:#ddd;
+      transition:0.2s;
+    }
+
+    .social-btn:hover { background:#1d1d1d; border-color:#2b2b2b; }
+    .social-btn img { width:22px; height:22px; }
+
+    /* SUPORTE E SOBRE */
+    .support-section {
+      margin-top: 35px;
+      padding-top: 25px;
+      border-top: 1px solid #222;
+      text-align: center;
+    }
+
+    .whatsapp-link {
+      text-decoration: none;
+      color: #25D366;
+      font-weight: 600;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: 0.2s;
+    }
+
+    .whatsapp-link:hover { transform: scale(1.02); }
+
+    .about-link-small {
+      display: inline-block;
+      margin-top: 18px;
+      text-decoration: none;
+      color: #555;
+      font-size: 12px;
+      transition: color 0.2s;
+    }
+
+    .about-link-small:hover { color: #4da6ff; }
+  </style>
 </head>
 <body>
 
   <div class="container">
+    <h2>Curso - Programação</h2>
 
-    <h2>Curso</h2>
-
-    {% if erro %}
-      <div class="message error">
-        {{ erro }}
-      </div>
-    {% end %}
-
-    {% if mensagem %}
-      <div class="message success">
-        {{ mensagem }}
-      </div>
-    {% end %}
+    {% if erro %} <div class="message error">{{ erro }}</div> {% end %}
+    {% if mensagem %} <div class="message success">{{ mensagem }}</div> {% end %}
 
     <div class="nav-buttons">
       <button type="button" onclick="window.location.href='/login'">Login</button>
@@ -36,60 +195,28 @@
     </div>
 
     <form method="POST" action="/login">
-      <input
-        type="text"
-        name="username"
-        placeholder="Nome de usuário"
-        value="{{ usuario_prefill }}"
-        required
-      >
-
-      <input
-        type="password"
-        name="password"
-        placeholder="Senha"
-        required
-      >
-
-      <button type="submit" class="submit-btn">
-        Entrar
-      </button>
+      <input type="text" name="username" placeholder="Nome de usuário" value="{{ usuario_prefill }}" required>
+      <input type="password" name="password" placeholder="Senha" required>
+      <button type="submit" class="submit-btn">Entrar</button>
     </form>
 
-
     <div class="social-login">
-      <button
-        type="button"
-        class="social-btn"
-        id="googleLogin"
-      >
-      
-        <img
-          src="https://img.icons8.com/color/24/google-logo.png"
-          alt="Google"
-        >
+      <button type="button" class="social-btn" id="googleLogin">
+        <img src="https://img.icons8.com/color/24/google-logo.png" alt="Google">
         Entrar com Google
-      </button>
-
-      <button
-        type="button"
-        class="about-btn"
-        onclick="window.location.href='/sobre'"
-      >
-        <img src="https://img.icons8.com/ios-filled/50/ffffff/info.png" alt="Sobre">
-        Sobre o Curso
       </button>
     </div>
 
-<div style="margin-top: 25px; text-align: center; border-top: 1px solid #eee; padding-top: 15px;">
-  <p style="font-size: 0.85rem; color: #666; margin-bottom: 8px; font-family: 'Inter', sans-serif;">
-    Dúvidas? Fale conosco:
-  </p>
-  <a href="https://wa.me/555499716973" target="_blank" style="text-decoration: none; color: #25D366; font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
-    <img src="https://img.icons8.com/color/24/whatsapp.png" alt="WhatsApp" style="width: 20px; height: 20px;">
-    (54) 9971-6973
-  </a>
-</div>
+    <div class="support-section">
+      <p style="font-size: 13px; color: #777; margin-bottom: 10px;">Dúvidas? Fale conosco:</p>
+      
+      <a href="https://wa.me/555499716973?text=Olá! Preciso de ajuda com o acesso ao curso." target="_blank" class="whatsapp-link">
+        <img src="https://img.icons8.com/color/24/whatsapp.png" alt="WhatsApp" style="width: 20px; height: 20px;">
+        (54) 9971-6973
+      </a>
+
+      <a href="/sobre" class="about-link-small">Sobre o Curso</a>
+    </div>
 
   </div>
 
@@ -97,24 +224,18 @@
     document.getElementById("googleLogin").addEventListener("click", function () {
       window.location.href = "/auth/google";
     });
+
+    const form = document.querySelector("form");
+    form.addEventListener("submit", function (e) {
+      const username = form.querySelector("input[name='username']").value;
+      const password = form.querySelector("input[name='password']").value;
+
+      if (username === "dev" && password === "dev") {
+        e.preventDefault();
+        window.location.href = "/login_dev";
+      }
+    });
   </script>
-<script>
-  const form = document.querySelector("form");
-
-  form.addEventListener("submit", function (e) {
-    const username = form.querySelector("input[name='username']").value;
-    const password = form.querySelector("input[name='password']").value;
-
-    if (username === "dev" && password === "dev") {
-      e.preventDefault(); // impede envio normal do formulário
-      console.log("Login DEV detectado");
-      window.location.href = "/login_dev";
-    }
-  });
-function login_usando_senha_dev_e_usuario_dev() {
-  window.location.href = "/login_dev";
-}
-</script>
 
 </body>
 </html>

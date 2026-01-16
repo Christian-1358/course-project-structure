@@ -1,47 +1,229 @@
-<!-- deixar bonito esse meu html de recuperar senha com css moderno e dark mode <!-->
-
-<DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>Recuperar Senha</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recuperar Senha - Curso Online</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/css/recuperar_senha.css">
-</head> 
-<style>
- 
-</style>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif; }
+
+    
+    body {
+      height: 100vh;
+      background: #0d0d0d;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #e6e6e6;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 400px;
+      background: #111;
+      padding: 35px 30px;
+      border-radius: 16px;
+      box-shadow: 0 0 40px rgba(0,0,0,0.6);
+      border: 1px solid rgba(255,255,255,0.05);
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity:0; transform:translateY(10px); }
+      to { opacity:1; transform:translateY(0); }
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 8px;
+      color: #fff;
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 25px;
+      line-height: 1.4;
+    }
+
+    .msg {
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .erro {
+      background: rgba(255, 60, 60, 0.1);
+      color: #ff3c3c;
+      border: 1px solid #ff3c3c;
+    }
+
+    .sucesso {
+      background: rgba(60, 255, 120, 0.1);
+      color: #3cff78;
+      border: 1px solid #3cff78;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    label {
+      font-size: 11px;
+      color: #888;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-left: 2px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #333;
+      background: #0b0b0b;
+      color: #fff;
+      font-size: 15px;
+    }
+
+    input:focus {
+      border-color: #4da6ff;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(77, 166, 255, 0.1);
+    }
+
+    .token-input {
+      letter-spacing: 5px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: 700;
+      color: #4da6ff;
+    }
+
+    button {
+      width: 100%;
+      padding: 13px;
+      background: #4da6ff;
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: 0.2s;
+      margin-top: 5px;
+    }
+
+    button:hover {
+      background: #1f8bff;
+    }
+
+    .secondary-btn {
+      background: transparent;
+      border: 1px solid #333;
+      color: #888;
+    }
+
+    .secondary-btn:hover {
+      background: #161616;
+      color: #fff;
+      border-color: #444;
+    }
+
+    hr {
+      margin: 25px 0;
+      border: 0;
+      border-top: 1px solid #222;
+    }
+
+    .back-link {
+      display: block;
+      margin-top: 20px;
+      text-align: center;
+      color: #555;
+      text-decoration: none;
+      font-size: 13px;
+    }
+
+    .back-link:hover {
+      color: #4da6ff;
+    }
+
+    .senha-wrapper {
+      position: relative;
+    }
+
+    .toggle-senha {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 12px;
+      color: #777;
+      cursor: pointer;
+      user-select: none;
+    }
+  </style>
+</head>
 <body>
 
 <div class="container">
-  <h2>Recuperar Senha</h2>
+  <h2>Recuperação de Senha</h2>
+  <p class="subtitle">Enviaremos um código para o e-mail cadastrado.</p>
 
-  {% if erro %}
-    <div class="msg erro">{{ erro }}</div>
-  {% end %}
-
-  {% if sucesso %}
-    <div class="msg sucesso">{{ sucesso }}</div>
-  {% end %}
-
+  {% if erro %}<div class="msg erro">{{ erro }}</div>{% end %}
+  {% if sucesso %}<div class="msg sucesso">{{ sucesso }}</div>{% end %}
 
   <form method="post">
-    <input type="email" name="email" placeholder="Digite seu e-mail" required>
-    <button>Gerar Token</button>
+    <label>E-mail da conta</label>
+    <input type="email" name="email" placeholder="exemplo@email.com" required>
+    <button type="submit">Enviar Código</button>
   </form>
 
   <hr>
+
   <form method="post">
-    <input type="text" name="token" placeholder="Token recebido" required>
-    <input type="password" name="nova_senha" placeholder="Nova senha" required>
-    <button>Redefinir Senha</button>
+    <label>Código de Verificação</label>
+    <input type="text" name="token" class="token-input" maxlength="10" required>
+
+    <label>Nova Senha</label>
+    <div class="senha-wrapper">
+      <input type="password" id="senha" name="nova_senha" minlength="5" required>
+      <span class="toggle-senha" onclick="toggleSenha()">Mostrar</span>
+    </div>
+
+    <button type="submit" class="secondary-btn">Atualizar Senha</button>
   </form>
 
-  <a href="/login">Voltar ao login</a>
+  <a href="/login" class="back-link">Voltar ao Login</a>
 </div>
+
+<script>
+function toggleSenha() {
+  const input = document.getElementById("senha");
+  const btn = document.querySelector(".toggle-senha");
+
+  if (input.type === "password") {
+    input.type = "text";
+    btn.innerText = "Ocultar";
+  } else {
+    input.type = "password";
+    btn.innerText = "Mostrar";
+  }
+}
+</script>
 
 </body>
 </html>
