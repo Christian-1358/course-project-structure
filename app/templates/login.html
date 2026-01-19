@@ -1,241 +1,328 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - Curso</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MilhasPro - O Método Definitivo</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif; }
+/* Módulos com estilo premium */
+.grid-modules {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+}
 
-    body {
-      height:100vh;
-      background:#0d0d0d;
-      color:#e6e6e6;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      padding:20px;
-    }
+.module-card {
+    position: relative;
+    background: var(--card-bg);
+    padding: 40px 30px 30px;
+    border-radius: 15px;
+    border: 1px solid #222;
+    overflow: hidden;
+    transition: 0.4s;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+}
+.module-card:hover {
+    transform: translateY(-10px);
+    border-color: #d4af37;
+    box-shadow: 0 20px 40px rgba(212,175,55,0.4);
+}
 
-    .container {
-      /* ESTICADO: Aumentado de 400px para 450px */
-      width: 100%;
-      max-width: 450px; 
-      background:#111;
-      padding:45px 40px; /* Aumentado o respiro interno */
-      border-radius:16px;
-      box-shadow:0 0 40px rgba(0,0,0,0.6);
-      border:1px solid rgba(255,255,255,0.05);
-      animation: fadeIn 0.4s ease;
-    }
+/* Número grande do módulo */
+.module-number {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 60px;
+    font-weight: 800;
+    background: linear-gradient(90deg, #d4af37 0%, #f1d592 50%, #d4af37 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    opacity: 0.15;
+}
 
-    @keyframes fadeIn {
-      from { opacity:0; transform:translateY(10px); }
-      to { opacity:1; transform:translateY(0); }
-    }
+/* Título do módulo */
+.module-card h3 {
+    color: #f1d592;
+    margin-bottom: 15px;
+    font-size: 1.6rem;
+    font-weight: 700;
+}
 
-    h2 { text-align:center; margin-bottom:25px; font-weight:600; color:#ffffff; letter-spacing:0.5px; }
+/* Descrição do módulo */
+.module-card p {
+    color: #ccc;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+:root {
+    --gold: linear-gradient(90deg, #d4af37 0%, #f1d592 50%, #d4af37 100%);
+    --dark-bg: #050505;
+    --card-bg: #111111;
+    --text-gray: #aaa;
+}
 
-    /* Mensagens de erro/sucesso */
-    .message {
-        padding: 12px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-        font-size: 14px;
-        text-align: center;
-        font-weight: 500;
-    }
-    .error {
-        background: rgba(255, 60, 60, 0.1);
-        color: #ff3c3c;
-        border: 1px solid #ff3c3c;
-    }
-    .success {
-        background: rgba(77, 166, 255, 0.1);
-        color: #4da6ff;
-        border: 1px solid #4da6ff;
-    }
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif; scroll-behavior: smooth; }
+body { background-color: var(--dark-bg); color: #fff; line-height: 1.6; }
 
-    /* BOTÕES DE NAVEGAÇÃO */
-    .nav-buttons {
-      display:flex;
-      justify-content:space-between;
-      margin-bottom:30px;
-      gap: 10px; /* Melhorado o espaço entre botões */
-    }
+/* HEADER */
+header {
+    padding: 20px 8%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0,0,0,0.9);
+    backdrop-filter: blur(10px);
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.logo { font-weight: 800; font-size: 24px; letter-spacing: -1px; }
+.logo span { background: var(--gold); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-    .nav-buttons button {
-      flex:1;
-      background:none;
-      border:1px solid #333;
-      border-radius:10px;
-      padding:12px 0;
-      font-size:15px;
-      cursor:pointer;
-      color:#777;
-      transition:0.2s;
-      font-weight:500;
-    }
+/* HERO SECTION - LAYOUT DEITADO */
+.hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 100vh;
+    padding: 120px 8% 60px;
+}
 
-    .nav-buttons button:hover {
-      color:#4da6ff;
-      border-color:#4da6ff;
-    }
+.hero-content { flex: 1; max-width: 600px; }
+.hero-content h1 { font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.1; margin-bottom: 25px; font-weight: 800; }
+.hero-content h1 span { color: #f1d592; }
+.hero-content p { font-size: 1.2rem; color: var(--text-gray); margin-bottom: 40px; max-width: 500px; }
 
-    /* FORM */
-    form { display:flex; flex-direction:column; gap:16px; }
+/* CTA BUTTON */
+.cta-button {
+    background: var(--gold); color: #000; padding: 20px 40px; border-radius: 10px;
+    text-decoration: none; font-weight: 800; text-transform: uppercase;
+    display: inline-flex; align-items: center; gap: 12px; transition: 0.3s;
+}
+.cta-button:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(212, 175, 55, 0.4); }
 
-    input {
-      padding:14px;
-      border-radius:10px;
-      border:1px solid #333;
-      background:#0b0b0b;
-      color:#fff;
-      font-size:15px;
-      transition:0.2s;
-    }
+/* HERO VISUAL - LOGIN CARD */
+.hero-visual {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    position: relative;
+}
 
-    input:focus {
-      border-color:#4da6ff;
-      box-shadow:0 0 0 2px rgba(77,166,255,0.25);
-      outline:none;
-    }
+/* LOGIN CARD */
+.login-card {
+    background: var(--card-bg);
+    padding: 40px;
+    border-radius: 15px;
+    width: 100%;
+    max-width: 400px;
+    border: 1px solid rgba(212,175,55,0.3);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+}
 
-    .submit-btn {
-      background:#4da6ff;
-      color:#fff;
-      padding:14px;
-      border:none;
-      border-radius:10px;
-      font-size:16px;
-      cursor:pointer;
-      font-weight:600;
-      transition:0.2s;
-      margin-top:10px;
-    }
+/* NAV BUTTONS (Criar Conta / Recuperar) */
+.nav-buttons {
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:20px;
+    gap:10px;
+}
+.nav-buttons button {
+    flex:1;
+    background:none;
+    border:1px solid #333;
+    border-radius:10px;
+    padding:10px 0;
+    font-size:14px;
+    cursor:pointer;
+    color:#777;
+    transition:0.2s;
+    font-weight:500;
+}
+.nav-buttons button:hover { color:#d4af37; border-color:#d4af37; }
 
-    .submit-btn:hover { background:#1f8bff; }
+/* LOGIN CARD ELEMENTS */
+.login-card h2 {
+    text-align:center;
+    margin-bottom: 20px;
+    font-weight:800;
+    font-size:1.6rem;
+    background: var(--gold);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
 
-    /* SOCIAL */
-    .social-login {
-      margin-top:25px;
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-    }
+form { display:flex; flex-direction:column; gap:16px; margin-bottom:20px; }
+input { padding:14px; border-radius:10px; border:1px solid #333; background:#0b0b0b; color:#fff; font-size:15px; transition:0.2s; }
+input:focus { border-color:#d4af37; box-shadow:0 0 0 2px rgba(212,175,55,0.25); outline:none; }
 
-    .social-btn {
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:12px;
-      padding:13px;
-      border-radius:10px;
-      border:1px solid #222;
-      background:#161616;
-      cursor:pointer;
-      font-size:14px;
-      font-weight:500;
-      color:#ddd;
-      transition:0.2s;
-    }
+.submit-btn {
+    background: var(--gold);
+    color:#000;
+    padding:14px;
+    border:none;
+    border-radius:10px;
+    font-size:16px;
+    cursor:pointer;
+    font-weight:700;
+    transition:0.3s;
+}
+.submit-btn:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(212,175,55,0.4); }
 
-    .social-btn:hover { background:#1d1d1d; border-color:#2b2b2b; }
-    .social-btn img { width:22px; height:22px; }
+/* SOCIAL LOGIN */
+.social-login { display:flex; flex-direction:column; gap:12px; margin-top:10px; }
+.social-btn {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+    padding:13px;
+    border-radius:10px;
+    border:1px solid #222;
+    background:#161616;
+    cursor:pointer;
+    font-size:14px;
+    font-weight:500;
+    color:#ddd;
+    transition:0.2s;
+}
+.social-btn:hover { background:#1d1d1d; border-color:#d4af37; }
+.social-btn img { width:22px; height:22px; }
 
-    /* SUPORTE E SOBRE */
-    .support-section {
-      margin-top: 35px;
-      padding-top: 25px;
-      border-top: 1px solid #222;
-      text-align: center;
-    }
+/* MENSAGENS */
+.message { padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; text-align: center; font-weight: 500; }
+.error { background: rgba(255,60,60,0.1); color: #ff3c3c; border:1px solid #ff3c3c; }
+.success { background: rgba(212,175,55,0.1); color: #d4af37; border:1px solid #d4af37; }
 
-    .whatsapp-link {
-      text-decoration: none;
-      color: #25D366;
-      font-weight: 600;
-      font-size: 15px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: 0.2s;
-    }
+/* SUPORTE */
+.support-section { margin-top: 20px; text-align:center; }
+.whatsapp-link { text-decoration:none; color:#25D366; font-weight:600; display:flex; align-items:center; justify-content:center; gap:8px; transition:0.2s; }
+.whatsapp-link:hover { transform: scale(1.02); }
+.about-link-small { display:inline-block; margin-top:10px; text-decoration:none; color:#aaa; font-size:12px; transition:0.2s; }
+.about-link-small:hover { color:#d4af37; }
 
-    .whatsapp-link:hover { transform: scale(1.02); }
-
-    .about-link-small {
-      display: inline-block;
-      margin-top: 18px;
-      text-decoration: none;
-      color: #555;
-      font-size: 12px;
-      transition: color 0.2s;
-    }
-
-    .about-link-small:hover { color: #4da6ff; }
-  </style>
+/* RESPONSIVO */
+@media (max-width: 900px) {
+    .hero { flex-direction: column; text-align: center; }
+    .hero-content { margin-bottom: 50px; }
+    .hero-visual { margin-top: 30px; }
+}
+</style>
 </head>
 <body>
 
-  <div class="container">
-    <h2>Curso - Programação</h2>
+<header>
+    <div class="logo">MILHAS<span>PRO</span></div>
+    <a href="/login" class="btn-login" style="border: 1px solid #d4af37; padding: 10px 25px; border-radius: 5px; text-decoration: none; color: #d4af37; font-weight: 600; font-size: 13px;">ÁREA DO ALUNO</a>
+</header>
 
-    {% if erro %} <div class="message error">{{ erro }}</div> {% end %}
-    {% if mensagem %} <div class="message success">{{ mensagem }}</div> {% end %}
-
-    <div class="nav-buttons">
-      <button type="button" onclick="window.location.href='/login'">Login</button>
-      <button type="button" onclick="window.location.href='/criar_conta'">Criar Conta</button>
-      <button type="button" onclick="window.location.href='/recuperar_senha'">Recuperar</button>
+<section class="hero">
+    <div class="hero-content">
+        <h1>A estratégia que transforma milhas em <span>lucro real.</span></h1>
+        <p>Aprenda a acumular milhões de milhas todos os meses, acessar as melhores salas VIP do mundo e viajar com luxo gastando quase zero.</p>
+        
+        <a href="#conteudo" class="cta-button">
+            QUERO COMEÇAR AGORA
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
     </div>
 
-    <form method="POST" action="/login">
-      <input type="text" name="username" placeholder="Nome de usuário" value="{{ usuario_prefill }}" required>
-      <input type="password" name="password" placeholder="Senha" required>
-      <button type="submit" class="submit-btn">Entrar</button>
-    </form>
+    <div class="hero-visual">
+        <!-- LOGIN CARD COMPLETO -->
+        <div class="login-card">
+            <div class="nav-buttons">
+                <button type="button" onclick="window.location.href='/login'">Login</button>
+                <button type="button" onclick="window.location.href='/criar_conta'">Criar Conta</button>
+                <button type="button" onclick="window.location.href='/recuperar_senha'">Recuperar</button>
+            </div>
 
-    <div class="social-login">
-      <button type="button" class="social-btn" id="googleLogin">
-        <img src="https://img.icons8.com/color/24/google-logo.png" alt="Google">
-        Entrar com Google
-      </button>
+            {% if erro %} <div class="message error">{{ erro }}</div> {% end %}
+            {% if mensagem %} <div class="message success">{{ mensagem }}</div> {% end %}
+
+            <form method="POST" action="/login">
+                <input type="text" name="username" placeholder="Nome de usuário" value="{{ usuario_prefill }}" required>
+                <input type="password" name="password" placeholder="Senha" required>
+                <button type="submit" class="submit-btn">Entrar</button>
+            </form>
+
+            <div class="social-login">
+                <button type="button" class="social-btn" id="googleLogin">
+                    <img src="https://img.icons8.com/color/24/google-logo.png" alt="Google">
+                    Entrar com Google
+                </button>
+            </div>
+
+            <div class="support-section">
+                <p style="font-size: 13px; color: var(--text-gray); margin-bottom: 8px;">Dúvidas? Fale conosco:</p>
+                <a href="https://wa.me/555499716973?text=Olá! Preciso de ajuda com o acesso ao curso." target="_blank" class="whatsapp-link">
+                    <img src="https://img.icons8.com/color/24/whatsapp.png" alt="WhatsApp" style="width: 20px; height: 20px;">
+                    (54) 9971-6973
+                </a>
+                <!--<a href="/sobre" class="about-link-small">Sobre o Curso</a>-->
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="modules" id="conteudo">
+    <div class="section-title">
+        <p>Conteúdo Exclusivo</p>
+        <h2>O que você vai dominar</h2>
     </div>
 
-    <div class="support-section">
-      <p style="font-size: 13px; color: #777; margin-bottom: 10px;">Dúvidas? Fale conosco:</p>
-      
-      <a href="https://wa.me/555499716973?text=Olá! Preciso de ajuda com o acesso ao curso." target="_blank" class="whatsapp-link">
-        <img src="https://img.icons8.com/color/24/whatsapp.png" alt="WhatsApp" style="width: 20px; height: 20px;">
-        (54) 9971-6973
-      </a>
-
-      <a href="/sobre" class="about-link-small">Sobre o Curso</a>
+    <div class="grid-modules">
+        <div class="module-card">
+            <div class="module-number">01</div>
+            <h3>Fundamentos</h3>
+            <p>O guia básico para entender os programas de fidelidade e como nunca mais perder pontos.</p>
+        </div>
+        <div class="module-card">
+            <div class="module-number">02</div>
+            <h3>Cartões Black</h3>
+            <p>Como conseguir os melhores cartões do mercado mesmo sem ter renda alta comprovada.</p>
+        </div>
+        <div class="module-card">
+            <div class="module-number">03</div>
+            <h3>Multiplicação</h3>
+            <p>As estratégias de transferência bonificada para dobrar suas milhas instantaneamente.</p>
+        </div>
+        <div class="module-card">
+            <div class="module-number">04</div>
+            <h3>Emissões VIP</h3>
+            <p>Como emitir passagens em Classe Executiva e Primeira Classe pelo menor preço possível.</p>
+        </div>
     </div>
+</section>
 
-  </div>
 
-  <script>
-    document.getElementById("googleLogin").addEventListener("click", function () {
-      window.location.href = "/auth/google";
-    });
+<footer>
+    <p>&copy; 2026 MilhasPro Treinamentos. Todos os direitos reservados.</p>
+    <p style="font-size: 12px; margin-top: 10px;"></p>
+</footer>
 
-    const form = document.querySelector("form");
-    form.addEventListener("submit", function (e) {
-      const username = form.querySelector("input[name='username']").value;
-      const password = form.querySelector("input[name='password']").value;
+<script>
+document.getElementById("googleLogin").addEventListener("click", function () {
+    window.location.href = "/auth/google";
+});
 
-      if (username === "dev" && password === "dev") {
+const form = document.querySelector("form");
+form.addEventListener("submit", function(e){
+    const username = form.querySelector("input[name='username']").value;
+    const password = form.querySelector("input[name='password']").value;
+    if(username==="dev" && password==="dev"){
         e.preventDefault();
-        window.location.href = "/login_dev";
-      }
-    });
-  </script>
+        window.location.href="/login_dev";
+    }
+});
+</script>
 
 </body>
 </html>
+
+
