@@ -28,7 +28,7 @@ from app.utils.admin_tools import (
     criar_usuario_admin_se_nao_existe
 )
 from app.handlers.pagamento_mensal import PagamentoMensalPage, CriarPagamentoHandler, WebhookHandler
-
+from app.handlers.modules import ModulesHandler
 def make_app():
     settings = dict(
         template_path=os.path.join(BASE_DIR, "app", "templates"),
@@ -65,6 +65,7 @@ def make_app():
         (r"/submit", SubmitCodeHandler),
         (r"/admin/emails_logados", EmailsLogadosHandler),
         (r"/admin/compras", ComprasHandler),
+        (r"/api/modules", ModulesHandler),
 
     ], **settings)
 
