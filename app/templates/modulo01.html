@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Módulo 1 | Curso de Milhas</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+:root{
+  --gold:#d4af37;
+  --dark-bg:#020202;
+  --dark-card:#0a0a0a;
+  --border:rgba(212,175,55,0.15);
+  --text-dim:#a0a0a0;
+  --card-glow:0 0 20px rgba(212,175,55,0.6);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Plus Jakarta Sans',sans-serif;}
+body{background:var(--dark-bg);color:#fff;display:flex;flex-direction:column;min-height:100vh;padding:40px;}
+h1{font-size:32px;color:var(--gold);margin-bottom:30px;text-shadow:0 0 10px rgba(212,175,55,0.7);}
+a.back{color:var(--text-dim);text-decoration:none;margin-bottom:30px;display:inline-block;font-size:16px;}
+a.back:hover{color:var(--gold);}
+
+.modules-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:25px;
+}
+
+/* Card da aula */
+.lesson-card{
+  background:var(--dark-card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:20px;
+  transition:0.3s;
+  cursor:pointer;
+  position:relative;
+}
+.lesson-card:hover{
+  transform:translateY(-5px);
+  box-shadow:var(--card-glow);
+  border-color:var(--gold);
+}
+.lesson-card h2{margin-bottom:10px;font-size:18px;}
+.lesson-card p{margin-bottom:0;color:var(--text-dim);font-size:14px;}
+
+/* Modal */
+.modal{
+  position:fixed;inset:0;background:rgba(0,0,0,0.95);
+  display:none;align-items:center;justify-content:center;z-index:2000;padding:20px;
+}
+.modal-body{
+  width:100%;max-width:1000px;background:var(--dark-card);
+  border-radius:24px;overflow:hidden;
+}
+.v-container{
+  position:relative;width:100%;padding-top:56.25%; /* 16:9 */
+}
+.v-container iframe{
+  position:absolute;top:0;left:0;width:100%;height:100%;
+}
+.modal-header{
+  padding:15px 20px;
+  border-bottom:1px solid var(--border);
+  font-weight:700;color:var(--gold);
+}
+.modal-close{
+  position:absolute;top:10px;right:15px;color:var(--text-dim);
+  background:none;border:none;font-size:18px;cursor:pointer;
+}
+.modal-close:hover{color:var(--gold);}
+</style>
+</head>
+<body>
+
+<a href="/curso" class="back"><i class="fas fa-arrow-left"></i> Voltar para o Curso</a>
+<h1>Módulo 1: Introdução às Milhas</h1>
+
+<div class="modules-grid" id="lessons-container">
+  <!-- As aulas serão inseridas via JS -->
+</div>
+
+<!-- Modal de aula -->
+<div class="modal" id="modal">
+  <div class="modal-body">
+    <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+    <div class="modal-header" id="modal-title">Título da Aula</div>
+    <div class="v-container">
+      <iframe id="modal-video" src="" frameborder="0" allowfullscreen></iframe>
+    </div>
+    <div style="padding:15px;color:var(--text-dim);" id="modal-desc">Descrição da aula...</div>
+  </div>
+</div>
+
+<script>
+// Aulas do módulo 1
+const lessons = [
+  {title:"Aula 1: O que são Milhas", desc:"Conceito de milhas, como funcionam programas de fidelidade e benefícios.", video:"https://www.youtube.com/embed/dQw4w9WgXcQ"},
+  {title:"Aula 2: Como acumular milhas", desc:"Formas de acumular milhas: cartões de crédito, voos e parceiros.", video:"https://www.youtube.com/embed/dQw4w9WgXcQ"},
+  {title:"Aula 3: Programas de fidelidade", desc:"Conheça os principais programas e suas vantagens.", video:"https://www.youtube.com/embed/dQw4w9WgXcQ"},
+  {title:"Aula 4: Milhas x Pontos", desc:"Diferença entre milhas e pontos e como maximizar cada um.", video:"https://www.youtube.com/embed/dQw4w9WgXcQ"},
+  {title:"Aula 5: Estratégias iniciais", desc:"Como planejar o acúmulo de milhas desde o começo do programa.", video:"https://www.youtube.com/embed/dQw4w9WgXcQ"},
+  {title:"Aula 6: Transferência de pontos", desc:"Aprenda a transferir pontos entre programas com segurança.", video:"https://www.youtube.com/embed/dQw4w9WgXcQ"},
+  {title:"Aula 7: Validade das milhas", desc:"Entenda o prazo de validade e como evitar que milhas expirem.", video:"https://www.youtube.com/embed/dQw4w9WgXcQ"},
+  {title:"Aula 8: Resgate de milhas", desc:"Tipos de resgate: passagens, upgrades e produtos.", video:"https://www.youtube.com/embed/dQw4w9WgXcQ"},
+  {title:"Aula 9: Milhas em viagens internacionais", desc:"Dicas para usar milhas em voos internacionais e destinos exóticos.", video:"https://www.youtube.com/embed/dQw4w9WgXcQ"},
+  {title:"Aula 10: Erros comuns", desc:"Evite erros ao acumular e resgatar milhas.", video:"https://www.youtube.com/embed/dQw4w9WgXcQ"},
+];
+
+// Renderiza cards
+const container = document.getElementById("lessons-container");
+lessons.forEach((lesson,index)=>{
+  const div = document.createElement("div");
+  div.className = "lesson-card";
+  div.innerHTML = `<h2>${lesson.title}</h2><p>${lesson.desc}</p>`;
+  div.onclick = () => openModal(lesson);
+  container.appendChild(div);
+});
+
+// Funções Modal
+function openModal(lesson){
+  document.getElementById("modal-title").innerText = lesson.title;
+  document.getElementById("modal-desc").innerText = lesson.desc;
+  document.getElementById("modal-video").src = lesson.video;
+  document.getElementById("modal").style.display = "flex";
+}
+
+function closeModal(){
+  document.getElementById("modal").style.display = "none";
+  document.getElementById("modal-video").src = "";
+}
+</script>
+
+</body>
+</html>

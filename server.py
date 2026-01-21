@@ -65,7 +65,13 @@ def make_app():
         (r"/submit", SubmitCodeHandler),
         (r"/admin/emails_logados", EmailsLogadosHandler),
         (r"/admin/compras", ComprasHandler),
-        (r"/api/modules", ModulesHandler),
+        
+
+        (r"/modulo01.html", tornado.web.StaticFileHandler, {"path": "."}),
+        (r"/modulo02.html", tornado.web.StaticFileHandler, {"path": "."}),
+        (r"/modulo03.html", tornado.web.StaticFileHandler, {"path": "."}),
+        (r"/modulo04.html", tornado.web.StaticFileHandler, {"path": "."}),
+        (r"/modulo05.html", tornado.web.StaticFileHandler, {"path": "."}),
 
     ], **settings)
 
