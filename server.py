@@ -14,7 +14,7 @@ from app.handlers.curso import CursoHandler
 from app.handlers.recuperar_senha import RecuperarSenhaHandler
 from app.handlers.emails_logados import EmailsLogadosHandler
 from app.handlers.avaliacao import SubmitCodeHandler
-
+from app.handlers.atividade import AtividadesHandlers
 from app.handlers.criar_conta import CriarContaHandler
 from app.utils.admin_tools import (
     LoginDevHandler,
@@ -28,7 +28,6 @@ from app.utils.admin_tools import (
     criar_usuario_admin_se_nao_existe
 )
 from app.handlers.pagamento_mensal import PagamentoMensalPage, CriarPagamentoHandler, WebhookHandler
-from app.handlers.modules import ModulesHandler
 def make_app():
     settings = dict(
         template_path=os.path.join(BASE_DIR, "app", "templates"),
@@ -65,13 +64,8 @@ def make_app():
         (r"/submit", SubmitCodeHandler),
         (r"/admin/emails_logados", EmailsLogadosHandler),
         (r"/admin/compras", ComprasHandler),
-        
+        (r"/atividades", AtividadesHandlers),       
 
-        (r"/modulo01.html", tornado.web.StaticFileHandler, {"path": "."}),
-        (r"/modulo02.html", tornado.web.StaticFileHandler, {"path": "."}),
-        (r"/modulo03.html", tornado.web.StaticFileHandler, {"path": "."}),
-        (r"/modulo04.html", tornado.web.StaticFileHandler, {"path": "."}),
-        (r"/modulo05.html", tornado.web.StaticFileHandler, {"path": "."}),
 
     ], **settings)
 
