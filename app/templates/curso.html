@@ -1,717 +1,304 @@
-vc pode arrumar  omeu comando,e  veja oq da para add nele (para ser mais proficional)
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MESTRE DAS MILHAS | Plataforma Elite 2026</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>MESTRE DAS MILHAS | Elite 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-
-        .exam-box {
-    background:#000;
-    border:1px solid var(--border);
-    border-radius:22px;
-    padding:25px;
-    margin-top:30px;
-}
-
-.exam-box h3 {
-    color:var(--gold);
-    margin-bottom:10px;
-}
-
-.exam-question {
-    margin-top:15px;
-    font-weight:600;
-}
-
-.exam-option {
-    margin-top:8px;
-    padding:12px;
-    border:1px solid #222;
-    border-radius:12px;
-    cursor:pointer;
-    transition:.3s;
-}
-
-.exam-option:hover {
-    border-color:var(--gold);
-    background:#0a0a0a;
-}
-
-.exam-option.selected {
-    border-color:var(--accent);
-    background:rgba(0,255,163,0.1);
-}
-
-.exam-feedback {
-    margin-top:15px;
-    font-weight:800;
-}
-
-.pass { color:var(--accent); }
-.fail { color:#ff4d4d; }
-
-        .activity-box {
-    background:#000;
-    border:1px solid var(--border);
-    border-radius:20px;
-    padding:25px;
-    margin-top:25px;
-}
-.activity-box textarea {
-    width:100%;
-    height:130px;
-    background:#050505;
-    color:#fff;
-    border-radius:12px;
-    padding:15px;
-}
-.activity-feedback {
-    margin-top:12px;
-    font-weight:800;
-}
-.ok { color:var(--accent); }
-.err { color:#ff5555; }
-
-
-
         :root {
             --gold: #d4af37;
             --gold-gradient: linear-gradient(135deg, #d4af37 0%, #f1d592 50%, #b8860b 100%);
             --dark-pure: #020202;
             --dark-card: #0a0a0a;
-            --border: rgba(212, 175, 55, 0.2);
+            --border: rgba(212, 175, 55, 0.12);
             --accent: #00ffa3;
-            --text-dim: #a0a0a0;
+            --text-dim: #777;
+            --glass: rgba(255, 255, 255, 0.02);
+            --sidebar-w: 260px;
         }
 
+        /* RESET PROFISSIONAL */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background-color: var(--dark-pure); color: #fff; display: flex; min-height: 100vh; scroll-behavior: smooth; }
+        body { background-color: var(--dark-pure); color: #fff; display: flex; min-height: 100vh; overflow-x: hidden; }
+        
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
 
-        /* SIDEBAR ROBUSTA */
-        nav { width: 300px; background: #000; border-right: 1px solid var(--border); padding: 40px 25px; position: fixed; height: 100vh; z-index: 1000; overflow-y: auto; }
-        .logo { font-size: 24px; font-weight: 900; color: #fff; margin-bottom: 50px; text-decoration: none; display: block; }
-        .logo span { color: var(--gold); }
-        
-        .nav-group { margin-bottom: 30px; }
-        .nav-label { font-size: 10px; color: var(--gold); font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; display: block; opacity: 0.7; }
-        
-        .nav-link { 
-            padding: 14px 18px; border-radius: 12px; text-decoration: none; color: var(--text-dim); 
-            margin-bottom: 8px; display: flex; align-items: center; gap: 15px; transition: 0.3s; 
-            font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid transparent;
+        /* SIDEBAR EXECUTIVA */
+        nav { 
+            width: var(--sidebar-w); background: #000; border-right: 1px solid var(--border); 
+            padding: 40px 20px; position: fixed; height: 100vh; z-index: 1000;
+            display: flex; flex-direction: column;
         }
-        .nav-link:hover, .nav-link.active { background: var(--dark-card); color: var(--gold); border-color: var(--border); transform: translateX(5px); }
+        .logo { font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 45px; text-decoration: none; letter-spacing: -0.5px; }
+        .logo span { color: var(--gold); font-weight: 900; }
+        
+        .nav-label { font-size: 10px; color: var(--gold); font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; display: block; opacity: 0.5; }
+        .nav-link { 
+            padding: 14px 16px; border-radius: 12px; text-decoration: none; color: var(--text-dim); 
+            margin-bottom: 6px; display: flex; align-items: center; gap: 12px; transition: 0.3s; 
+            font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid transparent;
+        }
+        .nav-link i { font-size: 16px; color: var(--gold); }
+        .nav-link:hover, .nav-link.active { background: var(--glass); color: #fff; border-color: var(--border); transform: translateX(5px); }
 
         /* ÁREA PRINCIPAL */
-        main { flex: 1; margin-left: 300px; padding: 50px; }
+        main { flex: 1; margin-left: var(--sidebar-w); padding: 50px 60px; max-width: 1600px; }
+        .view-section { display: none; animation: fadeIn 0.7s ease-out; }
+        .view-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* HEADER DASHBOARD */
-        .welcome-box { margin-bottom: 40px; }
-        .dashboard-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; margin-bottom: 40px; }
-        .stat-card { background: var(--dark-card); padding: 30px; border-radius: 24px; border: 1px solid var(--border); text-align: center; position: relative; overflow: hidden; }
-        .stat-card::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--gold-gradient); opacity: 0.3; }
-        .stat-card small { color: var(--text-dim); text-transform: uppercase; font-size: 11px; font-weight: 700; }
-        .stat-card .val { font-size: 36px; font-weight: 800; margin-top: 10px; display: block; }
+        /* DASHBOARD METRICS */
+        .page-title { margin-bottom: 40px; }
+        .page-title h1 { font-size: 34px; font-weight: 800; letter-spacing: -1px; }
+        .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; margin-bottom: 40px; }
+        .metric-item { background: var(--dark-card); padding: 30px; border-radius: 24px; border: 1px solid var(--border); }
+        .metric-item small { color: var(--gold); font-weight: 800; font-size: 11px; text-transform: uppercase; }
+        .metric-item .val { font-size: 34px; font-weight: 800; display: block; margin-top: 10px; }
 
-        /* RANKING INTERATIVO */
-        .ranking-card { background: var(--dark-card); border-radius: 24px; border: 1px solid var(--border); padding: 30px; margin-bottom: 40px; }
-        .ranking-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .ranking-table th { text-align: left; color: var(--gold); font-size: 12px; padding-bottom: 15px; text-transform: uppercase; }
-        .ranking-table tr { transition: 0.3s; cursor: pointer; }
-        .ranking-table tr:hover { background: rgba(212, 175, 55, 0.05); }
-        .ranking-table td { padding: 18px 0; border-bottom: 1px solid #151515; font-size: 14px; font-weight: 600; }
-        .status-badge { background: rgba(0, 255, 163, 0.1); color: var(--accent); padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 800; border: 1px solid var(--accent); transition: 0.3s; }
-        .status-badge:hover { background: var(--accent); color: #000; box-shadow: 0 0 15px var(--accent); }
-
-        /* CALCULADORA */
-        .calc-bar { background: var(--gold-gradient); color: #000; padding: 30px; border-radius: 24px; margin-bottom: 50px; display: flex; justify-content: space-between; align-items: center; }
-        .calc-inputs { display: flex; gap: 20px; }
-        .calc-inputs input { padding: 15px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); width: 180px; font-weight: 800; font-size: 16px; outline: none; }
-
-        /* MÓDULOS */
-        .section-view { display: none; }
-        .section-view.active { display: block; animation: slideUp 0.5s ease; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-
+        /* GRID DE AULAS PANORÂMICO */
         .module-block { margin-bottom: 60px; }
         .module-header { display: flex; align-items: center; gap: 20px; margin-bottom: 30px; }
-        .module-num { width: 50px; height: 50px; background: var(--gold-gradient); color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 20px; }
-        
-        .lesson-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
-        .lesson-card { background: var(--dark-card); border-radius: 20px; border: 1px solid #1a1a1a; cursor: pointer; transition: 0.4s; overflow: hidden; position: relative; }
-        .lesson-card:hover { border-color: var(--gold); transform: translateY(-8px); box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
-        .lesson-card.completed { border-color: var(--accent); }
-        .lesson-thumb { height: 180px; background: #000; display: flex; align-items: center; justify-content: center; background-size: cover; background-position: center; }
-        .lesson-body { padding: 25px; }
-        .lesson-body h4 { font-size: 16px; margin-bottom: 8px; }
-        .lesson-body p { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
+        .module-header h2 { font-size: 20px; font-weight: 700; color: #fff; }
+        .line { flex: 1; height: 1px; background: var(--border); }
 
-        /* BUSCA E PLANILHAS */
-        .tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 30px; }
-        .tool-card { background: var(--dark-card); padding: 35px; border-radius: 24px; border: 1px solid var(--border); transition: 0.3s; }
-        .tool-card:hover { border-color: var(--gold); background: #0f0f0f; }
-        .btn-tool { background: var(--gold); color: #000; padding: 15px 30px; border-radius: 12px; text-decoration: none; font-weight: 800; display: inline-block; margin-top: 20px; transition: 0.3s; border: none; cursor: pointer; }
-        .btn-tool:hover { background: #fff; transform: scale(1.05); }
-
-        /* MODAL */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 2000; display: none; padding: 40px; }
-        .modal-content { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 2.5fr 1fr; gap: 40px; height: 85vh; }
-        .v-container { background: #000; border-radius: 24px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 0 50px rgba(212,175,55,0.1); }
+        .class-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
+        .class-card { background: var(--dark-card); border-radius: 20px; border: 1px solid var(--border); overflow: hidden; cursor: pointer; transition: 0.4s; position: relative; }
+        .class-card:hover { transform: translateY(-8px); border-color: var(--gold); }
+        .class-card.done::after { content: '\f058'; font-family: 'Font Awesome 6 Free'; font-weight: 900; position: absolute; top: 15px; right: 15px; color: var(--accent); }
         
-        @media (max-width: 1200px) {
-            nav { display: none; }
-            main { margin-left: 0; padding: 25px; }
-            .modal-content { grid-template-columns: 1fr; overflow-y: auto; }
+        .thumb-land { height: 180px; width: 100%; background: #111; display: flex; align-items: center; justify-content: center; position: relative; }
+        .thumb-land i { font-size: 35px; color: var(--gold); opacity: 0.6; transition: 0.3s; }
+        .class-info { padding: 22px; }
+        .class-info h4 { font-size: 15px; font-weight: 700; margin-bottom: 8px; color: #efefef; }
+
+        /* MODAL CINEMATOGRÁFICO CORRIGIDO (HORIZONTAL) */
+        .modal { 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.96); 
+            z-index: 2000; display: none; align-items: center; justify-content: center; 
+            padding: 30px;
         }
+        .modal-body { 
+            width: 100%; max-width: 1350px; background: #000; 
+            border: 1px solid var(--border); border-radius: 32px;
+            display: grid; grid-template-columns: 1.7fr 1fr;
+            max-height: 85vh; overflow: hidden;
+            box-shadow: 0 50px 120px rgba(0,0,0,1);
+        }
+        
+        .v-container { 
+            position: relative; width: 100%; 
+            background: #000; align-self: center;
+            padding-top: 56.25%; /* Aspect Ratio 16:9 Cinema */
+        }
+        .v-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
-</style>
+        .v-details { 
+            padding: 45px; background: var(--dark-card); 
+            border-left: 1px solid var(--border); overflow-y: auto; 
+            display: flex; flex-direction: column; gap: 22px;
+        }
+        
+        .action-area { background: rgba(255,255,255,0.03); border: 1px solid #222; border-radius: 20px; padding: 22px; }
+        .action-area textarea { 
+            width: 100%; height: 95px; background: #050505; border: 1px solid #333; 
+            border-radius: 12px; color: #fff; padding: 14px; margin-top: 12px; resize: none; outline: none; transition: 0.3s;
+        }
+        .action-area textarea:focus { border-color: var(--gold); }
+        
+        .q-item { background: #111; padding: 14px; border-radius: 10px; margin-top: 10px; cursor: pointer; border: 1px solid #222; font-size: 13px; transition: 0.2s; }
+        .q-item:hover { border-color: var(--gold); }
+        .q-item.selected { border-color: var(--accent); background: rgba(0,255,163,0.04); }
 
+        .btn-gold { 
+            background: var(--gold-gradient); color: #000; width: 100%; padding: 18px; 
+            border-radius: 16px; border: none; font-weight: 800; cursor: pointer; transition: 0.3s; 
+            font-size: 15px; letter-spacing: 0.5px;
+        }
+        .btn-gold:hover { transform: translateY(-2px); filter: brightness(1.1); }
+
+        @media (max-width: 1100px) {
+            .modal-body { grid-template-columns: 1fr; overflow-y: auto; }
+            .v-details { border-left: none; border-top: 1px solid var(--border); }
+        }
+    </style>
 </head>
 <body>
 
     <nav>
-        <a href="#" class="logo">MILHAS<span>PRO</span></a>
+        <a href="#" class="logo">MILHAS<span>MASTER</span></a>
         
-        <div class="nav-group">
-            <span class="nav-label">CONTEÚDO</span>
-            <div class="nav-link active" onclick="showSection('dashboard')"><i class="fas fa-th-large"></i> <span>Dashboard</span></div>
-            <div class="nav-link" onclick="showSection('cursos')"><i class="fas fa-graduation-cap"></i> <span>Módulos do Curso</span></div>
-        </div>
-
-        <div class="nav-group">
-            <span class="nav-label">FERRAMENTAS</span>
-            <div class="nav-link" onclick="showSection('busca')"><i class="fas fa-search-location"></i> <span>Busca de Passagens</span></div>
-            <div class="nav-link" onclick="showSection('cartoes')"><i class="fas fa-credit-card"></i> <span>Ranking Cartões</span></div>
-            <div class="nav-link" onclick="showSection('downloads')"><i class="fas fa-cloud-download-alt"></i> <span>Planilhas & PDFs</span></div>
-        </div>
-
-        <div class="nav-group">
-            <span class="nav-label">SUPORTE</span>
-            <a href="https://wa.me/555499716973" target="_blank" class="nav-link" style="color: var(--accent);"><i class="fab fa-whatsapp"></i> <span>Mentor VIP 24h</span></a>
-            <div class="nav-link" onclick="alert('Comunidade abre em breve!')"><i class="fas fa-users"></i> <span>Grupo de Alunos</span></div>
+        <span class="nav-label">Plataforma</span>
+        <div class="nav-link active" onclick="nav('dash', this)"><i class="fas fa-columns"></i> Dashboard</div>
+        <div class="nav-link" onclick="nav('aulas', this)"><i class="fas fa-play-circle"></i> Área de Aulas</div>
+        
+        <span class="nav-label">Inteligência</span>
+        <div class="nav-link" onclick="nav('rank', this)"><i class="fas fa-crown"></i> Ranking Black</div>
+        
+        <div style="margin-top: auto;">
+            <a href="https://wa.me/555499716973" target="_blank" class="nav-link" style="color: var(--accent);">
+                <i class="fab fa-whatsapp"></i> SUPORTE MENTOR
+            </a>
         </div>
     </nav>
 
     <main>
-        <div id="dashboard" class="section-view active">
-            <div class="welcome-box">
-                <h1>Dashboard de Comando 2026</h1>
-                <p style="color: var(--text-dim);">Acompanhe seu progresso e utilize as calculadoras de giro.</p>
+        <div id="dash" class="view-section active">
+            <div class="page-title">
+                <h1>Painel Executivo</h1>
+                <p style="color:var(--text-dim)">Gerencie seu progresso técnico em tempo real.</p>
             </div>
-
-            <div class="dashboard-stats">
-                <div class="stat-card">
-                    <small>Sua Patente Atual</small>
-                    <span class="val" id="rank-name" style="color:var(--gold)">RECRUTA</span>
-                </div>
-                <div class="stat-card">
-                    <small>Conclusão do Curso</small>
-                    <span class="val" id="prog-pct">0%</span>
-                </div>
-                <div class="stat-card">
-                    <small>Aulas Assistidas</small>
-                    <span class="val" id="prog-count">0/40</span>
-                </div>
-            </div>
-
-            <div class="calc-bar">
-                <div>
-                    <h2>Calculadora de CPM Pro</h2>
-                    <p style="font-weight: 500; opacity: 0.8;">Avaliação de custo de milheiro em tempo real.</p>
-                </div>
-                <div class="calc-inputs">
-                    <input type="number" id="c-valor" placeholder="Valor Pago R$">
-                    <input type="number" id="c-milhas" placeholder="Qtd Milhas">
-                    <div id="c-res" style="font-size: 32px; font-weight: 900; min-width: 180px; text-align: right;">R$ 0,00</div>
-                </div>
-            </div>
-
-            <h3>Próximas Aulas para Você:</h3>
-            <div id="next-lessons-grid" class="lesson-grid" style="margin-top: 25px;">
-                </div>
-        </div>
-
-        <div id="cursos" class="section-view">
-            <h1 style="margin-bottom: 40px;">Módulos da Mentoria</h1>
-            <div id="full-course-render"></div>
-        </div>
-
-        <div id="busca" class="section-view">
-            <h1 style="margin-bottom: 30px;">Motores de Busca Estratégica</h1>
-            <div class="tool-grid">
-                <div class="tool-card">
-                    <h3><i class="fas fa-globe"></i> Google Flights</h3>
-                    <p style="margin-top:15px; color:var(--text-dim);">A base para qualquer busca. Use para encontrar datas com "preço base" baixo em dinheiro antes de olhar milhas.</p>
-                    <a href="https://www.google.com/flights" target="_blank" class="btn-tool">Abrir Google Flights</a>
-                </div>
-                <div class="tool-card">
-                    <h3><i class="fas fa-database"></i> ITA Matrix</h3>
-                    <p style="margin-top:15px; color:var(--text-dim);">O sistema raiz. Permite ver códigos tarifários e taxas de combustível separadas. Essencial para profissionais.</p>
-                    <a href="https://matrix.itasoftware.com" target="_blank" class="btn-tool">Acessar Matrix</a>
-                </div>
-                <div class="tool-card">
-                    <h3><i class="fas fa-search-plus"></i> ExpertFlyer</h3>
-                    <p style="margin-top:15px; color:var(--text-dim);">A única ferramenta que avisa quando abrem vagas para emitir com milhas em executiva. (Alertas automáticos).</p>
-                    <a href="https://www.expertflyer.com" target="_blank" class="btn-tool">Configurar Alertas</a>
-                </div>
-                <div class="tool-card">
-                    <h3><i class="fas fa-bolt"></i> Seats.aero</h3>
-                    <p style="margin-top:15px; color:var(--text-dim);">Busca instantânea de disponibilidade em parceiros Star Alliance, OneWorld e SkyTeam.</p>
-                    <a href="https://seats.aero" target="_blank" class="btn-tool">Buscar Vagas</a>
-                </div>
+            <div class="metrics">
+                <div class="metric-item"><small>Sua Patente</small><span class="val" id="st-rank" style="color:var(--gold)">RECRUTA</span></div>
+                <div class="metric-item"><small>Concluídas</small><span class="val" id="st-count">0 / 40</span></div>
+                <div class="metric-item"><small>Completude</small><span class="val" id="st-pct">0%</span></div>
             </div>
         </div>
 
-        <div id="cartoes" class="section-view">
-            <h1 style="margin-bottom: 10px;">O Olimpo dos Cartões 2026</h1>
-            <p style="color:var(--text-dim); margin-bottom: 40px;">Clique nos badges verdes para ir direto ao site de solicitação do banco.</p>
-            <iv class="ranking-card">
-                <table class="ranking-table">
-                    <thead><tr><th>RANK</th><th>CARTÃO</th><th>PONTUAÇÃO</th><th>BENEFÍCIO CHAVE</th><th>AÇÃO</th></tr></thead>
-                    <tbody id="ranking-body-2026">
-                        </tbody>
+        <div id="aulas" class="view-section">
+            <div class="page-title">
+                <h1>Formação Técnica Milhas</h1>
+                <p style="color:var(--text-dim)">Trilha de 40 aulas otimizadas para visualização horizontal.</p>
+            </div>
+            <div id="render-content"></div>
+        </div>
+
+        <div id="rank" class="view-section">
+            <div class="page-title"><h1>Ranking de Cartões 2026</h1></div>
+            <div class="metric-item" style="padding:0; overflow:hidden">
+                <table style="width:100%; border-collapse:collapse; text-align:left">
+                    <thead style="background:rgba(255,255,255,0.02)">
+                        <tr><th style="padding:20px; color:var(--gold)">#</th><th style="padding:20px">Cartão</th><th style="padding:20px">Pontos</th></tr>
+                    </thead>
+                    <tbody id="render-rank"></tbody>
                 </table>
-                <div class="activity-box">
-
-         </div>
-            <!-- ATIVIDADE DO MÓDULO -->
-
-        </div>
-
-        <div id="downloads" class="section-view">
-            <h1 style="margin-bottom: 40px;">Biblioteca de Ativos</h1>
-            <div class="tool-grid">
-                <div class="tool-card">
-                    <h3><i class="fas fa-file-excel"></i> Planilha de Gestão 2026</h3>
-                    <p style="margin-top:10px;">Controle de custo médio, validade de pontos e lucro por CPF.</p>
-                    <button class="btn-tool" onclick="alert('Iniciando Download da Planilha...')">Download .XLSX</button>
-                </div>
-                <div class="tool-card">
-                    <h3><i class="fas fa-file-pdf"></i> PDF: Dicionário Milheiro</h3>
-                    <p style="margin-top:10px;">Todos os termos técnicos (Award, Stopover, Open Jaw, CPM, Spread).</p>
-                    <button class="btn-tool" onclick="alert('Iniciando Download do PDF...')">Download .PDF</button>
-                </div>
-                <div class="tool-card">
-                    <h3><i class="fas fa-file-invoice"></i> Tabela Fixa Consolidada</h3>
-                    <p style="margin-top:10px;">Guia rápido de emissões com valores fixos em todas as alianças.</p>
-                    <button class="btn-tool" onclick="alert('Iniciando Download da Tabela...')">Download .PDF</button>
-                </div>
             </div>
         </div>
     </main>
 
-    <div class="modal" id="p-modal">
-        <div class="modal-content">
-            <div class="v-container">
-                <iframe id="v-frame" width="100%" height="100%" src="" allowfullscreen></iframe>
-            </div>
-            <div style="background:var(--dark-card); padding:30px; border-radius:24px; border:1px solid var(--border);">
-                <h2 id="v-title">Título da Aula</h2>
-                <p id="v-desc" style="color:var(--text-dim); margin-top:15px; font-size:14px;"></p>
-                <div style="margin-top:30px;">
-                    <h4 style="margin-bottom:10px;">Anotações da Estratégia</h4>
-                    <textarea id="v-notes" style="width:100%; height:200px; background:#000; color:#fff; border:1px solid #222; border-radius:15px; padding:15px; resize:none;"></textarea>
+    <div class="modal" id="modal-aula">
+        <div class="modal-body">
+            <div style="background: #000; display: flex; align-items: center;">
+                <div class="v-container">
+                    <iframe id="vid-player" src="" frameborder="0" allowfullscreen></iframe>
                 </div>
-                <button onclick="closeP()" class="btn-tool" style="width:100%; margin-top:30px;">SALVAR E CONCLUIR AULA</button>
+            </div>
+            
+            <div class="v-details">
+                <h2 id="m-t" style="font-size: 24px; font-weight: 800;">Título da Aula</h2>
+                <p id="m-d" style="color:var(--text-dim); font-size:14px;"></p>
+                
+                <div class="action-area">
+                    <h4 style="color:var(--gold); font-size: 14px; font-weight: 800;">📝 DESAFIO TÉCNICO</h4>
+                    <p id="m-task" style="font-size:11px; margin-top:6px; opacity:0.8; line-height: 1.5;"></p>
+                    <textarea id="m-inp" placeholder="Digite sua resposta estratégica aqui..."></textarea>
+                </div>
+
+                <div class="action-area">
+                    <h4 style="color:var(--gold); font-size: 14px; font-weight: 800;">🧠 VALIDAÇÃO RÁPIDA</h4>
+                    <div id="m-quiz"></div>
+                </div>
+
+                <button class="btn-gold" onclick="finishAula()">SALVAR E CONCLUIR AULA</button>
+                <button onclick="closeModal()" style="background:transparent; color:var(--text-dim); border:none; width:100%; cursor:pointer; font-size: 12px; font-weight: 600;">Fechar e Voltar ao Grid</button>
             </div>
         </div>
     </div>
 
-
-
     <script>
-        // TODOS OS MÓDULOS E AULAS (40 AULAS)
-const allModules = [
-{ id: 1, name: "Introdução ao Império", lessons: [
-    { id: "1-1", t: "O Mindset de Investidor de Milhas", d: "Por que milhas são melhores que qualquer investimento fixo.", v: "#" },
-    { id: "1-2", t: "O Cadastro Mestre", d: "Livelo, Esfera e programas base.", v: "#" },
-    { id: "1-3", t: "Erros de Iniciante", d: "O que te faz perder dinheiro.", v: "#" },
-    { id: "1-4", t: "Segurança Total", d: "Evite bloqueios e perdas.", v: "#" },
-    { id: "1-5", t: "Plano 100k", d: "Seu primeiro objetivo.", v: "#" }
-]},
-{ id: 2, name: "Cartões de Elite 2026", lessons: [
-    { id: "2-1", t: "Limite Alto", d: "Como crescer rápido.", v: "#" },
-    { id: "2-2", t: "Upgrade Sem Renda", d: "Estratégias reais.", v: "#" },
-    { id: "2-3", t: "Anuidade Zero", d: "Scripts de negociação.", v: "#" },
-    { id: "2-4", t: "Spread Oculto", d: "Onde o banco ganha.", v: "#" },
-    { id: "2-5", t: "Benefícios Secretos", d: "O que ninguém usa.", v: "#" }
-]},
-{ id: 3, name: "Acúmulo Acelerado", lessons: [
-    { id: "3-1", t: "Compras Bonificadas", d: "10x mais milhas.", v: "#" },
-    { id: "3-2", t: "Giro de Produtos", d: "Milhas grátis.", v: "#" },
-    { id: "3-3", t: "Transferências 100%", d: "Hora certa.", v: "#" },
-    { id: "3-4", t: "Clubes", d: "Quais valem a pena.", v: "#" },
-    { id: "3-5", t: "Milhas no Dia a Dia", d: "Uber, posto, apps.", v: "#" }
-]},
-{ id: 4, name: "Emissões Internacionais", lessons: [
-    { id: "4-1", t: "Tabela Fixa", d: "LATAM e parceiras.", v: "#" },
-    { id: "4-2", t: "Executiva Europa", d: "Iberia e TAP.", v: "#" },
-    { id: "4-3", t: "Star Alliance", d: "United, Swiss.", v: "#" },
-    { id: "4-4", t: "OneWorld", d: "AA e BA.", v: "#" },
-    { id: "4-5", t: "Stopover", d: "2 viagens em 1.", v: "#" }
-]},
-{ id: 5, name: "Venda de Milhas", lessons: [
-    { id: "5-1", t: "Venda Direta", d: "Lucro máximo.", v: "#" },
-    { id: "5-2", t: "Limites de CPF", d: "Como evitar travas.", v: "#" },
-    { id: "5-3", t: "CPM Real", d: "Nunca venda no prejuízo.", v: "#" },
-    { id: "5-4", t: "Imposto", d: "Declare corretamente.", v: "#" },
-    { id: "5-5", t: "Escala Familiar", d: "Use CPFs.", v: "#" }
-]},
-{ id: 6, name: "Estratégias Avançadas", lessons: [
-    { id: "6-1", t: "Interline", d: "Emitindo tudo.", v: "#" },
-    { id: "6-2", t: "Upgrade em Voo", d: "Última hora.", v: "#" },
-    { id: "6-3", t: "Erros de Sistema", d: "Promoções secretas.", v: "#" },
-    { id: "6-4", t: "Hotéis", d: "Accor e parceiros.", v: "#" },
-    { id: "6-5", t: "Primeira Classe", d: "Emirates, Qatar.", v: "#" }
-]},
-{ id: 7, name: "Ferramentas Profissionais", lessons: [
-    { id: "7-1", t: "ExpertFlyer", d: "Assentos award.", v: "#" },
-    { id: "7-2", t: "Alertas", d: "Automação total.", v: "#" },
-    { id: "7-3", t: "Seats.aero", d: "Busca rápida.", v: "#" },
-    { id: "7-4", t: "Google Flights", d: "Estratégia híbrida.", v: "#" },
-    { id: "7-5", t: "Scripts", d: "Busca eficiente.", v: "#" }
-]},
-{ id: 8, name: "Mentoria Direta", lessons: [
-    { id: "8-1", t: "1 Milhão de Milhas", d: "Plano anual.", v: "#" },
-    { id: "8-2", t: "Carteira Ideal", d: "Cartões certos.", v: "#" },
-    { id: "8-3", t: "Dúvidas Reais", d: "Casos reais.", v: "#" },
-    { id: "8-4", t: "Planejamento", d: "Viagem prática.", v: "#" },
-    { id: "8-5", t: "Formatura", d: "Acesso Black.", v: "#" }
-]},
-{ id: 9, name: "Automação & Escala", lessons: [
-    { id: "9-1", t: "Automação de Alertas", d: "Sistema passivo.", v: "#" },
-    { id: "9-2", t: "Planilhas Inteligentes", d: "Controle total.", v: "#" },
-    { id: "9-3", t: "Rotina Profissional", d: "Checklist semanal.", v: "#" },
-    { id: "9-4", t: "Erros de Escala", d: "Evite bloqueios.", v: "#" },
-    { id: "9-5", t: "Sistema Próprio", d: "Mentalidade empresa.", v: "#" }
-]},
-{ id: 10, name: "Autoridade & Longo Prazo", lessons: [
-    { id: "10-1", t: "Histórico Forte", d: "Nunca perca limite.", v: "#" },
-    { id: "10-2", t: "Relação com Bancos", d: "Tratamento VIP.", v: "#" },
-    { id: "10-3", t: "Milhas Eternas", d: "Jogo longo.", v: "#" },
-    { id: "10-4", t: "Blindagem Legal", d: "Evite riscos.", v: "#" },
-    { id: "10-5", t: "Plano Final", d: "Liberdade total.", v: "#" }
-]}
-];
+        // BASE DE DADOS 40 AULAS
+        const DB = [];
+        const mods = ["Estratégia Base", "Cartões Elite", "Sistemas Bancários", "Acúmulo", "Compras", "Emissões", "Tabelas", "Gestão"];
 
-        let progress = JSON.parse(localStorage.getItem('mpro_vfinal')) || {};
-
-        function renderAll() {
-            const courseArea = document.getElementById('full-course-render');
-            const nextArea = document.getElementById('next-lessons-grid');
-            courseArea.innerHTML = '';
-            nextArea.innerHTML = '';
-
-            allModules.forEach(mod => {
-                let lessonsHtml = '';
-                mod.lessons.forEach(l => {
-                    const done = progress[l.id] ? 'completed' : '';
-                    const html = `
-                        <div class="lesson-card ${done}" onclick="openP('${l.id}','${l.t}','${l.v}','${l.d}')">
-                            <div class="lesson-thumb" style="background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1570126688035-1e6adfd6f0b1?auto=format&fit=crop&w=400&q=80')">
-                                <i class="fas fa-play-circle fa-3x" style="color:var(--gold)"></i>
-                            </div>
-                            <div class="lesson-body">
-                                <h4>${l.t}</h4>
-                                <p>${l.d}</p>
-                                <small style="margin-top:10px; display:block; color:${progress[l.id] ? 'var(--accent)' : 'var(--gold)'}">
-                                    ${progress[l.id] ? '✅ CONCLUÍDA' : '▶ ASSISTIR AGORA'}
-                                </small>
-                            </div>
-                        </div>
-                    `;
-                    lessonsHtml += html;
-                    if(!progress[l.id] && nextArea.children.length < 3) {
-                        nextArea.innerHTML += html;
-                    }
-                });
-
-                courseArea.innerHTML += `
-                    <div class="module-block">
-                        <div class="module-header">
-                            <div class="module-num">${mod.id}</div>
-                            <h2>${mod.name}</h2>
-                        </div>
-                        <div class="lesson-grid">${lessonsHtml}</div>
-                    </div>
-                `;
+        for(let i=1; i<=40; i++) {
+            let mIdx = Math.ceil(i/5) - 1;
+            DB.push({
+                id: i, mod: mIdx + 1, mod_n: mods[mIdx],
+                title: `Aula ${i}: ${getAulaNome(i)}`,
+                desc: "Conteúdo focado em escala, lucro real e estratégias avançadas de 2026.",
+                video: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                task: `Explique como a aula de ${getAulaNome(i)} impacta diretamente no seu lucro mensal.`,
+                quiz: { q: "Qual o foco técnico desta aula?", o: ["Acúmulo", "Emissão", "Escala de Lucro"], c: 2 }
             });
+        }
+
+        function getAulaNome(i) {
+            const nomes = ["Mentalidade", "Sistemas", "Segurança", "Plano 1M", "Relacionamento", "Score", "Upgrade", "Anuidade", "Spread", "Giro de Caixa", "Livelo PRO", "Esfera VIP", "Transferência", "Smiles", "Latam Pass", "Clubes", "Compra Pontos", "Promoções", "Giro de Limite", "Antecipação", "iPhone Lucro", "Eletro", "Marketplace", "Logística", "Cashback", "Buscadores", "Stopover", "Salas VIP", "First Class", "Tabela Fixa", "Iberia", "British", "American", "TAP", "Hotéis", "Milhas 3º", "Gestão CPFs", "Emissão", "Escala", "Masterclass"];
+            return nomes[i-1] || "Estratégia";
+        }
+
+        let prog = JSON.parse(localStorage.getItem('mm_v4_final')) || {};
+        let cur = null, selQ = null;
+
+        function init() {
+            renderAulas();
             updateStats();
         }
 
-        function updateStats() {
-            const total = 40;
-            const watched = Object.keys(progress).length;
-            const pct = Math.round((watched/total)*100);
-            document.getElementById('prog-pct').innerText = pct + '%';
-            document.getElementById('prog-count').innerText = `${watched}/${total}`;
-            
-            const rank = document.getElementById('rank-name');
-            if(pct < 10) { rank.innerText = "RECRUTA"; rank.style.color = "#888"; }
-            else if(pct < 40) { rank.innerText = "INICIANTE"; rank.style.color = "#cd7f32"; }
-            else if(pct < 70) { rank.innerText = "ESPECIALISTA"; rank.style.color = "#c0c0c0"; }
-            else if(pct < 100) { rank.innerText = "ELITE BLACK"; rank.style.color = "var(--gold)"; }
-            else { rank.innerText = "MESTRE DAS MILHAS"; rank.style.color = "var(--accent)"; }
-        }
-
-        // RANKING DE CARTÕES COM URLS REAIS
-        function renderRanking() {
-            const cards = [
-                { rank: "01", name: "BRB Dux Visa Infinite", pts: "5.0 pts/$", ben: "Lounge Key Ilimitado", url: "https://www.brb.com.br/dux" },
-                { rank: "02", name: "Santander Unlimited", pts: "3.0 pts/$", ben: "Acesso DragonPass", url: "https://www.santander.com.br/cartoes/unlimited" },
-                { rank: "03", name: "Itaú The One", pts: "3.5 pts/$", ben: "Assistente Pessoal VIP", url: "https://www.itau.com.br/personnalite/cartoes/the-one" },
-                { rank: "04", name: "Inter Black Win", pts: "1 ponto / R$ 2", ben: "Cashback direto", url: "https://www.bancointer.com.br/cartoes/black" },
-                { rank: "05", name: "Bradesco Aeternum", pts: "4.0 pts/$", ben: "Metal Card Exclusivo", url: "https://banco.bradesco/aeternum" }
-            ];
-            const body = document.getElementById('ranking-body-2026');
-            body.innerHTML = cards.map(c => `
-                <tr onclick="window.open('${c.url}', '_blank')">
-                    <td style="color:var(--gold)">#${c.rank}</td>
-                    <td>${c.name}</td>
-                    <td>${c.pts}</td>
-                    <td>${c.ben}</td>
-                    <td><span class="status-badge">SOLICITAR</span></td>
-                </tr>
-            `).join('');
-        }
-
-        function showSection(id) {
-            document.querySelectorAll('.section-view').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            event.currentTarget.classList.add('active');
-        }
-
-        function openP(id, t, v, d) {
-            document.getElementById('v-title').innerText = t;
-            document.getElementById('v-desc').innerText = d;
-            document.getElementById('v-frame').src = v;
-            document.getElementById('p-modal').style.display = 'block';
-            progress[id] = true;
-            localStorage.setItem('mpro_vfinal', JSON.stringify(progress));
-        }
-
-        function closeP() {
-            document.getElementById('p-modal').style.display = 'none';
-            document.getElementById('v-frame').src = '';
-            renderAll();
-        }
-
-        // CALCULADORA CPM
-        document.querySelectorAll('#c-valor, #c-milhas').forEach(input => {
-            input.addEventListener('input', () => {
-                const v = document.getElementById('c-valor').value;
-                const m = document.getElementById('c-milhas').value;
-                if(v && m) {
-                    const res = (v / (m/1000)).toFixed(2);
-                    document.getElementById('c-res').innerText = `R$ ${res}`;
-                    document.getElementById('c-res').style.color = res > 18 ? '#000' : '#fff'; // Ajuste visual no fundo ouro
+        function renderAulas() {
+            const area = document.getElementById('render-content');
+            area.innerHTML = ''; let lastM = 0;
+            DB.forEach(a => {
+                if(a.mod !== lastM) {
+                    lastM = a.mod;
+                    area.innerHTML += `<div class="module-block"><div class="module-header"><h2>${a.mod_n}</h2><div class="line"></div></div><div class="class-grid" id="m-${a.mod}"></div></div>`;
                 }
+                const isDone = prog[a.id] ? 'done' : '';
+                document.getElementById(`m-${a.mod}`).innerHTML += `
+                    <div class="class-card ${isDone}" onclick="openAula(${a.id})">
+                        <div class="thumb-land"><i class="fas fa-play"></i></div>
+                        <div class="class-info"><h4>${a.title}</h4></div>
+                    </div>`;
             });
-        });
+        }
 
-        renderAll();
-        renderRanking();
+        function openAula(id) {
+            cur = DB.find(x => x.id === id); selQ = null;
+            document.getElementById('vid-player').src = cur.video;
+            document.getElementById('m-t').innerText = cur.title;
+            document.getElementById('m-d').innerText = cur.desc;
+            document.getElementById('m-task').innerText = cur.task;
+            document.getElementById('m-inp').value = '';
+            const qA = document.getElementById('m-quiz');
+            qA.innerHTML = `<p style="font-size:12px; margin-bottom:8px">${cur.quiz.q}</p>`;
+            cur.quiz.o.forEach((o, i) => { qA.innerHTML += `<div class="q-item" onclick="selQuiz(${i}, this)">${o}</div>`; });
+            document.getElementById('modal-aula').style.display = 'flex';
+        }
 
-        let activities = JSON.parse(localStorage.getItem('mpro_activities')) || {};
+        function selQuiz(i, el) { selQ = i; document.querySelectorAll('.q-item').forEach(x => x.classList.remove('selected')); el.classList.add('selected'); }
 
-function openP(id, t, v, d) {
-    currentModule = id.split('-')[0];
-    document.getElementById('v-title').innerText = t;
-    document.getElementById('v-desc').innerText = d;
-    document.getElementById('v-frame').src = v;
-    document.getElementById('p-modal').style.display = 'block';
-    progress[id] = true;
-    localStorage.setItem('mpro_vfinal', JSON.stringify(progress));
-}
+        function finishAula() {
+            if(document.getElementById('m-inp').value.length < 20) return alert("Sua resposta técnica é muito curta.");
+            if(selQ === null) return alert("Responda ao quiz de validação.");
+            if(selQ !== cur.quiz.c) return alert("Resposta incorreta! Reveja a aula.");
+            prog[cur.id] = true; localStorage.setItem('mm_v4_final', JSON.stringify(prog));
+            closeModal(); renderAulas(); updateStats();
+        }
 
-function checkActivity() {
-    const txt = document.getElementById('activity-answer').value.trim();
-    const fb = document.getElementById('activity-feedback');
+        function closeModal() { document.getElementById('modal-aula').style.display = 'none'; document.getElementById('vid-player').src = ""; }
 
-    if (txt.length < 30) {
-        fb.innerText = "❌ Resposta curta. Desenvolva melhor.";
-        fb.className = "activity-feedback err";
-        return;
-    }
+        function updateStats() {
+            const count = Object.keys(prog).length;
+            const pct = Math.round((count/40)*100);
+            document.getElementById('st-pct').innerText = pct + '%';
+            document.getElementById('st-count').innerText = `${count} / 40`;
+            const r = document.getElementById('st-rank');
+            if(pct < 30) r.innerText = "RECRUTA";
+            else if(pct < 70) r.innerText = "EXECUTIVO";
+            else r.innerText = "ELITE BLACK";
+        }
 
-    activities[currentModule] = true;
-    localStorage.setItem('mpro_activities', JSON.stringify(activities));
-    fb.innerText = "✅ Atividade aprovada!";
-    fb.className = "activity-feedback ok";
-}
-const exams = {
-    1: {
-        q: "Qual é o principal objetivo do uso estratégico de milhas?",
-        options: [
-            "Viajar apenas em econômica",
-            "Gerar valor e reduzir custos",
-            "Acumular pontos sem usar",
-            "Comprar produtos caros"
-        ],
-        correct: 1
-    },
-    2: {
-        q: "Qual fator mais ajuda a aumentar limite do cartão?",
-        options: [
-            "Score apenas",
-            "Movimentação financeira",
-            "Ter muitos cartões",
-            "Pagar mínimo"
-        ],
-        correct: 1
-    },
-    3: {
-        q: "O que é giro no mercado de milhas?",
-        options: [
-            "Transferir pontos",
-            "Vender milhas",
-            "Comprar e revender produtos",
-            "Cancelar cartões"
-        ],
-        correct: 2
-    },
-    4: {
-        q: "O que é stopover?",
-        options: [
-            "Conexão longa gratuita",
-            "Multa de passagem",
-            "Upgrade automático",
-            "Cancelamento"
-        ],
-        correct: 0
-    },
-    5: {
-        q: "Antes de vender milhas você deve:",
-        options: [
-            "Aceitar qualquer preço",
-            "Calcular o CPM",
-            "Transferir tudo",
-            "Ignorar impostos"
-        ],
-        correct: 1
-    },
-    6: {
-        q: "Interline permite:",
-        options: [
-            "Emitir apenas uma aérea",
-            "Emitir várias companhias",
-            "Comprar passagem",
-            "Pagar imposto"
-        ],
-        correct: 1
-    },
-    7: {
-        q: "ExpertFlyer serve para:",
-        options: [
-            "Comprar milhas",
-            "Ver assentos award",
-            "Cancelar voo",
-            "Emitir nota"
-        ],
-        correct: 1
-    },
-    8: {
-        q: "Mentoria serve para:",
-        options: [
-            "Assistir vídeos",
-            "Aprender sozinho",
-            "Ajustar estratégia real",
-            "Cancelar cartões"
-        ],
-        correct: 2
-    },
-    9: {
-        q: "Automação ajuda a:",
-        options: [
-            "Perder controle",
-            "Escalar resultados",
-            "Bloquear contas",
-            "Pagar taxas"
-        ],
-        correct: 1
-    },
-    10: {
-        q: "Pensar longo prazo significa:",
-        options: [
-            "Lucro rápido",
-            "Estabilidade e estratégia",
-            "Evitar bancos",
-            "Cancelar cartões"
-        ],
-        correct: 1
-    }
-};
+        function nav(id, el) {
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            document.getElementById(id).classList.add('active'); el.classList.add('active');
+        }
 
-let examAnswers = {};
-let examsDone = JSON.parse(localStorage.getItem('mpro_exams')) || {};
-let currentModule = null;
-function openP(id, t, v, d) {
-    currentModule = parseInt(id.split('-')[0]);
-    examAnswers[currentModule] = null;
-
-    document.getElementById('v-title').innerText = t;
-    document.getElementById('v-desc').innerText = d;
-    document.getElementById('v-frame').src = v;
-    document.getElementById('p-modal').style.display = 'block';
-
-    progress[id] = true;
-    localStorage.setItem('mpro_vfinal', JSON.stringify(progress));
-
-    renderExam();
-}
-function renderExam() {
-    const exam = exams[currentModule];
-    const area = document.getElementById('exam-area');
-    const fb = document.getElementById('exam-feedback');
-
-    fb.innerHTML = "";
-
-    if (examsDone[currentModule]) {
-        area.innerHTML = "✅ Prova já concluída com sucesso.";
-        return;
-    }
-
-    area.innerHTML = `
-        <div class="exam-question">${exam.q}</div>
-        ${exam.options.map((o,i)=>`
-            <div class="exam-option" onclick="selectOption(${i})">${o}</div>
-        `).join("")}
-    `;
-}
-function selectOption(i) {
-    examAnswers[currentModule] = i;
-    document.querySelectorAll('.exam-option').forEach((el,idx)=>{
-        el.classList.toggle('selected', idx === i);
-    });
-}
-
-function submitExam() {
-    const fb = document.getElementById('exam-feedback');
-    if (examAnswers[currentModule] === null) {
-        fb.innerText = "❌ Selecione uma resposta.";
-        fb.className = "exam-feedback fail";
-        return;
-    }
-
-    if (examAnswers[currentModule] === exams[currentModule].correct) {
-        examsDone[currentModule] = true;
-        localStorage.setItem('mpro_exams', JSON.stringify(examsDone));
-        fb.innerText = "✅ Prova aprovada!";
-        fb.className = "exam-feedback pass";
-    } else {
-        fb.innerText = "❌ Resposta incorreta. Revise o módulo.";
-        fb.className = "exam-feedback fail";
-    }
-}
-
+        init();
     </script>
 </body>
 </html>
-
