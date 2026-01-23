@@ -1,309 +1,262 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Mestre Milhas | Curso Completo</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
+<title>Mestre das Milhas | Plataforma Elite 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-    /* =======================
-   MÓDULOS PREMIUM (GRID)
-======================= */
-
 :root {
-    --gold: linear-gradient(90deg, #d4af37 0%, #f1d592 50%, #d4af37 100%);
-    --dark-bg: #050505;
-    --card-bg: #111111;
-    --text-gray: #aaa;
+  --bg:#0a0b0d; --panel:#161b22; --sidebar:#0d1117; --text:#e6edf3;
+  --text-muted:#8b949e; --accent:#2f81f7; --success:#238636;
+  --neon:#0ff; --border:#30363d;
+  --light-bg:#f5f5f5; --light-panel:#fff; --light-sidebar:#eaeaea; --light-text:#0a0b0d; --light-border:#ccc;
 }
+*{box-sizing:border-box; transition:all 0.3s ease;}
+body{margin:0;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+header{height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:var(--sidebar);border-bottom:1px solid var(--border);position:relative;z-index:100;}
+.logo{font-weight:800;color:var(--accent);font-size:1.2rem;}
+.dark-toggle{cursor:pointer;font-size:1.2rem; margin-left:15px;}
+main{display:flex;flex:1;overflow:hidden;}
+@media(max-width:992px){main{flex-direction:column;overflow-y:auto;}}
+.content-area{flex:1;overflow-y:auto;background:var(--bg);padding-bottom:50px;scroll-behavior:smooth;}
+.video-container{width:100%;background:#000;aspect-ratio:16/9;position:sticky;top:0;overflow:hidden;border-radius:10px;}
+.video-container iframe{width:100%;height:100%;border:none;}
+.lesson-body{padding:30px 40px;max-width:1000px;margin:0 auto;}
+.nav-controls{display:flex;gap:12px;margin:20px 0;flex-wrap:wrap;}
+button{padding:10px 18px;border-radius:8px;border:1px solid var(--border);background:var(--panel);color:var(--text);cursor:pointer;font-weight:500;box-shadow:0 0 5px rgba(0,0,0,0.3);}
+button:hover{background:var(--border);box-shadow:0 0 10px var(--accent);}
+button.primary{background:var(--accent);border-color:var(--accent);}
+button.success{background:var(--success);border-color:var(--success);display:none;}
 
-.grid-modules {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 25px;
-    margin-top: 40px;
-}
+/* FAVORITO */
+.fav-btn{margin-left:10px;cursor:pointer;color:var(--accent);font-size:16px;}
+.fav-btn.favorited{color:#ffd700;}
 
-.module-card {
-    position: relative;
-    background: var(--card-bg);
-    padding: 40px 30px 30px;
-    border-radius: 15px;
-    border: 1px solid #222;
-    overflow: hidden;
-    transition: 0.4s;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.4);
-}
-
-.module-card:hover {
-    transform: translateY(-10px);
-    border-color: #d4af37;
-    box-shadow: 0 20px 40px rgba(212,175,55,0.4);
-}
-
-/* Número grande do módulo */
-.module-number {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    font-size: 60px;
-    font-weight: 800;
-    background: var(--gold);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    opacity: 0.15;
-}
-
-/* Título */
-.module-card h3 {
-    color: #f1d592;
-    margin-bottom: 15px;
-    font-size: 1.6rem;
-    font-weight: 700;
-}
-
-/* Descrição */
-.module-card p {
-    color: #ccc;
-    font-size: 0.95rem;
-    line-height: 1.5;
-}
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:'Inter',sans-serif;
-}
-body{
-    background:#0f0f12;
-    color:#fff;
-    display:flex;
-    height:100vh;
-}
-
-/* PLAYER */
-.player{
-    flex:1;
-    background:#111;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-}
-.player-box{
-    width:80%;
-    height:60%;
-    background:#000;
-    border-radius:14px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:#777;
-    font-size:18px;
-}
+/* COMMENTS */
+.comments-section{margin-top:40px;border-top:1px solid var(--border);padding-top:30px;}
+.comment-input{width:100%;background:var(--panel);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:15px;margin-bottom:10px;resize:none;}
+.comment-item{background:var(--panel);padding:15px;border-radius:8px;margin-bottom:12px;border-left:3px solid var(--accent);}
+.comment-item strong{color:var(--accent);}
 
 /* SIDEBAR */
-.sidebar{
-    width:380px;
-    background:#18181d;
-    border-left:1px solid #222;
-    overflow-y:auto;
-}
-.sidebar-header{
-    padding:20px;
-    border-bottom:1px solid #222;
-}
-.sidebar-header h1{
-    font-size:22px;
-    font-weight:700;
-}
-.sidebar-header span{
-    font-size:13px;
-    color:#aaa;
-}
+.sidebar{width:380px;background:var(--sidebar);border-left:1px solid var(--border);display:flex;flex-direction:column;}
+@media(max-width:992px){.sidebar{width:100%;border-left:none;}}
+.progress-container{padding:20px;border-bottom:1px solid var(--border);}
+.progress-bar{height:10px;background:#21262d;border-radius:5px;overflow:hidden;box-shadow:0 0 5px #0ff;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--neon),var(--accent));width:0%;transition:width 0.7s ease;}
+.modules-wrapper{flex:1;overflow-y:auto;}
+.module-item{border-bottom:1px solid var(--border);}
+.module-btn{width:100%;padding:16px 20px;background:none;border:none;color:var(--text);display:flex;justify-content:space-between;cursor:pointer;font-weight:600;position:relative;}
+.module-btn span{transition:transform 0.3s;}
+.module-item.open .module-btn span{transform:rotate(180deg);}
+.lessons-list{display:none;background:#090c10;}
+.module-item.open .lessons-list{display:block;}
+.lesson-item{padding:12px 20px;display:flex;gap:12px;cursor:pointer;font-size:14px;align-items:center;position:relative;}
+.lesson-item:hover{background:#1f242c;}
+.lesson-item.active{background:#1f242c;border-left:3px solid var(--accent);}
+.lesson-item.completed span{text-decoration:line-through;color:var(--text-muted);}
+.lesson-item img{width:60px;height:35px;object-fit:cover;border-radius:4px;margin-right:10px;}
 
-/* MÓDULOS */
-.module{
-    border-bottom:1px solid #222;
-}
-.module-title{
-    padding:16px 20px;
-    cursor:pointer;
-    font-weight:600;
-    background:#1f1f26;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-}
-.module-title:hover{
-    background:#262630;
-}
-.lessons{
-    display:none;
-    background:#141418;
-}
-.lesson{
-    padding:12px 32px;
-    font-size:14px;
-    color:#ccc;
-    cursor:pointer;
-}
-.lesson:hover{
-    background:#222;
-    color:#fff;
-}
+/* NOTIFICAÇÃO */
+#notif{position:fixed;top:20px;right:20px;background:var(--accent);color:#fff;padding:10px 20px;border-radius:8px;display:none;z-index:999;box-shadow:0 0 15px rgba(0,255,255,0.7);font-weight:600;}
 
-/* SCROLL */
-.sidebar::-webkit-scrollbar{width:6px;}
-.sidebar::-webkit-scrollbar-thumb{
-    background:#333;
-    border-radius:10px;
-}
+/* MEDALHAS */
+.medal{display:inline-block;background:var(--accent);color:#000;padding:5px 10px;border-radius:6px;margin-left:8px;font-size:12px;font-weight:700;box-shadow:0 0 10px var(--neon);}
 </style>
 </head>
-
 <body>
-<!-- PLAYER -->
-<div class="player">
-    <div class="player-box">
-        ▶ Selecione uma aula para começar
+
+<header>
+  <div class="logo">✈️ MESTRE DAS MILHAS</div>
+  <div>
+    <span id="perc-text" style="font-size:13px;font-weight:600;">0%</span>
+    <span class="dark-toggle" onclick="toggleTheme()" title="Alternar tema">🌙</span>
+  </div>
+</header>
+
+<main>
+  <div class="content-area">
+    <div class="video-container">
+      <iframe id="mainPlayer" src="" allow="autoplay"></iframe>
     </div>
-</div>
+    <div class="lesson-body">
+      <h2 id="currentTitle">Selecione uma aula</h2>
+      <p id="currentDesc" style="color:var(--text-muted);">Clique em uma aula na lateral para iniciar.</p>
+      <div class="nav-controls">
+        <button onclick="changeLesson(-1)">Anterior</button>
+        <button class="primary" onclick="changeLesson(1)">Próxima Aula</button>
+        <button id="btnFav" class="primary fav-btn" onclick="toggleFavorite()">☆ Favoritar</button>
+        <button id="btnAtiv" class="primary" onclick="abrirAtividade()">Atividade</button>
+        <button id="btnCert" class="success" onclick="gerarCertificado()">Emitir Certificado</button>
+      </div>
+      <div class="comments-section">
+        <h3>Dúvidas e Comentários</h3>
+        <input type="text" id="userName" placeholder="Seu nome" style="margin-bottom:10px;padding:8px;width:200px;border-radius:6px;border:1px solid var(--border);">
+        <textarea class="comment-input" id="commentText" placeholder="Escreva sua dúvida sobre esta aula..."></textarea>
+        <button class="primary" onclick="addComment()">Enviar Comentário</button>
+        <div id="commentsList" style="margin-top:20px;"></div>
+      </div>
+    </div>
+  </div>
 
-<!-- SIDEBAR -->
-<div class="sidebar">
+  <div class="sidebar">
+    <div class="progress-container">
+      <span style="font-size:12px;color:var(--text-muted)">Progresso do Curso</span>
+      <div class="progress-bar"><div class="progress-fill" id="progBar"></div></div>
+    </div>
+    <div class="modules-wrapper" id="moduleContainer"></div>
+  </div>
+</main>
 
-<div class="sidebar-header">
-    <h1>Mestre Milhas</h1>
-    <span>Curso Completo de Milhas Aéreas</span>
-</div>
-
-<!-- MÓDULO 1 -->
-<div class="module">
-<div class="module-title" onclick="toggleModule(this)">
-Módulo 1 — Fundamentos das Milhas <span>▼</span>
-</div>
-<div class="lessons">
-<div class="lesson">1. O que são Milhas Aéreas</div>
-<div class="lesson">2. História das Milhas</div>
-<div class="lesson">3. Pontos vs Milhas</div>
-<div class="lesson">4. Programas Nacionais</div>
-<div class="lesson">5. Programas Internacionais</div>
-<div class="lesson">6. Validade das Milhas</div>
-<div class="lesson">7. Como não perder Milhas</div>
-<div class="lesson">8. Principais Termos</div>
-<div class="lesson">9. Erros de Iniciantes</div>
-<div class="lesson">10. Mentalidade Mestre Milhas</div>
-</div>
-</div>
-
-<!-- MÓDULO 2 -->
-<div class="module">
-<div class="module-title" onclick="toggleModule(this)">
-Módulo 2 — Cartões de Crédito <span>▼</span>
-</div>
-<div class="lessons">
-<div class="lesson">11. Como Cartões Geram Milhas</div>
-<div class="lesson">12. Score e Aprovação</div>
-<div class="lesson">13. Cartões sem Anuidade</div>
-<div class="lesson">14. Cartões Platinum</div>
-<div class="lesson">15. Cartões Black / Infinite</div>
-<div class="lesson">16. Estratégia de Gastos</div>
-<div class="lesson">17. Limite Inteligente</div>
-<div class="lesson">18. Benefícios Escondidos</div>
-<div class="lesson">19. Isenção de Anuidade</div>
-<div class="lesson">20. Cartão Ideal para Você</div>
-</div>
-</div>
-
-<!-- MÓDULO 3 -->
-<div class="module">
-<div class="module-title" onclick="toggleModule(this)">
-Módulo 3 — Acúmulo Avançado <span>▼</span>
-</div>
-<div class="lessons">
-<div class="lesson">21. Clubes de Milhas</div>
-<div class="lesson">22. Promoções Bônus</div>
-<div class="lesson">23. Transferência Inteligente</div>
-<div class="lesson">24. Compras Bonificadas</div>
-<div class="lesson">25. Cashback Estratégico</div>
-<div class="lesson">26. Assinaturas que Valem a Pena</div>
-<div class="lesson">27. Erros que Queimam Milhas</div>
-<div class="lesson">28. Planejamento Mensal</div>
-<div class="lesson">29. Ferramentas Úteis</div>
-<div class="lesson">30. Estratégia Avançada Mestre</div>
-</div>
-</div>
-
-<!-- MÓDULO 4 -->
-<div class="module">
-<div class="module-title" onclick="toggleModule(this)">
-Módulo 4 — Emissão de Passagens <span>▼</span>
-</div>
-<div class="lessons">
-<div class="lesson">31. Quando Emitir Passagens</div>
-<div class="lesson">32. Datas Inteligentes</div>
-<div class="lesson">33. Econômica vs Executiva</div>
-<div class="lesson">34. Emissão Nacional</div>
-<div class="lesson">35. Emissão Internacional</div>
-<div class="lesson">36. Stopover e Open Jaw</div>
-<div class="lesson">37. Emissão para Terceiros</div>
-<div class="lesson">38. Taxas e Combustível</div>
-<div class="lesson">39. Cancelamento e Reembolso</div>
-<div class="lesson">40. Casos Reais de Emissão</div>
-</div>
-</div>
-
-<!-- MÓDULO 5 -->
-<div class="module">
-<div class="module-title" onclick="toggleModule(this)">
-Módulo 5 — Monetização e Estratégias <span>▼</span>
-</div>
-<div class="lessons">
-<div class="lesson">41. Venda de Milhas</div>
-<div class="lesson">42. Plataformas de Venda</div>
-<div class="lesson">43. Hotéis com Pontos</div>
-<div class="lesson">44. Upgrade de Cabine</div>
-<div class="lesson">45. Viagens Quase Grátis</div>
-<div class="lesson">46. Planejamento Anual</div>
-<div class="lesson">47. Estratégia Familiar</div>
-<div class="lesson">48. Milhas para Negócios</div>
-<div class="lesson">49. Como Escalar Resultados</div>
-<div class="lesson">50. Método Mestre Milhas</div>
-</div>
-
-
-
-
-<div class="lesson" onclick="window.open('atividade.html','_blank')">
-📘 Atividades Complementares
-</div>
-
-
-
-
-
-
-
-<!--
-<div class="module"></div> 
-<div class="module-title" onclick="toggleModule(this)">
-<div class=" lesson"> 
-<div class="lesson">Atividades Complementares</div>
-
-<!--aqui vai ter um link que vai levar para meu arquivo: atividade.html--> 
-</div>
-</div>
-
+<div id="notif"></div>
 
 <script>
-function toggleModule(el){
-    const lessons = el.nextElementSibling;
-    lessons.style.display = lessons.style.display === "block" ? "none" : "block";
+// ===== DADOS DO CURSO =====
+const course=[
+  {name:"1. Fundamentos e Mentalidade",lessons:[
+    {t:"Boas Vindas e Roadmap",d:"Conheça o caminho para viajar de executiva.",v:"3r6Q9tCzX4k",thumb:"https://img.youtube.com/vi/3r6Q9tCzX4k/0.jpg",link:"#"},
+    {t:"O que são Milhas Reais",d:"Diferença entre pontos e milhas.",v:"8pTEmbeENF4",thumb:"https://img.youtube.com/vi/8pTEmbeENF4/0.jpg",link:"#"}
+  ]},
+  {name:"2. Cartões e Estratégias Bancárias",lessons:[
+    {t:"Ranking de Cartões Black",d:"Qual o melhor para o seu perfil.",v:"5Y3G6a2Z8sU",thumb:"https://img.youtube.com/vi/5Y3G6a2Z8sU/0.jpg",link:"#"}
+  ]}
+];
+
+let current={m:0,l:0};
+let completed=JSON.parse(localStorage.getItem('milhas_prog'))||[];
+let favorites=JSON.parse(localStorage.getItem('milhas_fav'))||[];
+let comments=JSON.parse(localStorage.getItem('milhas_comm'))||{};
+let xp=parseInt(localStorage.getItem('milhas_xp'))||0;
+
+// ===== INICIALIZAÇÃO =====
+function init(){
+  const container=document.getElementById('moduleContainer');
+  container.innerHTML="";
+  course.forEach((mod,mIdx)=>{
+    const div=document.createElement('div');
+    div.className=`module-item ${mIdx===0?'open':''}`;
+    div.innerHTML=`
+      <button class="module-btn" onclick="this.parentElement.classList.toggle('open')">${mod.name} <span>▼</span></button>
+      <div class="lessons-list">
+        ${mod.lessons.map((les,lIdx)=>`
+        <div class="lesson-item ${completed.includes(les.v)?'completed':''}" id="les-${les.v}" onclick="play(${mIdx},${lIdx})">
+          <img src="${les.thumb}" alt="${les.t}">
+          <input type="checkbox" ${completed.includes(les.v)?'checked':''} onclick="event.stopPropagation(); toggle('${les.v}')">
+          <span>${lIdx+1}. ${les.t}</span>
+        </div>`).join('')}
+      </div>`;
+    container.appendChild(div);
+  });
+  updateProg();
+}
+init();
+
+// ===== FUNÇÕES =====
+function play(m,l){
+  current={m,l};
+  const les=course[m].lessons[l];
+  document.getElementById('mainPlayer').src=`https://www.youtube.com/embed/${les.v}?autoplay=1`;
+  document.getElementById('currentTitle').innerText=les.t;
+  document.getElementById('currentDesc').innerText=les.d;
+  document.querySelectorAll('.lesson-item').forEach(e=>e.classList.remove('active'));
+  document.getElementById(`les-${les.v}`).classList.add('active');
+  renderComments(les.v);
+  updateFavBtn();
+}
+
+function toggleFavorite(){
+  const les=course[current.m].lessons[current.l].v;
+  if(favorites.includes(les)) favorites=favorites.filter(i=>i!==les);
+  else favorites.push(les);
+  localStorage.setItem('milhas_fav',JSON.stringify(favorites));
+  updateFavBtn();
+}
+function updateFavBtn(){
+  const les=course[current.m].lessons[current.l].v;
+  const btn=document.getElementById('btnFav');
+  if(favorites.includes(les)){
+    btn.innerText="★ Favorito"; btn.classList.add('favorited');
+  }else{
+    btn.innerText="☆ Favoritar"; btn.classList.remove('favorited');
+  }
+}
+
+function abrirAtividade(){
+  const les=course[current.m].lessons[current.l];
+  window.open(les.link,"_blank");
+}
+
+function toggle(id){
+  completed.includes(id)?completed=completed.filter(i=>i!==id):completed.push(id);
+  localStorage.setItem('milhas_prog',JSON.stringify(completed));
+  document.getElementById(`les-${id}`).classList.toggle('completed');
+  notify(`Aula ${completed.includes(id)?'concluída':'desmarcada'}`);
+  updateProg();
+}
+
+function updateProg(){
+  const total=course.reduce((acc,m)=>acc+m.lessons.length,0);
+  const p=Math.round((completed.length/total)*100);
+  document.getElementById('progBar').style.width=p+'%';
+  document.getElementById('perc-text').innerHTML=p+'% Concluído';
+  document.getElementById('btnCert').style.display=p===100?'block':'none';
+  xp=completed.length*10;
+  localStorage.setItem('milhas_xp',xp);
+  // Medalha de 100% Concluído
+  if(p===100) notify("🎉 Parabéns! Curso Concluído!");
+}
+
+function addComment(){
+  const name=document.getElementById('userName').value||"Anônimo";
+  const id=course[current.m].lessons[current.l].v;
+  const txt=document.getElementById('commentText').value;
+  if(!txt) return;
+  if(!comments[id]) comments[id]=[];
+  comments[id].push({user:name,text:txt});
+  localStorage.setItem('milhas_comm',JSON.stringify(comments));
+  document.getElementById('commentText').value='';
+  renderComments(id);
+}
+
+function renderComments(id){
+  const list=document.getElementById('commentsList');
+  list.innerHTML=(comments[id]||[]).map(c=>`<div class="comment-item"><strong>${c.user}:</strong> ${c.text}</div>`).join('');
+}
+
+function changeLesson(s){
+  let n=current.l+s;
+  if(course[current.m].lessons[n]) play(current.m,n);
+}
+
+function notify(msg){
+  const n=document.getElementById('notif');
+  n.innerText=msg; n.style.display='block';
+  setTimeout(()=>{n.style.display='none'},2000);
+}
+
+function gerarCertificado(){
+  const nome=prompt("Digite seu nome para o certificado:");
+  if(!nome) return;
+  const win=window.open('','_blank');
+  win.document.write(`<h1>Certificado de Conclusão</h1><p>Aluno: ${nome}</p><p>Curso: Mestre das Milhas</p><p>Progresso: ${completed.length} aulas concluídas</p>`);
+  win.print();
+}
+
+function toggleTheme(){
+  document.body.classList.toggle('light-mode');
+  if(document.body.classList.contains('light-mode')){
+    document.body.style.background='var(--light-bg)';
+    document.body.style.color='var(--light-text)';
+    document.querySelectorAll('.sidebar').forEach(e=>e.style.background='var(--light-sidebar)');
+    document.querySelectorAll('.lesson-body, .video-container, .comments-section, .lesson-item').forEach(e=>e.style.background='var(--light-panel)');
+  }else{
+    document.body.style.background='var(--bg)';
+    document.body.style.color='var(--text)';
+    document.querySelectorAll('.sidebar').forEach(e=>e.style.background='var(--sidebar)');
+    document.querySelectorAll('.lesson-body, .video-container, .comments-section, .lesson-item').forEach(e=>e.style.background='var(--panel)');
+  }
 }
 </script>
-
 </body>
 </html>
