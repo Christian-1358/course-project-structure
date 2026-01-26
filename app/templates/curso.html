@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -100,7 +101,7 @@
             {t: "Upgrade de Limite", d: "Como forçar o banco a te dar um cartão Black/Infinite.", v: "9X3ZLkQ8P2s"},
             {t: "Spread Zero", d: "Como economizar em todas as compras internacionais.", v: "M8LZ9Q2KX1A"},
             {t: "Proteção de Preço", d: "Receba dinheiro de volta se o preço do produto baixar.", v: "wZ8L9Ck3m0E"}
-        ], file: "Prova_modulo2.html" },
+        ], file: "prova_modulo2.html" },
 
         { name: "3. Acúmulo Estratégico", lessons: [
             {t: "Compras 10x1", d: "Como ganhar 10 pontos por real em compras comuns.", v: "P9Zk3L8QX4s"},
@@ -137,80 +138,186 @@
         ], file: "Prova_modulo5.html" }
     ];
 
-    let current = { m: 0, l: 0 };
-    let completed = JSON.parse(localStorage.getItem('mm_v10_c')) || [];
 
-    function init() {
-        const container = document.getElementById('moduleContainer');
-        course.forEach((mod, mIdx) => {
-            const div = document.createElement('div');
-            div.className = `module-item ${mIdx === 0 ? 'open' : ''}`;
-            const lessonsHTML = mod.lessons.map((les, lIdx) => `
-                <div class="lesson-item ${completed.includes(les.v) ? 'completed' : ''}" id="les-${les.v}" onclick="play(${mIdx}, ${lIdx})">
-                    <input type="checkbox" ${completed.includes(les.v) ? 'checked' : ''} onclick="event.stopPropagation(); toggle('${les.v}')">
-                    <span>${lIdx+1}. ${les.t}</span>
-                </div>`).join('');
-            
-            div.innerHTML = `
-                <button class="module-btn" onclick="this.parentElement.classList.toggle('open')">${mod.name} <span>▼</span></button>
-                <div class="lessons-list">
-                    ${lessonsHTML}
-                    <div class="lesson-item is-quiz" onclick="openExamFile(${mIdx})">
-                        <span>📝 ABRIR: ${mod.file}</span>
-                    </div>
-                </div>`;
-            container.appendChild(div);
-        });
-        play(0,0); updateProg();
+let current = { m: 0, l: 0 };
+
+let progress = JSON.parse(localStorage.getItem('mm_progress')) || {
+    lessons: {},   // { videoId: true }
+    exams: {},     // { moduleIndex: true }
+    final: false
+};
+
+/* =========================
+   INICIALIZAÇÃO
+========================= */
+
+function init() {
+    const container = document.getElementById('moduleContainer');
+    container.innerHTML = "";
+
+    course.forEach((mod, mIdx) => {
+        const div = document.createElement('div');
+        div.className = `module-item ${mIdx === 0 ? 'open' : ''}`;
+
+        const lessonsHTML = mod.lessons.map((les, lIdx) => `
+            <div class="lesson-item ${progress.lessons[les.v] ? 'completed' : ''}"
+                 id="les-${les.v}"
+                 onclick="play(${mIdx}, ${lIdx})">
+                 
+                <input type="checkbox"
+                    ${progress.lessons[les.v] ? 'checked' : ''}
+                    onclick="event.stopPropagation(); toggleLesson('${les.v}')">
+                    
+                <span>${lIdx + 1}. ${les.t}</span>
+            </div>
+        `).join('');
+
+        div.innerHTML = `
+            <button class="module-btn" onclick="this.parentElement.classList.toggle('open')">
+                ${mod.name}
+                <span>▼</span>
+            </button>
+
+            <div class="lessons-list">
+                ${lessonsHTML}
+                <div class="lesson-item is-quiz" onclick="openExamFile(${mIdx})">
+                    <span>📄 PROVA DO MÓDULO</span>
+                </div>
+            </div>
+        `;
+
+        container.appendChild(div);
+    });
+
+    play(0, 0);
+    updateProgressUI();
+}
+
+/* =========================
+   PLAYER / NAVEGAÇÃO
+========================= */
+
+function play(m, l) {
+    current = { m, l };
+    const lesson = course[m].lessons[l];
+
+    document.getElementById('mainPlayer').src =
+        `https://www.youtube.com/embed/${lesson.v}?autoplay=1`;
+
+    document.getElementById('currentTitle').innerText = lesson.t;
+    document.getElementById('currentDesc').innerText = lesson.d;
+
+    document.querySelectorAll('.lesson-item')
+        .forEach(e => e.classList.remove('active'));
+
+    const active = document.getElementById(`les-${lesson.v}`);
+    if (active) active.classList.add('active');
+}
+
+function changeLesson(step) {
+    const next = current.l + step;
+    if (course[current.m].lessons[next]) {
+        play(current.m, next);
+    }
+}
+
+/* =========================
+   CONTROLE DE PROGRESSO
+========================= */
+
+function toggleLesson(videoId) {
+    progress.lessons[videoId] = !progress.lessons[videoId];
+    saveProgress();
+    updateLessonUI(videoId);
+    updateProgressUI();
+}
+
+function updateLessonUI(videoId) {
+    const el = document.getElementById(`les-${videoId}`);
+    if (!el) return;
+    el.classList.toggle('completed');
+}
+
+function updateProgressUI() {
+    const total = course.reduce((acc, m) => acc + m.lessons.length, 0);
+    const done = Object.keys(progress.lessons).filter(k => progress.lessons[k]).length;
+    const percent = Math.round((done / total) * 100);
+
+    document.getElementById('prog-txt').innerText = `${percent}% Concluído`;
+
+    const btnFinal = document.getElementById('finalBtn');
+
+    if (percent === 100) {
+        btnFinal.disabled = false;
+        btnFinal.innerText = "🚀 INICIAR ATIVIDADE FINAL";
+    } else {
+        btnFinal.disabled = true;
+        btnFinal.innerText = "🎓 ATIVIDADE FINAL (BLOQUEADA)";
+    }
+}
+
+function saveProgress() {
+    localStorage.setItem('mm_progress', JSON.stringify(progress));
+}
+
+/* =========================
+   PROVAS POR MÓDULO
+========================= */
+
+function openExamFile(mIdx) {
+    const mod = course[mIdx];
+
+    const allLessonsDone = mod.lessons.every(
+        l => progress.lessons[l.v]
+    );
+
+    if (!allLessonsDone) {
+        alert("⚠️ Conclua todas as aulas deste módulo para liberar a prova.");
+        return;
     }
 
-    function play(m, l) {
-        current = { m, l };
-        const les = course[m].lessons[l];
-        document.getElementById('mainPlayer').src = `https://www.youtube.com/embed/${les.v}?autoplay=1`;
-        document.getElementById('currentTitle').innerText = les.t;
-        document.getElementById('currentDesc').innerText = les.d;
-        document.querySelectorAll('.lesson-item').forEach(e => e.classList.remove('active'));
-        document.getElementById(`les-${les.v}`).classList.add('active');
+    progress.exams[mIdx] = true;
+    saveProgress();
+
+    window.location.href = mod.file;
+}
+
+/* =========================
+   ATIVIDADE FINAL
+========================= */
+
+function startFinal() {
+    const total = course.reduce((a, m) => a + m.lessons.length, 0);
+    const done = Object.keys(progress.lessons).filter(k => progress.lessons[k]).length;
+
+    if (done !== total) {
+        alert("⚠️ Finalize todas as aulas antes de iniciar a atividade final.");
+        return;
     }
 
-    function toggle(id) {
-        completed.includes(id) ? completed = completed.filter(i => i !== id) : completed.push(id);
-        localStorage.setItem('mm_v10_c', JSON.stringify(completed));
-        document.getElementById(`les-${id}`).classList.toggle('completed');
-        updateProg();
-    }
+    progress.final = true;
+    saveProgress();
 
-    function updateProg() {
-        const total = course.reduce((acc, m) => acc + m.lessons.length, 0);
-        const p = Math.round((completed.length / total) * 100);
-        document.getElementById('prog-txt').innerText = `${p}% Concluído`;
-        const btnFinal = document.getElementById('finalBtn');
-        btnFinal.disabled = p < 100;
-        if(p === 100) btnFinal.innerText = "🎓 INICIAR ATIVIDADE FINAL";
-    }
+    window.location.href = "atividade_final.html";
+}
 
-    function openExamFile(mIdx) {
-        const mod = course[mIdx];
-        const allDone = mod.lessons.every(l => completed.includes(l.v));
-        if(!allDone) return alert("Você deve concluir todas as aulas deste módulo para abrir a prova!");
-        
-        // Simulação de abertura do arquivo externo
-        window.location.href = mod.file;
-    }
+/* =========================
+   SIDEBAR
+========================= */
 
-    function toggleSidebar() {
-        const sb = document.getElementById('sidebar');
-        sb.classList.toggle('closed');
-        document.querySelector('.toggle-sidebar-btn').innerText = sb.classList.contains('closed') ? '❯' : '❮';
-    }
+function toggleSidebar() {
+    const sb = document.getElementById('sidebar');
+    sb.classList.toggle('closed');
+    document.querySelector('.toggle-sidebar-btn').innerText =
+        sb.classList.contains('closed') ? '❯' : '❮';
+}
 
-    function changeLesson(s) {
-        let n = current.l + s;
-        if(course[current.m].lessons[n]) play(current.m, n);
-    }
+/* =========================
+   START
+========================= */
 
-    init();
+init();
+
 </script>
 </body>
 </html>

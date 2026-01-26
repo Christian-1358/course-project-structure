@@ -14,7 +14,6 @@ from app.handlers.curso import CursoHandler
 from app.handlers.recuperar_senha import RecuperarSenhaHandler
 from app.handlers.emails_logados import EmailsLogadosHandler
 from app.handlers.avaliacao import SubmitCodeHandler
-from app.handlers.atividade import AtividadesHandlers
 from app.handlers.criar_conta import CriarContaHandler
 from app.utils.admin_tools import (
     LoginDevHandler,
@@ -27,6 +26,8 @@ from app.utils.admin_tools import (
     criar_tabela,
     criar_usuario_admin_se_nao_existe
 )
+from app.handlers.atividade_1 import Prova1
+
 from app.handlers.pagamento_mensal import PagamentoMensalPage, CriarPagamentoHandler, WebhookHandler
 def make_app():
     settings = dict(
@@ -64,9 +65,8 @@ def make_app():
         (r"/submit", SubmitCodeHandler),
         (r"/admin/emails_logados", EmailsLogadosHandler),
         (r"/admin/compras", ComprasHandler),
-        (r"/atividades", AtividadesHandlers),       
 
-
+        (r"atividade1", Prova1),        
     ], **settings)
 
 if __name__ == "__main__":
