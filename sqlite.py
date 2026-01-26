@@ -21,9 +21,19 @@ def criar_banco():
             ativo INTEGER DEFAULT 1
         );
         """)
+    c.execute("""
+CREATE TABLE IF NOT EXISTS provas_resultado (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    modulo INTEGER NOT NULL,
+    nota REAL NOT NULL,
+    aprovado INTEGER NOT NULL,
+    data TEXT NOT NULL
+)
+""")
 
         # ================= PROGRESSO =================
-        c.execute("""
+    c.execute("""
         CREATE TABLE IF NOT EXISTS progresso (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
@@ -38,7 +48,7 @@ def criar_banco():
         """)
 
         # ================= PASSWORD RESET =================
-        c.execute("""
+    c.execute("""
         CREATE TABLE IF NOT EXISTS password_reset (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
@@ -51,7 +61,7 @@ def criar_banco():
         );
         """)
 
-        conn.commit()
+    conn.commit()
 
 if __name__ == "__main__":
     criar_banco()

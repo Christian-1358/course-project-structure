@@ -1,3 +1,4 @@
+from datetime import datetime
 import tornado.web
 import tornado.auth
 import sqlite3
@@ -5,6 +6,9 @@ import hashlib
 import uuid
 import os
 
+# ===============================
+# CONFIG DB
+# ===============================
 BASE_DIR = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 )
@@ -21,6 +25,9 @@ def hash_senha(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
+# ===============================
+# LOGIN NORMAL
+# ===============================
 class LoginHandler(tornado.web.RequestHandler):
     def get(self):
         self.render(
@@ -47,16 +54,17 @@ class LoginHandler(tornado.web.RequestHandler):
 
         conn = conectar()
         c = conn.cursor()
+
         c.execute("""
-            SELECT id, username
+            SELECT id, username, inicio_curso
             FROM users
             WHERE username=? AND password=? AND ativo=1
         """, (username, senha_hash))
 
         user = c.fetchone()
-        conn.close()
 
         if not user:
+            conn.close()
             self.render(
                 "login.html",
                 erro="Usuário inválido ou bloqueado",
@@ -65,12 +73,26 @@ class LoginHandler(tornado.web.RequestHandler):
             )
             return
 
+        # 🟢 salva início do curso (1ª vez)
+        if not user["inicio_curso"]:
+            inicio = datetime.now().strftime("%d/%m/%Y")
+            c.execute("""
+                UPDATE users
+                SET inicio_curso = ?
+                WHERE id = ?
+            """, (inicio, user["id"]))
+            conn.commit()
+
+        conn.close()
+
         self.set_secure_cookie("user", user["username"])
         self.set_secure_cookie("user_id", str(user["id"]))
         self.redirect("/curso")
 
 
-
+# ===============================
+# LOGIN GOOGLE
+# ===============================
 class GoogleLoginHandler(
     tornado.web.RequestHandler,
     tornado.auth.GoogleOAuth2Mixin
@@ -104,21 +126,31 @@ class GoogleLoginHandler(
             conn = conectar()
             c = conn.cursor()
 
-            c.execute("SELECT id, ativo FROM users WHERE email=?", (email,))
+            c.execute("""
+                SELECT id, ativo, inicio_curso
+                FROM users
+                WHERE email=?
+            """, (email,))
+
             row = c.fetchone()
 
             if not row:
                 senha_fake = hash_senha(str(uuid.uuid4()))
+                inicio = datetime.now().strftime("%d/%m/%Y")
+
                 c.execute("""
-                    INSERT INTO users (username, password, email, ativo)
-                    VALUES (?, ?, ?, 1)
-                """, (username, senha_fake, email))
+                    INSERT INTO users
+                    (username, password, email, ativo, inicio_curso)
+                    VALUES (?, ?, ?, 1, ?)
+                """, (username, senha_fake, email, inicio))
+
                 user_id = c.lastrowid
             else:
                 if row["ativo"] == 0:
                     conn.close()
                     self.write("Conta bloqueada pelo administrador.")
                     return
+
                 user_id = row["id"]
 
             conn.commit()
@@ -138,6 +170,9 @@ class GoogleLoginHandler(
             )
 
 
+# ===============================
+# LOGOUT
+# ===============================
 class LogoutHandler(tornado.web.RequestHandler):
     def get(self):
         self.clear_cookie("user")

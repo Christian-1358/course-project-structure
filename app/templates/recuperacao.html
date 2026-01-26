@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Recuperação | Mestre das Milhas</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --gold: linear-gradient(90deg, #d4af37 0%, #f1d592 50%, #d4af37 100%);
+    --dark-bg: #050505;
+    --card-bg: #111111;
+    --text-gray: #aaa;
+    --danger: #ff3c3c;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background: var(--dark-bg);
+    color: #fff;
+    min-height: 100vh;
+}
+
+header {
+    padding: 20px 8%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0,0,0,0.9);
+    position: fixed;
+    width: 100%;
+    top: 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.logo {
+    font-weight: 800;
+    font-size: 24px;
+}
+
+.logo span {
+    background: var(--gold);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.resultado-box {
+    max-width: 650px;
+    margin: 160px auto 80px;
+    padding: 55px 45px;
+    border-radius: 20px;
+    text-align: center;
+    background: var(--card-bg);
+    border: 1px solid rgba(212,175,55,0.3);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.7);
+}
+
+.resultado-box h2 {
+    font-size: 2.3rem;
+    font-weight: 900;
+    color: var(--danger);
+}
+
+.nota-final {
+    font-size: 90px;
+    font-weight: 900;
+    margin: 20px 0;
+    background: var(--gold);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.resultado-box p {
+    color: var(--text-gray);
+    font-size: 1.1rem;
+    margin-bottom: 18px;
+}
+
+.btn-refazer {
+    display: inline-block;
+    margin-top: 30px;
+    background: var(--gold);
+    color: #000;
+    padding: 18px 55px;
+    border-radius: 14px;
+    font-weight: 900;
+    text-decoration: none;
+    transition: 0.3s;
+    text-transform: uppercase;
+}
+
+.btn-refazer:hover {
+    transform: scale(1.06);
+    box-shadow: 0 0 40px rgba(212,175,55,0.6);
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">
+        Mestre <span>das Milhas</span>
+    </div>
+</header>
+
+<section class="resultado-box">
+    <h2>❌ Média não atingida</h2>
+
+    <div class="nota-final">
+        {{ nota }}
+    </div>
+
+    <p>Sua nota final nesta avaliação</p>
+
+    <p>
+        <strong>Média mínima:</strong> 7.0<br>
+        Revise o conteúdo e tente novamente.
+    </p>
+
+    <a href="/prova/{{ modulo }}" class="btn-refazer">
+        🔁 Refazer Prova
+    </a>
+</section>
+
+</body>
+</html>

@@ -15,6 +15,7 @@ from app.handlers.recuperar_senha import RecuperarSenhaHandler
 from app.handlers.emails_logados import EmailsLogadosHandler
 from app.handlers.avaliacao import SubmitCodeHandler
 from app.handlers.criar_conta import CriarContaHandler
+from app.handlers.prova import ProvaHandler
 from app.utils.admin_tools import (
     LoginDevHandler,
     AlterarStatusHandler,
@@ -24,10 +25,18 @@ from app.utils.admin_tools import (
     BuscarUsuarioHandler,
     ComprasHandler,
     criar_tabela,
+ 
     criar_usuario_admin_se_nao_existe
 )
-from app.handlers.atividade_1 import Prova1
+from app.handlers.certificado import CertificadoPDFHandler
+from app.handlers.certificado import (
+    CertificadoPDFHandler,
+    CertificadoHandler,
+    CertificadoPDFHandler
+)
 
+from app.handlers.prova import ProvaHandler
+from app.handlers.recuperacao import RecuperacaoHandler
 from app.handlers.pagamento_mensal import PagamentoMensalPage, CriarPagamentoHandler, WebhookHandler
 def make_app():
     settings = dict(
@@ -43,6 +52,7 @@ def make_app():
         },
     )
     return tornado.web.Application([
+        
         (r"/pagamento", PagamentoMensalPage),                
         (r"/pagamento_mensal", PagamentoMensalPage),
         (r"/pagamento/criar", CriarPagamentoHandler),
@@ -66,8 +76,13 @@ def make_app():
         (r"/admin/emails_logados", EmailsLogadosHandler),
         (r"/admin/compras", ComprasHandler),
 
-        (r"atividade1", Prova1),        
-    ], **settings)
+
+(r"/prova/([0-9]+)", ProvaHandler),
+        (r"/certificado", CertificadoHandler),
+        (r"/certificado/pdf", CertificadoPDFHandler),
+        (r"/recuperacao/([0-9]+)", RecuperacaoHandler),
+
+        ], **settings)  
 
 if __name__ == "__main__":
     try:
@@ -82,3 +97,4 @@ if __name__ == "__main__":
     print(" Servidor rodando em: http://localhost:8080")
     print("Acesse o Painel Admin em: http://localhost:8080/login_dev")
     tornado.ioloop.IOLoop.current().start()
+

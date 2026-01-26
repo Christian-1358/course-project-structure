@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Prova Interativa | Mestre das Milhas</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --gold: linear-gradient(90deg,#d4af37,#f1d592,#d4af37);
+    --bg: #050505;
+    --card: #111;
+    --correct: #22c55e;
+    --wrong: #ef4444;
+}
+
+body {
+    background: var(--bg);
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+}
+
+.prova-container {
+    max-width: 800px;
+    margin: 120px auto;
+    background: var(--card);
+    padding: 50px;
+    border-radius: 18px;
+    border: 1px solid #d4af37;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    background: var(--gold);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.questao {
+    display: none;
+}
+
+.questao.active {
+    display: block;
+}
+
+.questao h4 {
+    margin-bottom: 20px;
+}
+
+.alternativas {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+.opcao {
+    padding: 16px 20px;
+    border-radius: 12px;
+    background: #0b0b0b;
+    border: 1px solid #222;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.opcao:hover {
+    border-color: #d4af37;
+}
+
+.opcao.correct {
+    background: rgba(34,197,94,0.2);
+    border-color: var(--correct);
+}
+
+.opcao.wrong {
+    background: rgba(239,68,68,0.2);
+    border-color: var(--wrong);
+}
+
+.feedback {
+    margin-top: 18px;
+    font-weight: 700;
+}
+
+.feedback.correct {
+    color: var(--correct);
+}
+
+.feedback.wrong {
+    color: var(--wrong);
+}
+
+.btn-next {
+    margin-top: 25px;
+    padding: 14px 30px;
+    background: var(--gold);
+    color: #000;
+    border: none;
+    border-radius: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    display: none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="prova-container">
+<h2>Prova Final — Módulo {{ modulo }}</h2>
+
+<form id="formProva" method="post" action="/prova/{{ modulo }}">
+
+<!-- QUESTÃO 1 -->
+<div class="questao active" data-correta="b">
+<h4>1. Qual é o melhor uso das milhas?</h4>
+
+<div class="alternativas">
+<div class="opcao" data-value="a">Comprar produtos</div>
+<div class="opcao" data-value="b">Emitir passagens aéreas</div>
+<div class="opcao" data-value="c">Trocar por brindes</div>
+<div class="opcao" data-value="d">Deixar expirar</div>
+</div>
+
+<input type="hidden" name="q1">
+<div class="feedback"></div>
+<button type="button" class="btn-next">Próxima</button>
+</div>
+
+<!-- QUESTÃO 2 -->
+<div class="questao" data-correta="b">
+<h4>2. Programas de fidelidade servem para?</h4>
+
+<div class="alternativas">
+<div class="opcao" data-value="a">Cobrar taxas</div>
+<div class="opcao" data-value="b">Acumular benefícios</div>
+<div class="opcao" data-value="c">Cancelar cartões</div>
+<div class="opcao" data-value="d">Criar dívidas</div>
+</div>
+
+<input type="hidden" name="q2">
+<div class="feedback"></div>
+<button type="button" class="btn-next">Próxima</button>
+</div>
+<div class="questao" data-correta="c">
+<h4>3. O que significa transferir milhas com bônus?</h4>
+
+<div class="alternativas">
+<div class="opcao" data-value="a">Perder milhas ao transferir</div>
+<div class="opcao" data-value="b">Pagar taxa extra</div>
+<div class="opcao" data-value="c">Receber milhas extras na transferência</div>
+<div class="opcao" data-value="d">Cancelar a conta</div>
+</div>
+
+<input type="hidden" name="q3">
+<div class="feedback"></div>
+<button type="button" class="btn-next">Próxima</button>
+</div>
+
+<div class="questao" data-correta="a">
+<h4>4. Qual cartão costuma gerar mais milhas?</h4>
+
+<div class="alternativas">
+<div class="opcao" data-value="a">Cartão com maior pontuação por dólar</div>
+<div class="opcao" data-value="b">Cartão débito</div>
+<div class="opcao" data-value="c">Cartão pré-pago</div>
+<div class="opcao" data-value="d">Cartão virtual temporário</div>
+</div>
+
+<input type="hidden" name="q4">
+<div class="feedback"></div>
+<button type="button" class="btn-next">Próxima</button>
+</div>
+<div class="questao" data-correta="b">
+<h4>5. O que pode fazer você perder milhas?</h4>
+
+<div class="alternativas">
+<div class="opcao" data-value="a">Usar o cartão frequentemente</div>
+<div class="opcao" data-value="b">Deixar as milhas expirarem</div>
+<div class="opcao" data-value="c">Transferir para companhias aéreas</div>
+<div class="opcao" data-value="d">Emitir passagens</div>
+</div>
+
+<input type="hidden" name="q5">
+<div class="feedback"></div>
+<button type="button" class="btn-next">Próxima</button>
+</div>
+<div class="questao" data-correta="d">
+<h4>6. Qual é a melhor estratégia para usar milhas?</h4>
+
+<div class="alternativas">
+<div class="opcao" data-value="a">Usar assim que ganhar</div>
+<div class="opcao" data-value="b">Trocar por produtos</div>
+<div class="opcao" data-value="c">Vender ilegalmente</div>
+<div class="opcao" data-value="d">Planejar e usar em promoções</div>
+</div>
+
+<input type="hidden" name="q6">
+<div class="feedback"></div>
+<button type="button" class="btn-next">Próxima</button>
+</div>
+<div class="questao" data-correta="a">
+<h4>7. O que é um programa de fidelidade?</h4>
+
+<div class="alternativas">
+<div class="opcao" data-value="a">Sistema de recompensa por consumo</div>
+<div class="opcao" data-value="b">Sistema de multas</div>
+<div class="opcao" data-value="c">Programa governamental</div>
+<div class="opcao" data-value="d">Conta bancária comum</div>
+</div>
+
+<input type="hidden" name="q7">
+<div class="feedback"></div>
+<button type="button" class="btn-next">Próxima</button>
+</div>
+<div class="questao" data-correta="c">
+<h4>8. Qual dessas ações ajuda a acumular mais milhas?</h4>
+
+<div class="alternativas">
+<div class="opcao" data-value="a">Usar dinheiro em vez de cartão</div>
+<div class="opcao" data-value="b">Pagar boletos manualmente</div>
+<div class="opcao" data-value="c">Concentrar gastos em um cartão com boa pontuação</div>
+<div class="opcao" data-value="d">Evitar programas de fidelidade</div>
+</div>
+
+<input type="hidden" name="q8">
+<div class="feedback"></div>
+<button type="button" class="btn-next">Próxima</button>
+</div>
+<div class="questao" data-correta="a">
+<h4>9. O que significa emitir passagem com milhas?</h4>
+
+<div class="alternativas">
+<div class="opcao" data-value="a">Trocar milhas por passagens aéreas</div>
+<div class="opcao" data-value="b">Comprar passagem com dinheiro</div>
+<div class="opcao" data-value="c">Reservar hotel</div>
+<div class="opcao" data-value="d">Transferir pontos</div>
+</div>
+
+<input type="hidden" name="q9">
+<div class="feedback"></div>
+<button type="button" class="btn-next">Próxima</button>
+</div>
+<div class="questao" data-correta="d">
+<h4>10. Qual o maior erro de iniciantes no mundo das milhas?</h4>
+
+<div class="alternativas">
+<div class="opcao" data-value="a">Pesquisar antes de usar</div>
+<div class="opcao" data-value="b">Planejar viagens</div>
+<div class="opcao" data-value="c">Acompanhar promoções</div>
+<div class="opcao" data-value="d">Usar milhas sem estratégia</div>
+</div>
+
+<input type="hidden" name="q10">
+<div class="feedback"></div>
+<button type="button" class="btn-next">Finalizar Prova</button>
+</div>
+
+<!-- ÚLTIMA -->
+<button type="submit" id="finalizar" style="display:none" class="btn-next">
+Finalizar Prova
+</button>
+
+</form>
+</div>
+
+<script>
+const questoes = document.querySelectorAll(".questao");
+
+questoes.forEach((questao, index) => {
+    const correta = questao.dataset.correta;
+    const opcoes = questao.querySelectorAll(".opcao");
+    const feedback = questao.querySelector(".feedback");
+    const nextBtn = questao.querySelector(".btn-next");
+    const inputHidden = questao.querySelector("input");
+
+    opcoes.forEach(opcao => {
+        opcao.addEventListener("click", () => {
+            if (feedback.textContent) return;
+
+            const valor = opcao.dataset.value;
+            inputHidden.value = valor;
+
+            if (valor === correta) {
+                opcao.classList.add("correct");
+                feedback.textContent = "✅ Resposta correta";
+                feedback.classList.add("correct");
+            } else {
+                opcao.classList.add("wrong");
+                feedback.textContent = "❌ Resposta incorreta";
+                feedback.classList.add("wrong");
+
+                questao.querySelector(`[data-value="${correta}"]`)
+                    .classList.add("correct");
+            }
+
+            nextBtn.style.display = "inline-block";
+        });
+    });
+
+    nextBtn?.addEventListener("click", () => {
+        questao.classList.remove("active");
+
+        if (index + 1 < questoes.length) {
+            questoes[index + 1].classList.add("active");
+        } else {
+            document.getElementById("finalizar").style.display = "inline-block";
+        }
+    });
+});
+</script>
+
+</body>
+</html>
