@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -90,8 +89,8 @@
             {t: "Cias Aéreas", d: "Diferenças entre Smiles, Latam Pass e TudoAzul.", v: "p7HKvqRI_Bo"},
             {t: "Alertas Técnicos", d: "Configurando ferramentas de monitoramento em tempo real.", v: "dZ9gY8JwqfE"},
             {t: "Primeiro Acúmulo", d: "Passo a passo prático para gerar suas primeiras milhas.", v: "5Y3G6a2Z8sU"}
-        ], id: 1 },
-        
+        ], id: 0 },
+
         { name: "2. Cartões e Benefícios", lessons: [
             {t: "Ranking de Cartões", d: "Quais cartões realmente valem a pena manter em 2026.", v: "Qv2L8g1m3kM"},
             {t: "Zerar Anuidade", d: "Scripts de negociação para não pagar taxas bancárias.", v: "7J9x8w3QX2M"},
@@ -101,7 +100,7 @@
             {t: "Upgrade de Limite", d: "Como forçar o banco a te dar um cartão Black/Infinite.", v: "9X3ZLkQ8P2s"},
             {t: "Spread Zero", d: "Como economizar em todas as compras internacionais.", v: "M8LZ9Q2KX1A"},
             {t: "Proteção de Preço", d: "Receba dinheiro de volta se o preço do produto baixar.", v: "wZ8L9Ck3m0E"}
-        ], id: 2},
+        ], id: 1},
 
         { name: "3. Acúmulo Estratégico", lessons: [
             {t: "Compras 10x1", d: "Como ganhar 10 pontos por real em compras comuns.", v: "P9Zk3L8QX4s"},
@@ -113,7 +112,7 @@
             {t: "Gestão de CPFs", d: "Como escalar o acúmulo usando contas de terceiros.", v: "yJz8QyYw7l8"},
             {t: "Datas Sazonais", d: "Aproveitando Black Friday e aniversários de programas.", v: "p7HKvqRI_Bo"},
             {t: "Giro de Boletos", d: "Pagando contas e ganhando pontos simultaneamente.", v: "dZ9gY8JwqfE"}
-        ], id: 3 },
+        ], id: 2 },
 
         { name: "4. Emissões Internacionais", lessons: [
             {t: "Tabela Fixa", d: "O segredo para passagens baratas independente da data.", v: "5Y3G6a2Z8sU"},
@@ -124,7 +123,7 @@
             {t: "Destinos EUA", d: "Melhores rotas para Miami e NY com milhas Smiles.", v: "C8QZ3y9mF4s"},
             {t: "Taxas de Combustível", d: "Como identificar e evitar cobranças abusivas.", v: "9X3ZLkQ8P2s"},
             {t: "ALL Accor", d: "Hospedagem de luxo utilizando seus pontos.", v: "M8LZ9Q2KX1A"}
-        ], id: 5},
+        ], id: 3},
 
         { name: "5. Milhas como Negócio", lessons: [
             {t: "Venda em Balcão", d: "Operando via Maxmilhas e Hotmilhas com segurança.", v: "wZ8L9Ck3m0E"},
@@ -135,7 +134,7 @@
             {t: "Reinvestimento", d: "Como fazer as milhas pagarem suas próprias faturas.", v: "8pTEmbeENF4"},
             {t: "Tendências 2026", d: "O que esperar do mercado nos próximos meses.", v: "Z9z8Z2f3nGQ"},
             {t: "Mentoria Final", d: "Dúvidas finais e encerramento da jornada.", v: "yJz8QyYw7l8"}
-        ], file: "Prova_modulo5.html" }
+        ], id: 4 }
     ];
 
 
@@ -267,6 +266,7 @@ function saveProgress() {
 function openExamFile(mIdx) {
     const mod = course[mIdx];
 
+    // Verifica se todas as lições do módulo foram marcadas como concluídas [cite: 2026-01-20]
     const allLessonsDone = mod.lessons.every(
         l => progress.lessons[l.v]
     );
@@ -276,14 +276,15 @@ function openExamFile(mIdx) {
         return;
     }
 
+    // O mIdx do primeiro módulo é 0. Somamos 1 para virar /prova/1 [cite: 2026-01-20]
+    const moduloReal = mIdx + 1;
+    
     progress.exams[mIdx] = true;
     saveProgress();
 
-    // 🔥 REDIRECIONA PARA A PROVA (SAI DO CURSO)
-    window.location.href = `/prova/${mIdx}`;
+    // Redireciona para o arquivo correto (prova.html, prova2.html, etc) [cite: 2026-01-20]
+    window.location.href = `/prova/${moduloReal}`;
 }
-
-
 /* =========================
    ATIVIDADE FINAL
 ========================= */

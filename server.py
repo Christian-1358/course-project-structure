@@ -32,7 +32,7 @@ from app.handlers.certificado import CertificadoPDFHandler
 from app.handlers.certificado import (
     CertificadoPDFHandler,
     CertificadoHandler,
-    CertificadoPDFHandler
+    
 )
 
 from app.handlers.prova import ProvaHandler
@@ -77,8 +77,8 @@ def make_app():
         (r"/admin/compras", ComprasHandler),
 
 
-(r"/prova/([0-9]+)", ProvaHandler),
-        (r"/certificado", CertificadoHandler),
+        (r"/prova/([0-9]+)", ProvaHandler),
+        (r"/certificado/([0-9]+)", CertificadoHandler),
         (r"/certificado/pdf", CertificadoPDFHandler),
         (r"/recuperacao/([0-9]+)", RecuperacaoHandler),
 
