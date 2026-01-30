@@ -2,29 +2,16 @@ import tornado.web
 import sqlite3
 import os
 import io
-from datetime import datetime
-from reportlab.lib.pagesizes import A4, landscape
-from reportlab.pdfgen import canvas
-from reportlab.lib.colors import HexColor
-terminar o certificado, comadno handlers
+from xhtml2pdf import pisa # Biblioteca para converter HTML em PDF profissional
+
 class CertificadoHandler(tornado.web.RequestHandler):
     def get_current_user(self):
-        """Fundamental para o funcionamento do @authenticated [cite: 2026-01-20]"""
         return self.get_secure_cookie("user_id")
 
     @tornado.web.authenticated
     def get(self, modulo):
-        # 1. Recuperação de Identidade
-        user_id_cookie = self.current_user
-        nome_cookie = self.get_secure_cookie("user")
-
-        if not user_id_cookie or not nome_cookie:
-            return self.redirect("/login")
-
-        user_id = int(user_id_cookie.decode())
-        nome_aluno = nome_cookie.decode().upper()
-
-        # 2. Localização Dinâmica do Banco de Dados [cite: 2026-01-20]
+        user_id = self.current_user.decode()
+        
         BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
         DB_PATH = os.path.join(BASE_DIR, "usuarios.db")
         
@@ -33,117 +20,55 @@ class CertificadoHandler(tornado.web.RequestHandler):
         c = conn.cursor()
         
         try:
-            # Busca a data de conclusão do módulo específico
-            query = f"SELECT fim_modulo{modulo} FROM users WHERE id = ?"
-            c.execute(query, (user_id,))
-            dados = c.fetchone()
+            c.execute(f"SELECT nome, username, inicio_curso, fim_modulo{modulo} FROM users WHERE id = ?", (user_id,))
+            user = c.fetchone()
         except Exception:
             conn.close()
-            return self.write("<h3>Erro: Coluna do módulo não encontrada. Verifique o banco.</h3>")
-        
+            return self.write("Erro no banco de dados.")
         conn.close()
 
-        # Validação: Só gera se tiver data de conclusão
-        if not dados or not dados[0]:
+        if not user or not user[3]:
             return self.redirect("/curso")
 
-        data_conclusao = dados[0]
+        nome_aluno = user['nome'] if user['nome'] else user['username'].upper()
+        data_inicio = user['inicio_curso'] if user['inicio_curso'] else "---"
+        data_fim = user[3]
 
-        # 3. Geração do PDF com seu Design Premium [cite: 2026-01-20]
-        buffer = io.BytesIO()
-        p = canvas.Canvas(buffer, pagesize=landscape(A4))
-        w, h = landscape(A4)
+        ementas = {
+            "1": "Fundamentos de Milhagem, Programas de Fidelidade e Acúmulo Orgânico.",
+            "2": "Cartões High-End, Salas VIP e Estratégias de Proteção de Preço.",
+            "3": "Multiplicação de Pontos, Clubes de Milhas e Estratégias de Giro.",
+            "4": "Emissões Internacionais, Tabelas Fixas e Stopover de Luxo.",
+            "5": "Gestão de Lucro, Balcão de Milhas e Comercialização Elite."
+        }
+        aprendizado = ementas.get(str(modulo), "Estratégias Avançadas em Milhas Aéreas.")
 
-        # --- FUNDO E MOLDURA ---
-        p.setFillColor(HexColor("#050505")) # Black Premium
-        p.rect(0, 0, w, h, fill=1)
-
-        # Marca d'água central
-        p.setFont("Helvetica-Bold", 140)
-        p.setFillColor(HexColor("#0A0A0A"))
-        p.drawCentredString(w/2, h/2 - 50, "MILHASPRO")
-
-        # Bordas Douradas Duplas
-        p.setStrokeColor(HexColor("#d4af37"))
-        p.setLineWidth(12)
-        p.rect(25, 25, w-50, h-50, stroke=1, fill=0)
-        p.setLineWidth(1)
-        p.rect(40, 40, w-80, h-80, stroke=1, fill=0)
-
-        # --- CABEÇALHO ---
-        p.setFillColor(HexColor("#ffffff"))
-        p.setFont("Helvetica-Bold", 22)
-        p.drawCentredString(w/2, h - 90, "MILHASPRO")
-
-        # --- TÍTULO ---
-        p.setFillColor(HexColor("#f1d592")) # Dourado
-        p.setFont("Helvetica-Bold", 55)
-        p.drawCentredString(w/2, h - 170, "CERTIFICADO")
+        # Se for download, geramos o PDF usando o HTML
+        if self.get_argument("download", "false") == "true":
+            return self.gerar_pdf_via_html(nome_aluno, modulo, data_inicio, data_fim, aprendizado)
         
-        p.setFillColor(HexColor("#888888"))
-        p.setFont("Helvetica", 12)
-        p.drawCentredString(w/2, h - 195, f"CONCLUSÃO E ESPECIALIZAÇÃO: MÓDULO {modulo}")
+        self.render("certificado.html", nome=nome_aluno, modulo=modulo, inicio=data_inicio, fim=data_fim, ementa=aprendizado)
 
-        # --- TEXTO DE CERTIFICAÇÃO ---
-        p.setFillColor(HexColor("#cccccc"))
-        p.setFont("Helvetica", 18)
-        p.drawCentredString(w/2, h/2 + 35, "Certificamos que para os devidos fins de direito")
-
-        # Nome do Aluno
-        p.setFillColor(HexColor("#ffffff"))
-        p.setFont("Helvetica-Bold", 38)
-        p.drawCentredString(w/2, h/2 - 20, nome_aluno)
+    def gerar_pdf_via_html(self, nome, modulo, inicio, fim, ementa):
+        # Renderiza o HTML para uma string
+        html_content = self.render_string("certificado.html", 
+                                          nome=nome, modulo=modulo, 
+                                          inicio=inicio, fim=fim, 
+                                          ementa=ementa, is_pdf=True).decode('utf-8')
         
-        p.setStrokeColor(HexColor("#d4af37"))
-        p.setLineWidth(2)
-        p.line(w/2 - 200, h/2 - 30, w/2 + 200, h/2 - 30)
+        result = io.BytesIO()
+        # Converte o HTML em PDF preservando o CSS
+        pisa_status = pisa.CreatePDF(io.StringIO(html_content), dest=result)
+        
+        if pisa_status.err:
+            return self.write("Erro ao gerar PDF profissional.")
 
-        # Descrição Dinâmica
-        p.setFillColor(HexColor("#aaaaaa"))
-        p.setFont("Helvetica", 14)
-        p.drawCentredString(w/2, h/2 - 70, f"concluiu com êxito o Módulo {modulo} do treinamento MilhasPro,")
-        p.drawCentredString(w/2, h/2 - 90, "dominando as estratégias elite de acúmulo e emissões de luxo.")
-
-        # --- RODAPÉ E ASSINATURAS ---
-        p.setStrokeColor(HexColor("#444444"))
-        p.setLineWidth(1)
-
-        # Assinatura Direção
-        p.line(120, 110, 320, 110)
-        p.setFillColor(HexColor("#ffffff"))
-        p.setFont("Helvetica-Bold", 10)
-        p.drawCentredString(220, 95, "DIRETOR EXECUTIVO")
-        p.setFillColor(HexColor("#666666"))
-        p.setFont("Helvetica", 8)
-        p.drawCentredString(220, 82, "Gestão Estratégica MilhasPro")
-
-        # Selo de Autenticidade
-        p.setFillColor(HexColor("#d4af37"))
-        p.setFont("Helvetica-Bold", 11)
-        p.drawCentredString(w/2, 60, f"AUTENTICADO EM {data_conclusao}")
-
-        # Assinatura Coordenação
-        p.line(w-320, 110, w-120, 110)
-        p.setFillColor(HexColor("#ffffff"))
-        p.setFont("Helvetica-Bold", 10)
-        p.drawCentredString(w-220, 95, "COORDENAÇÃO TÉCNICA")
-        p.setFillColor(HexColor("#666666"))
-        p.setFont("Helvetica", 8)
-        p.drawCentredString(w-220, 82, "Núcleo de Inteligência e Emissões")
-
-        p.showPage()
-        p.save()
-
-        # 4. Envio do PDF
-        buffer.seek(0)
+        result.seek(0)
         self.set_header("Content-Type", "application/pdf")
-        self.set_header("Content-Disposition", f"attachment; filename=Certificado_M{modulo}_Elite.pdf")
-        self.write(buffer.read())
+        self.set_header("Content-Disposition", f"attachment; filename=Certificado_M{modulo}.pdf")
+        self.write(result.read())
         self.finish()
-
 class CertificadoPDFHandler(CertificadoHandler):
-    """Classe de compatibilidade para links que não usam ID [cite: 2026-01-20]"""
+    """Atalho para links antigos [cite: 2026-01-20]"""
     def get(self):
         super().get(modulo="1")
-
-        

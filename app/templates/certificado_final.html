@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Certificado Final | {{ nome }}</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --gold: linear-gradient(135deg,#d4af37 0%,#f1d592 50%,#d4af37 100%);
+    --border-gold: rgba(212,175,55,.4);
+}
+*{box-sizing:border-box}
+body{
+    background:#000;
+    margin:0;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    font-family:'Inter',sans-serif;
+}
+
+.cert-canvas{
+    width:900px;
+    height:600px;
+    padding:20px;
+    background:#080808;
+    border:10px solid #d4af37;
+    border-image:linear-gradient(135deg,#d4af37,#8a6d1d) 1;
+    position:relative;
+    box-shadow:0 0 60px rgba(0,0,0,.9);
+}
+
+.watermark{
+    position:absolute;
+    top:50%;left:50%;
+    transform:translate(-50%,-50%) rotate(-12deg);
+    font-size:180px;
+    font-weight:900;
+    color:rgba(212,175,55,.04);
+    pointer-events:none;
+}
+
+.inner-border{
+    border:1px solid var(--border-gold);
+    height:100%;
+    padding:40px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    align-items:center;
+    background:radial-gradient(circle,#111 0%,#050505 100%);
+    position:relative;
+}
+
+.header-logo{
+    font-size:22px;
+    font-weight:900;
+    letter-spacing:4px;
+    color:#fff;
+}
+.header-logo span{color:#d4af37}
+
+.main-title h1{
+    font-size:54px;
+    margin:0;
+    letter-spacing:8px;
+    text-transform:uppercase;
+    background:var(--gold);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    font-weight:900;
+    text-align:center;
+}
+
+.subtitle{
+    font-size:11px;
+    color:#888;
+    letter-spacing:3px;
+    font-weight:700;
+    text-align:center;
+}
+
+.student-name{
+    font-size:42px;
+    font-weight:700;
+    color:#fff;
+    margin:18px 0;
+    border-bottom:2px solid #d4af37;
+    min-width:450px;
+    text-align:center;
+    padding-bottom:8px;
+}
+
+.description{
+    font-size:16px;
+    color:#ccc;
+    text-align:center;
+    max-width:720px;
+    line-height:1.6;
+}
+
+.ementa{
+    margin-top:14px;
+    color:#f1d592;
+    font-weight:600;
+    font-size:15px;
+}
+
+.periodo{
+    margin-top:22px;
+    font-size:11px;
+    color:#666;
+    letter-spacing:2px;
+    font-weight:700;
+    text-transform:uppercase;
+}
+
+.footer{
+    width:100%;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+}
+
+.signature{
+    width:230px;
+    text-align:center;
+    border-top:1px solid #333;
+    padding-top:12px;
+    font-size:10px;
+    color:#666;
+    font-weight:600;
+    text-transform:uppercase;
+}
+
+.seal{
+    text-align:center;
+}
+.seal img{width:65px}
+.seal p{
+    font-size:8px;
+    color:#d4af37;
+    font-weight:800;
+    letter-spacing:1px;
+    margin-top:6px;
+}
+
+.download{
+    margin-top:30px;
+}
+.btn-download{
+    background:var(--gold);
+    color:#000;
+    border:none;
+    padding:16px 45px;
+    border-radius:50px;
+    font-weight:900;
+    letter-spacing:1px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    text-transform:uppercase;
+}
+.btn-download:hover{
+    transform:scale(1.08);
+    box-shadow:0 15px 35px rgba(212,175,55,.4);
+}
+</style>
+</head>
+
+<body>
+
+<div class="cert-canvas">
+    <div class="watermark">MILHASPRO</div>
+
+    <div class="inner-border">
+        <div class="header-logo">MILHAS<span>PRO</span></div>
+
+        <div>
+            <div class="main-title">
+                <h1>Certificado</h1>
+            </div>
+            <div class="subtitle">CERTIFICAÇÃO FINAL · 2026</div>
+        </div>
+
+        <div style="text-align:center">
+            <p style="font-size:18px;color:#ccc;margin-bottom:6px">
+                Certificamos que
+            </p>
+
+            <div class="student-name">{{ nome }}</div>
+
+            <p class="description">
+                foi aprovado com êxito na <strong>Prova Final de Certificação</strong>,
+                concluindo integralmente o programa
+                <strong>Mestre das Milhas</strong>, com formação completa em:
+            </p>
+
+            <div class="ementa">
+                Fundamentos em CPM · Cartões e Benefícios · Acúmulo Estratégico ·
+                Emissões Internacionais · Milhas como Negócio
+            </div>
+
+            <div class="periodo">
+                Período de Formação: {{ inicio }} — {{ fim }}
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="signature">Diretor Executivo</div>
+
+            <div class="seal">
+                <img src="https://img.icons8.com/color/96/guarantee.png">
+                <p>AUTENTICIDADE GARANTIDA</p>
+            </div>
+
+            <div class="signature">Coordenação Técnica</div>
+        </div>
+    </div>
+</div>
+
+<div class="download">
+    <button class="btn-download" onclick="baixarCertificado()">
+        <img src="https://img.icons8.com/ios-filled/22/000000/pdf.png">
+        Baixar PDF
+    </button>
+</div>
+
+<script>
+function baixarCertificado(){
+    const url = "/certificado/final?download=true";
+    window.open(url,"_blank") || (window.location.href=url);
+}
+</script>
+
+</body>
+</html>

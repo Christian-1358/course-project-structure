@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Elite Milhas | Avaliação Módulo 4</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: linear-gradient(135deg, #d4af37 0%, #f1d592 50%, #d4af37 100%);
+            --bg: #0a0a0a;
+            --card-bg: #141414;
+            --border: #2a2a2a;
+            --text-main: #ffffff;
+            --text-dim: #a0a0a0;
+            --correct: #10b981;
+            --wrong: #ef4444;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--text-main); font-family: 'Inter', sans-serif; margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .prova-container { width: 95%; max-width: 650px; background: var(--card-bg); padding: 40px; border-radius: 24px; border: 1px solid var(--border); box-shadow: 0 20px 50px rgba(0,0,0,0.4); position: relative; }
+        .progress-container { width: 100%; height: 6px; background: #222; border-radius: 10px; margin-bottom: 30px; }
+        .progress-bar { height: 100%; background: var(--gold); width: 10%; border-radius: 10px; transition: var(--transition); }
+        h2 { text-align: center; font-size: 1.5rem; margin-bottom: 5px; background: var(--gold); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
+        p.subtitle { text-align: center; color: var(--text-dim); font-size: 0.9rem; margin-bottom: 30px; }
+        .questao { display: none; }
+        .questao.active { display: block; animation: slideIn 0.4s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+        h4 { font-size: 1.2rem; margin-bottom: 20px; line-height: 1.4; }
+        .opcao { padding: 18px; border-radius: 14px; background: #1e1e1e; border: 1px solid var(--border); cursor: pointer; margin-bottom: 12px; transition: var(--transition); display: flex; align-items: center; font-weight: 500; }
+        .opcao:hover { border-color: #d4af37; background: #252525; transform: translateY(-2px); }
+        .opcao.correct { border-color: var(--correct); background: rgba(16, 185, 129, 0.1); color: var(--correct); }
+        .opcao.wrong { border-color: var(--wrong); background: rgba(239, 68, 68, 0.1); color: var(--wrong); }
+        .btn-action { width: 100%; margin-top: 20px; padding: 18px; background: var(--gold); color: #000; border: none; border-radius: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; display: none; transition: var(--transition); }
+        #resultado { text-align: center; display: none; padding: 20px 0; }
+        .score-circle { width: 120px; height: 120px; border: 4px solid #d4af37; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 2.5rem; font-weight: 800; color: #d4af37; }
+        .badge { display: inline-block; padding: 6px 12px; background: rgba(212, 175, 55, 0.1); border: 1px solid #d4af37; color: #d4af37; border-radius: 20px; font-size: 0.75rem; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="prova-container">
+    <div id="quiz-content">
+        <div class="badge">MÓDULO 4</div>
+        <h2>Emissões Internacionais</h2>
+        <p class="subtitle">Tabela Fixa, Alianças e Taxas de Combustível</p>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progress"></div>
+        </div>
+
+        <form id="formProva" action="/prova/4" method="POST">
+            <div class="questao active" data-correta="b">
+                <h4>1. Qual a maior "pegadinha" ao tentar emitir uma Tabela Fixa da LATAM para parceiros?</h4>
+                <div class="opcao" data-value="a">O valor muda todo dia de acordo com o dólar.</div>
+                <div class="opcao" data-value="b">A disponibilidade deve ser tarifada como "Award" (Classe X ou I) e não comercial.</div>
+                <div class="opcao" data-value="c">A LATAM não permite mais emissões para parceiros.</div>
+                <div class="opcao" data-value="d">Só é possível emitir pelo site, nunca pelo Call Center.</div>
+                <input type="hidden" name="q1" id="q1">
+                <button type="button" class="btn-action">Próxima Questão</button>
+            </div>
+
+            <div class="questao" data-correta="a">
+                <h4>2. Para voar na "Qsuite" da Qatar Airways usando milhas nacionais, qual o caminho técnico mais eficiente?</h4>
+                <div class="opcao" data-value="a">Tabela Fixa LATAM Pass (Interline).</div>
+                <div class="opcao" data-value="b">Resgate direto no site da Smiles.</div>
+                <div class="opcao" data-value="c">Compra de passagens no dinheiro.</div>
+                <div class="opcao" data-value="d">Transferência da Livelo para a Azul.</div>
+                <input type="hidden" name="q2" id="q2">
+                <button type="button" class="btn-action">Próxima Questão</button>
+            </div>
+
+            <div class="questao" data-correta="c">
+                <h4>3. No programa da TAP (Star Alliance), qual a regra do Stopover gratuito?</h4>
+                <div class="opcao" data-value="a">Pode ser feito em qualquer cidade do mundo.</div>
+                <div class="opcao" data-value="b">Dura no máximo 2 horas.</div>
+                <div class="opcao" data-value="c">Permite uma parada de até 10 dias em Lisboa ou Porto na ida ou na volta.</div>
+                <div class="opcao" data-value="d">O Stopover custa o dobro das milhas originais.</div>
+                <input type="hidden" name="q3" id="q3">
+                <button type="button" class="btn-action">Próxima Questão</button>
+            </div>
+
+            <div class="questao" data-correta="d">
+                <h4>4. O que torna o Iberia Plus um "Sweet Spot" para brasileiros indo para a Europa?</h4>
+                <div class="opcao" data-value="a">A possibilidade de pagar com Pix.</div>
+                <div class="opcao" data-value="b">Ter voos saindo de todas as capitais.</div>
+                <div class="opcao" data-value="c">Não cobrar nenhuma taxa de aeroporto.</div>
+                <div class="opcao" data-value="d">Tabela baseada em distância e calendário Off-peak (fora de pico).</div>
+                <input type="hidden" name="q4" id="q4">
+                <button type="button" class="btn-action">Próxima Questão</button>
+            </div>
+
+            <div class="questao" data-correta="b">
+                <h4>5. Qual a restrição de CPFs na LATAM Pass para evitar o bloqueio da conta?</h4>
+                <div class="opcao" data-value="a">Não existe limite de CPFs.</div>
+                <div class="opcao" data-value="b">Limite de 25 CPFs diferentes por ano calendário.</div>
+                <div class="opcao" data-value="c">Apenas 5 CPFs pelo resto da vida.</div>
+                <div class="opcao" data-value="d">Só pode emitir para o titular da conta.</div>
+                <input type="hidden" name="q5" id="q5">
+                <button type="button" class="btn-action">Próxima Questão</button>
+            </div>
+
+            <div class="questao" data-correta="a">
+                <h4>6. Para ir aos EUA (Miami/NY) com milhas Smiles, qual parceira costuma ter as melhores taxas?</h4>
+                <div class="opcao" data-value="a">American Airlines.</div>
+                <div class="opcao" data-value="b">British Airways (via Londres).</div>
+                <div class="opcao" data-value="c">Emirates.</div>
+                <div class="opcao" data-value="d">Lufthansa.</div>
+                <input type="hidden" name="q6" id="q6">
+                <button type="button" class="btn-action">Próxima Questão</button>
+            </div>
+
+            <div class="questao" data-correta="c">
+                <h4>7. O que é a temida "Taxa de Combustível" (YQ)?</h4>
+                <div class="opcao" data-value="a">Uma taxa paga diretamente no posto do aeroporto.</div>
+                <div class="opcao" data-value="b">Um imposto do governo brasileiro.</div>
+                <div class="opcao" data-value="c">Uma sobretaxa das aéreas (comum na British/Lufthansa) que não é coberta pelas milhas.</div>
+                <div class="opcao" data-value="d">A taxa de embarque padrão de Guarulhos.</div>
+                <input type="hidden" name="q7" id="q7">
+                <button type="button" class="btn-action">Próxima Questão</button>
+            </div>
+
+            <div class="questao" data-correta="d">
+                <h4>8. Qual a proporção estratégica de conversão Smiles para o ALL Accor?</h4>
+                <div class="opcao" data-value="a">1:1 para todos os clientes.</div>
+                <div class="opcao" data-value="b">10:1 (Péssimo negócio).</div>
+                <div class="opcao" data-value="c">Não é possível transferir Smiles para o ALL.</div>
+                <div class="opcao" data-value="d">6:1 ou 5:1 para clientes Clube/Diamante (Excelente para hospedagem).</div>
+                <input type="hidden" name="q8" id="q8">
+                <button type="button" class="btn-action">Próxima Questão</button>
+            </div>
+
+            <div class="questao" data-correta="b">
+                <h4>9. Se você tem milhas na TAP, você pode emitir voos da United porque ambas pertencem à:</h4>
+                <div class="opcao" data-value="a">Oneworld.</div>
+                <div class="opcao" data-value="b">Star Alliance.</div>
+                <div class="opcao" data-value="c">SkyTeam.</div>
+                <div class="opcao" data-value="d">Aliança Ibérica.</div>
+                <input type="hidden" name="q9" id="q9">
+                <button type="button" class="btn-action">Próxima Questão</button>
+            </div>
+
+            <div class="questao" data-correta="a">
+                <h4>10. Qual o "erro fatal" de um aluno iniciante em emissões internacionais?</h4>
+                <div class="opcao" data-value="a">Transferir pontos para um programa estrangeiro sem verificar a disponibilidade real de assentos.</div>
+                <div class="opcao" data-value="b">Emitir em classe econômica.</div>
+                <div class="opcao" data-value="c">Pagar as taxas de embarque no cartão de crédito.</div>
+                <div class="opcao" data-value="d">Viajar apenas com bagagem de mão.</div>
+                <input type="hidden" name="q10" id="q10">
+                <button type="button" id="finalizar-btn" class="btn-action">Ver Resultado</button>
+            </div>
+        </form>
+    </div>
+
+    <div id="resultado">
+        <div class="badge">RESULTADO FINAL</div>
+        <h2>Nível Especialista</h2>
+        <div class="score-circle" id="nota-valor">0</div>
+        <p id="mensagem-final"></p>
+        <button id="btn-submit-final" class="btn-action" style="display:block;" onclick="document.getElementById('formProva').submit()">Confirmar e Gerar Certificado</button>
+    </div>
+</div>
+
+<script>
+    const questoes = document.querySelectorAll(".questao");
+    const progressBar = document.getElementById("progress");
+    let acertos = 0;
+
+    questoes.forEach((q, index) => {
+        const correta = q.dataset.correta;
+        const opcoes = q.querySelectorAll(".opcao");
+        const nextBtn = q.querySelector(".btn-action");
+        const finalizarBtn = document.getElementById("finalizar-btn");
+
+        opcoes.forEach(op => {
+            op.onclick = () => {
+                if (q.classList.contains("respondida")) return;
+                q.classList.add("respondida");
+                const selecionada = op.dataset.value;
+                document.getElementById(`q${index + 1}`).value = selecionada;
+
+                if (selecionada === correta) { op.classList.add("correct"); acertos++; } 
+                else { op.classList.add("wrong"); q.querySelector(`[data-value="${correta}"]`).classList.add("correct"); }
+
+                if (nextBtn) nextBtn.style.display = "block";
+                if (index === questoes.length - 1) finalizarBtn.style.display = "block";
+            };
+        });
+
+        if (nextBtn) {
+            nextBtn.onclick = () => {
+                q.classList.remove("active");
+                questoes[index + 1].classList.add("active");
+                progressBar.style.width = ((index + 2) / questoes.length) * 100 + "%";
+            };
+        }
+    });
+
+    document.getElementById("finalizar-btn").onclick = () => {
+        document.getElementById("quiz-content").style.display = "none";
+        document.getElementById("resultado").style.display = "block";
+        document.getElementById("nota-valor").textContent = acertos;
+        const msg = document.getElementById("mensagem-final");
+        msg.innerHTML = acertos >= 7 ? "APROVADO! Você domina as emissões internacionais." : "REPROVADO! As pegadinhas te pegaram.";
+        msg.style.color = acertos >= 7 ? "var(--correct)" : "var(--wrong)";
+    };
+</script>
+</body>
+</html>

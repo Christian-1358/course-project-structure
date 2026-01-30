@@ -28,9 +28,9 @@ from app.utils.admin_tools import (
  
     criar_usuario_admin_se_nao_existe
 )
+from app.handlers.certificado_final import CertificadoFinalHandler # Exemplo de import
 from app.handlers.certificado import CertificadoPDFHandler
 from app.handlers.certificado import (
-    CertificadoPDFHandler,
     CertificadoHandler,
     
 )
@@ -76,12 +76,18 @@ def make_app():
         (r"/admin/emails_logados", EmailsLogadosHandler),
         (r"/admin/compras", ComprasHandler),
 
-
+    
         (r"/prova/([0-9]+)", ProvaHandler),
+        (r"/certificado\.html", CertificadoHandler, dict(modulo_padrao="1")),
+        (r"/certificado2\.html", CertificadoHandler, dict(modulo_padrao="2")),
+        (r"/certificado3\.html", CertificadoHandler, dict(modulo_padrao="3")),
+        (r"/certificado4\.html", CertificadoHandler, dict(modulo_padrao="4")),
+        (r"/certificado5\.html", CertificadoHandler, dict(modulo_padrao="5")),
         (r"/certificado/([0-9]+)", CertificadoHandler),
         (r"/certificado/pdf", CertificadoPDFHandler),
         (r"/recuperacao/([0-9]+)", RecuperacaoHandler),
 
+        (r"/certificado/final", CertificadoFinalHandler),
         ], **settings)  
 
 if __name__ == "__main__":

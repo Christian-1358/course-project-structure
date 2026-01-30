@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Elite Milhas | Avaliação Módulo 3</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: linear-gradient(135deg, #d4af37 0%, #f1d592 50%, #d4af37 100%);
+            --bg: #0a0a0a;
+            --card-bg: #141414;
+            --border: #2a2a2a;
+            --text-main: #ffffff;
+            --text-dim: #a0a0a0;
+            --correct: #10b981;
+            --wrong: #ef4444;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--text-main); font-family: 'Inter', sans-serif; margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .prova-container { width: 95%; max-width: 650px; background: var(--card-bg); padding: 40px; border-radius: 24px; border: 1px solid var(--border); box-shadow: 0 20px 50px rgba(0,0,0,0.4); position: relative; }
+        .progress-container { width: 100%; height: 6px; background: #222; border-radius: 10px; margin-bottom: 30px; }
+        .progress-bar { height: 100%; background: var(--gold); width: 10%; border-radius: 10px; transition: var(--transition); }
+        h2 { text-align: center; font-size: 1.5rem; margin-bottom: 5px; background: var(--gold); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
+        p.subtitle { text-align: center; color: var(--text-dim); font-size: 0.9rem; margin-bottom: 30px; }
+        .questao { display: none; }
+        .questao.active { display: block; animation: slideIn 0.4s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+        h4 { font-size: 1.2rem; margin-bottom: 20px; line-height: 1.4; }
+        .opcao { padding: 18px; border-radius: 14px; background: #1e1e1e; border: 1px solid var(--border); cursor: pointer; margin-bottom: 12px; transition: var(--transition); display: flex; align-items: center; font-weight: 500; }
+        .opcao:hover { border-color: #d4af37; background: #252525; transform: translateY(-2px); }
+        .opcao.correct { border-color: var(--correct); background: rgba(16, 185, 129, 0.1); color: var(--correct); }
+        .opcao.wrong { border-color: var(--wrong); background: rgba(239, 68, 68, 0.1); color: var(--wrong); }
+        .btn-action { width: 100%; margin-top: 20px; padding: 18px; background: var(--gold); color: #000; border: none; border-radius: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; display: none; transition: var(--transition); }
+        #resultado { text-align: center; display: none; padding: 20px 0; }
+        .score-circle { width: 120px; height: 120px; border: 4px solid #d4af37; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 2.5rem; font-weight: 800; color: #d4af37; }
+        .badge { display: inline-block; padding: 6px 12px; background: rgba(212, 175, 55, 0.1); border: 1px solid #d4af37; color: #d4af37; border-radius: 20px; font-size: 0.75rem; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="prova-container">
+    <div id="quiz-content">
+        <div class="badge">MÓDULO 3</div>
+        <h2>Especialista em Acúmulo</h2>
+        <p class="subtitle">Multiplicação e Compras Bonificadas</p>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progress"></div>
+        </div>
+
+        <form id="formProva" action="/prova/3" method="POST">
+            <div class="questao active" data-correta="c">
+                <h4>1. No acúmulo 10x1 da Livelo, qual a estratégia principal ao gastar R$ 2.000,00?</h4>
+                <div class="opcao" data-value="a">Acumular 2.000 milhas orgânicas</div>
+                <div class="opcao" data-value="b">Esperar o banco dar pontos de graça</div>
+                <div class="opcao" data-value="c">Gerar 20.000 pontos através de parceiros de varejo</div>
+                <div class="opcao" data-value="d">Pagar anuidade para dobrar os pontos</div>
+                <input type="hidden" name="q1" id="q1">
+                <button type="button" class="btn-action">Próxima Questão</button>
+            </div>
+
+            <div class="questao" data-correta="b">
+                <h4>2. O que significa o conceito de "Compra de Pontos" estratégica?</h4>
+                <div class="opcao" data-value="a">Comprar pontos em qualquer valor</div>
+                <div class="opcao" data-value="b">Comprar quando o custo (CPM) é inferior ao valor de mercado</div>
+                <div class="opcao" data-value="c">Pagar o preço cheio no site da Smiles ou TudoAzul</div>
+                <div class="opcao" data-value="d">Apenas assinar o clube mensal</div>
+                <input type="hidden" name="q2" id="q2">
+                <button type="button" class="btn-action">Próxima Questão</button>
+            </div>
+
+            <div class="questao" data-correta="a">
+                <h4>3. Qual o bônus ideal para transferências banco -> companhia aérea?</h4>
+                <div class="opcao" data-value="a">Bônus de 100% ou superior</div>
+                <div class="opcao" data-value="b">Transferência sem bônus (1:1)</div>
+                <div class="opcao" data-value="c">Bônus de 20% com taxa</div>
+                <div class="opcao" data-value="d">Qualquer promoção de fim de semana</div>
+                <input type="hidden" name="q3" id="q3">
+                <button type="button" class="btn-action">Próxima Questão</button>
+            </div>
+
+            <div class="questao" data-correta="d">
+                <h4>4. Sobre a "Milhas no Tanque", como ocorre o acúmulo?</h4>
+                <div class="opcao" data-value="a">Comprando combustível com milhas</div>
+                <div class="opcao" data-value="b">Através de sorteios no posto</div>
+                <div class="opcao" data-value="c">Trocando óleo do carro</div>
+                <div class="opcao" data-value="d">Utilizando parceiros como Shell Box e Ipiranga (Abastece aí)</div>
+                <input type="hidden" name="q4" id="q4">
+                <button type="button" class="btn-action">Próxima Questão</button>
+            </div>
+
+            <div class="questao" data-correta="c">
+                <h4>5. Qual o papel da "Gestão de CPFs" na estratégia Elite?</h4>
+                <div class="opcao" data-value="a">Evitar pagar impostos</div>
+                <div class="opcao" data-value="b">Usar apenas o CPF de familiares próximos</div>
+                <div class="opcao" data-value="c">Gerenciar o limite de emissões (5 beneficiários) em cada conta</div>
+                <div class="opcao" data-value="d">Cadastrar CPFs aleatórios na conta</div>
+                <input type="hidden" name="q5" id="q5">
+                <button type="button" class="btn-action">Próxima Questão</button>
+            </div>
+
+            <div class="questao" data-correta="a">
+                <h4>6. O "Giro de Boletos" serve para:</h4>
+                <div class="opcao" data-value="a">Gerar milhas pagando contas orgânicas via apps de pagamento</div>
+                <div class="opcao" data-value="b">Atrasar o pagamento da fatura</div>
+                <div class="opcao" data-value="c">Pagar juros menores no banco</div>
+                <div class="opcao" data-value="d">Evitar usar o cartão de crédito</div>
+                <input type="hidden" name="q6" id="q6">
+                <button type="button" class="btn-action">Próxima Questão</button>
+            </div>
+
+            <div class="questao" data-correta="b">
+                <h4>7. O que são "Datas Sazonais" no mercado de milhas?</h4>
+                <div class="opcao" data-value="a">Feriados onde ninguém viaja</div>
+                <div class="opcao" data-value="b">Períodos de bônus agressivo (Black Friday, Aniversário Livelo)</div>
+                <div class="opcao" data-value="c">Apenas as férias escolares</div>
+                <div class="opcao" data-value="d">Dias de semana com pouco movimento</div>
+                <input type="hidden" name="q7" id="q7">
+                <button type="button" class="btn-action">Próxima Questão</button>
+            </div>
+
+            <div class="questao" data-correta="d">
+                <h4>8. Qual a vantagem de acumular via "Parceiros Varejo"?</h4>
+                <div class="opcao" data-value="a">Receber o produto mais rápido</div>
+                <div class="opcao" data-value="b">Não pagar frete</div>
+                <div class="opcao" data-value="c">Ganhar descontos em dinheiro</div>
+                <div class="opcao" data-value="d">Acumular até 15x mais pontos que o gasto direto no cartão</div>
+                <input type="hidden" name="q8" id="q8">
+                <button type="button" class="btn-action">Próxima Questão</button>
+            </div>
+
+            <div class="questao" data-correta="a">
+                <h4>9. No conceito de "Multiplicação", o que potencializa o lucro?</h4>
+                <div class="opcao" data-value="a">Comprar pontos bonificados e transferir com 100% de bônus</div>
+                <div class="opcao" data-value="b">Usar vários cartões ao mesmo tempo</div>
+                <div class="opcao" data-value="c">Vender milhas para amigos</div>
+                <div class="opcao" data-value="d">Esperar os pontos vencerem</div>
+                <input type="hidden" name="q9" id="q9">
+                <button type="button" class="btn-action">Próxima Questão</button>
+            </div>
+
+            <div class="questao" data-correta="c">
+                <h4>10. O "Assine e Ganhe" dos Clubes é vantajoso quando:</h4>
+                <div class="opcao" data-value="a">A mensalidade é gratuita</div>
+                <div class="opcao" data-value="b">Dá acesso apenas à sala VIP</div>
+                <div class="opcao" data-value="c">Oferece bônus agressivo na adesão e reduz o custo do milheiro</div>
+                <div class="opcao" data-value="d">O banco obriga a assinatura</div>
+                <input type="hidden" name="q10" id="q10">
+                <button type="button" id="finalizar-btn" class="btn-action">Ver Resultado</button>
+            </div>
+        </form>
+    </div>
+
+    <div id="resultado">
+        <div class="badge">RESULTADO FINAL</div>
+        <h2>Desempenho Elite</h2>
+        <div class="score-circle" id="nota-valor">0</div>
+        <p id="mensagem-final"></p>
+        <button id="btn-submit-final" class="btn-action" style="display:block;" onclick="document.getElementById('formProva').submit()">Gravar no Banco e Emitir Certificado</button>
+    </div>
+</div>
+
+<script>
+    const questoes = document.querySelectorAll(".questao");
+    const progressBar = document.getElementById("progress");
+    let acertos = 0;
+
+    questoes.forEach((q, index) => {
+        const correta = q.dataset.correta;
+        const opcoes = q.querySelectorAll(".opcao");
+        const nextBtn = q.querySelector(".btn-action");
+        const finalizarBtn = document.getElementById("finalizar-btn");
+
+        opcoes.forEach(op => {
+            op.onclick = () => {
+                if (q.classList.contains("respondida")) return;
+                q.classList.add("respondida");
+                const selecionada = op.dataset.value;
+                document.getElementById(`q${index + 1}`).value = selecionada;
+
+                if (selecionada === correta) { op.classList.add("correct"); acertos++; } 
+                else { op.classList.add("wrong"); q.querySelector(`[data-value="${correta}"]`).classList.add("correct"); }
+
+                if (nextBtn) nextBtn.style.display = "block";
+                if (index === questoes.length - 1) finalizarBtn.style.display = "block";
+            };
+        });
+
+        if (nextBtn) {
+            nextBtn.onclick = () => {
+                q.classList.remove("active");
+                questoes[index + 1].classList.add("active");
+                progressBar.style.width = ((index + 2) / questoes.length) * 100 + "%";
+            };
+        }
+    });
+
+    document.getElementById("finalizar-btn").onclick = () => {
+        document.getElementById("quiz-content").style.display = "none";
+        document.getElementById("resultado").style.display = "block";
+        document.getElementById("nota-valor").textContent = acertos;
+        const msg = document.getElementById("mensagem-final");
+        msg.innerHTML = acertos >= 7 ? "APROVADO! Sua especialização foi registrada." : "REPROVADO! Tente a recuperação.";
+        msg.style.color = acertos >= 7 ? "var(--correct)" : "var(--wrong)";
+    };
+</script>
+</body>
+</html>

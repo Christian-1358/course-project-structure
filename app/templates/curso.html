@@ -12,22 +12,16 @@
         }
         * { box-sizing: border-box; transition: all 0.2s ease; }
         body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        
         header { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; background: var(--sidebar); border-bottom: 1px solid var(--border); z-index: 100; }
         .logo { font-weight: 800; font-size: 1.1rem; }
         .logo span { color: var(--accent); }
-
         main { display: flex; flex: 1; overflow: hidden; position: relative; }
         .content-area { flex: 1; overflow-y: auto; background: var(--bg); }
         .video-container { width: 100%; background: #000; aspect-ratio: 16/9; position: relative; }
         .video-container iframe { width: 100%; height: 100%; border: none; }
-        
         .toggle-sidebar-btn { position: absolute; right: 0; top: 50%; transform: translateY(-50%); background: var(--accent); color: white; border: none; padding: 15px 8px; cursor: pointer; border-radius: 8px 0 0 8px; z-index: 50; }
-
         .lesson-body { padding: 30px 40px; max-width: 1000px; }
         .nav-controls { display: flex; align-items: center; gap: 15px; margin: 25px 0; }
-        
-        /* SIDEBAR */
         .sidebar { width: 380px; background: var(--sidebar); border-left: 1px solid var(--border); display: flex; flex-direction: column; }
         .sidebar.closed { width: 0; overflow: hidden; border-left: none; }
         .modules-wrapper { flex: 1; overflow-y: auto; }
@@ -35,16 +29,14 @@
         .module-btn { width: 100%; padding: 16px 20px; background: var(--panel); border: none; color: var(--text); display: flex; justify-content: space-between; cursor: pointer; font-size: 14px; font-weight: 600; text-align: left; }
         .lessons-list { display: none; }
         .module-item.open .lessons-list { display: block; }
-
         .lesson-item { padding: 15px 20px; display: flex; gap: 12px; cursor: pointer; font-size: 13px; border-bottom: 1px solid var(--border); align-items: center; }
         .lesson-item.active { background: #21262d; border-left: 4px solid var(--accent); }
         .lesson-item.completed span { color: var(--text-muted); text-decoration: line-through; }
         .lesson-item.is-quiz { background: rgba(168, 85, 247, 0.05); color: var(--accent); font-weight: 700; border-top: 1px solid var(--border); }
-
         .final-exam-area { padding: 20px; background: var(--panel); border-top: 2px solid var(--accent); }
-
         button { padding: 10px 18px; border-radius: 6px; cursor: pointer; border: 1px solid var(--border); background: var(--panel); color: var(--text); font-weight: 600; }
         .btn-accent { background: var(--accent); color: white; border: none; }
+        .btn-accent:disabled { background: #333; cursor: not-allowed; opacity: 0.5; }
     </style>
 </head>
 <body>
@@ -57,10 +49,9 @@
 <main>
     <div class="content-area">
         <div class="video-container">
-<iframe id="mainPlayer" src=""></iframe>
+            <iframe id="mainPlayer" src=""></iframe>
             <button class="toggle-sidebar-btn" onclick="toggleSidebar()">❮</button>
         </div>
-        
         <div class="lesson-body">
             <h2 id="currentTitle">...</h2>
             <div class="nav-controls">
@@ -74,7 +65,7 @@
     <div class="sidebar" id="sidebar">
         <div class="modules-wrapper" id="moduleContainer"></div>
         <div class="final-exam-area">
-            <button class="btn-accent" style="width:100%" onclick="window.location.href='Atividade_Final.html'" id="finalBtn" disabled>🎓 ATIVIDADE FINAL (BLOQUEADA)</button>
+            <button class="btn-accent" style="width:100%" onclick="startFinal()" id="finalBtn" disabled>🎓 ATIVIDADE FINAL (BLOQUEADA)</button>
         </div>
     </div>
 </main>
@@ -82,245 +73,135 @@
 <script>
     const course = [
         { name: "1. Fundamentos e CPM", lessons: [
-            {t: "Visão Geral 2026", d: "Entenda o mercado atual e como se posicionar para lucrar.", v: "3r6Q9tCzX4k"},
-            {t: "Dicionário do Milheiro", d: "Termos técnicos essenciais para não ficar perdido.", v: "8pTEmbeENF4"},
-            {t: "Cálculo de CPM", d: "A matemática que define se você tem lucro ou prejuízo.", v: "Z9z8Z2f3nGQ"},
-            {t: "Livelo e Esfera", d: "Os dois pilares do acúmulo bancário no Brasil.", v: "yJz8QyYw7l8"},
-            {t: "Cias Aéreas", d: "Diferenças entre Smiles, Latam Pass e TudoAzul.", v: "p7HKvqRI_Bo"},
-            {t: "Alertas Técnicos", d: "Configurando ferramentas de monitoramento em tempo real.", v: "dZ9gY8JwqfE"},
-            {t: "Primeiro Acúmulo", d: "Passo a passo prático para gerar suas primeiras milhas.", v: "5Y3G6a2Z8sU"}
-        ], id: 0 },
-
+            {t: "Visão Geral 2026", d: "Entenda o mercado atual.", v: "3r6Q9tCzX4k"},
+            {t: "Dicionário do Milheiro", d: "Termos técnicos essenciais.", v: "8pTEmbeENF4"},
+            {t: "Cálculo de CPM", d: "Matemática do lucro.", v: "Z9z8Z2f3nGQ"},
+            {t: "Livelo e Esfera", d: "Acúmulo bancário.", v: "yJz8QyYw7l8"},
+            {t: "Cias Aéreas", d: "Diferenças entre programas.", v: "p7HKvqRI_Bo"},
+            {t: "Alertas Técnicos", d: "Monitoramento em tempo real.", v: "dZ9gY8JwqfE"},
+            {t: "Primeiro Acúmulo", d: "Passo a passo prático.", v: "5Y3G6a2Z8sU"}
+        ]},
         { name: "2. Cartões e Benefícios", lessons: [
-            {t: "Ranking de Cartões", d: "Quais cartões realmente valem a pena manter em 2026.", v: "Qv2L8g1m3kM"},
-            {t: "Zerar Anuidade", d: "Scripts de negociação para não pagar taxas bancárias.", v: "7J9x8w3QX2M"},
-            {t: "Salas VIP", d: "LoungeKey, DragonPass e Priority Pass na prática.", v: "1b9QX5M0H8I"},
-            {t: "Seguros Gratuitos", d: "Economize com seguros de viagem inclusos no cartão.", v: "L8z1p9Y0QH4"},
-            {t: "Cooperativas", d: "O poder do Sicredi e Unicred no mundo das milhas.", v: "C8QZ3y9mF4s"},
-            {t: "Upgrade de Limite", d: "Como forçar o banco a te dar um cartão Black/Infinite.", v: "9X3ZLkQ8P2s"},
-            {t: "Spread Zero", d: "Como economizar em todas as compras internacionais.", v: "M8LZ9Q2KX1A"},
-            {t: "Proteção de Preço", d: "Receba dinheiro de volta se o preço do produto baixar.", v: "wZ8L9Ck3m0E"}
-        ], id: 1},
-
+            {t: "Ranking de Cartões", d: "Melhores cartões 2026.", v: "Qv2L8g1m3kM"},
+            {t: "Zerar Anuidade", d: "Scripts de negociação.", v: "7J9x8w3QX2M"},
+            {t: "Salas VIP", d: "LoungeKey e DragonPass.", v: "1b9QX5M0H8I"},
+            {t: "Seguros Gratuitos", d: "Economia em viagens.", v: "L8z1p9Y0QH4"},
+            {t: "Cooperativas", d: "Sicredi e Unicred.", v: "C8QZ3y9mF4s"},
+            {t: "Upgrade de Limite", d: "Conquistando o Black.", v: "9X3ZLkQ8P2s"},
+            {t: "Spread Zero", d: "Compras internacionais.", v: "M8LZ9Q2KX1A"},
+            {t: "Proteção de Preço", d: "Dinheiro de volta.", v: "wZ8L9Ck3m0E"}
+        ]},
         { name: "3. Acúmulo Estratégico", lessons: [
-            {t: "Compras 10x1", d: "Como ganhar 10 pontos por real em compras comuns.", v: "P9Zk3L8QX4s"},
-            {t: "Compra de Pontos", d: "Quando vale a pena comprar pontos diretamente no banco.", v: "Q9ZL2X8M3F4"},
-            {t: "Bônus de 100%", d: "A hora certa de transferir seus pontos para as aéreas.", v: "dZ9gY8JwqfE"},
-            {t: "Clubes de Milhas", d: "Análise de ROI: Quais clubes assinar e quais cancelar.", v: "3r6Q9tCzX4k"},
-            {t: "Milhas no Tanque", d: "Estratégias para Shell Box e postos Ipiranga.", v: "8pTEmbeENF4"},
-            {t: "Parceiros Varejo", d: "Amazon, Magalu e Casas Bahia como fontes de pontos.", v: "Z9z8Z2f3nGQ"},
-            {t: "Gestão de CPFs", d: "Como escalar o acúmulo usando contas de terceiros.", v: "yJz8QyYw7l8"},
-            {t: "Datas Sazonais", d: "Aproveitando Black Friday e aniversários de programas.", v: "p7HKvqRI_Bo"},
-            {t: "Giro de Boletos", d: "Pagando contas e ganhando pontos simultaneamente.", v: "dZ9gY8JwqfE"}
-        ], id: 2 },
-
+            {t: "Compras 10x1", d: "10 pontos por real.", v: "P9Zk3L8QX4s"},
+            {t: "Compra de Pontos", d: "Análise de custo.", v: "Q9ZL2X8M3F4"},
+            {t: "Bônus de 100%", d: "Transferência certa.", v: "dZ9gY8JwqfE"},
+            {t: "Clubes de Milhas", d: "ROI de assinaturas.", v: "3r6Q9tCzX4k"},
+            {t: "Milhas no Tanque", d: "Shell e Ipiranga.", v: "8pTEmbeENF4"},
+            {t: "Parceiros Varejo", d: "Amazon e Magalu.", v: "Z9z8Z2f3nGQ"},
+            {t: "Gestão de CPFs", d: "Escalando o acúmulo.", v: "yJz8QyYw7l8"},
+            {t: "Datas Sazonais", d: "Black Friday.", v: "p7HKvqRI_Bo"},
+            {t: "Giro de Boletos", d: "Pontuando em contas.", v: "dZ9gY8JwqfE"}
+        ]},
         { name: "4. Emissões Internacionais", lessons: [
-            {t: "Tabela Fixa", d: "O segredo para passagens baratas independente da data.", v: "5Y3G6a2Z8sU"},
-            {t: "Classe Executiva", d: "Como voar com luxo pagando preço de econômica.", v: "Qv2L8g1m3kM"},
-            {t: "Stopover", d: "Adicionando destinos extras sem custo na passagem.", v: "7J9x8w3QX2M"},
-            {t: "Iberia Plus", d: "A melhor forma de chegar à Europa com milhas.", v: "1b9QX5M0H8I"},
-            {t: "Regras de CPF", d: "Limites de emissão para não ser bloqueado nas cias.", v: "L8z1p9Y0QH4"},
-            {t: "Destinos EUA", d: "Melhores rotas para Miami e NY com milhas Smiles.", v: "C8QZ3y9mF4s"},
-            {t: "Taxas de Combustível", d: "Como identificar e evitar cobranças abusivas.", v: "9X3ZLkQ8P2s"},
-            {t: "ALL Accor", d: "Hospedagem de luxo utilizando seus pontos.", v: "M8LZ9Q2KX1A"}
-        ], id: 3},
-
+            {t: "Tabela Fixa", d: "Segredos da emissão.", v: "5Y3G6a2Z8sU"},
+            {t: "Classe Executiva", d: "Luxo barato.", v: "Qv2L8g1m3kM"},
+            {t: "Stopover", d: "Destinos extras.", v: "7J9x8w3QX2M"},
+            {t: "Iberia Plus", d: "Foco na Europa.", v: "1b9QX5M0H8I"},
+            {t: "Regras de CPF", d: "Evitando bloqueios.", v: "L8z1p9Y0QH4"},
+            {t: "Destinos EUA", d: "Miami e NY.", v: "C8QZ3y9mF4s"},
+            {t: "Taxas de Combustível", d: "Identificando taxas.", v: "9X3ZLkQ8P2s"},
+            {t: "ALL Accor", d: "Hotéis com pontos.", v: "M8LZ9Q2KX1A"}
+        ]},
         { name: "5. Milhas como Negócio", lessons: [
-            {t: "Venda em Balcão", d: "Operando via Maxmilhas e Hotmilhas com segurança.", v: "wZ8L9Ck3m0E"},
-            {t: "Venda Particular", d: "Captando clientes e aumentando sua margem de lucro.", v: "P9Zk3L8QX4s"},
-            {t: "Gestão de Lucro", d: "Planilhas profissionais para controle de estoque de milhas.", v: "Q9ZL2X8M3F4"},
-            {t: "Imposto de Renda", d: "Como declarar seus ganhos de forma legal.", v: "dZ9gY8JwqfE"},
-            {t: "Agência Digital", d: "Estruturando sua própria emissora de passagens.", v: "3r6Q9tCzX4k"},
-            {t: "Reinvestimento", d: "Como fazer as milhas pagarem suas próprias faturas.", v: "8pTEmbeENF4"},
-            {t: "Tendências 2026", d: "O que esperar do mercado nos próximos meses.", v: "Z9z8Z2f3nGQ"},
-            {t: "Mentoria Final", d: "Dúvidas finais e encerramento da jornada.", v: "yJz8QyYw7l8"}
-        ], id: 4 }
+            {t: "Venda em Balcão", d: "Max e Hotmilhas.", v: "wZ8L9Ck3m0E"},
+            {t: "Venda Particular", d: "Margem de lucro.", v: "P9Zk3L8QX4s"},
+            {t: "Gestão de Lucro", d: "Planilha de controle.", v: "Q9ZL2X8M3F4"},
+            {t: "Imposto de Renda", d: "Declaração legal.", v: "dZ9gY8JwqfE"},
+            {t: "Agência Digital", d: "Sua própria agência.", v: "3r6Q9tCzX4k"},
+            {t: "Reinvestimento", d: "Giro de capital.", v: "8pTEmbeENF4"},
+            {t: "Tendências 2026", d: "Futuro do mercado.", v: "Z9z8Z2f3nGQ"},
+            {t: "Mentoria Final", d: "Encerramento.", v: "yJz8QyYw7l8"}
+        ]}
     ];
 
+    let current = { m: 0, l: 0 };
+    let progress = JSON.parse(localStorage.getItem('mm_progress')) || { lessons: {}, exams: {} };
 
-let current = { m: 0, l: 0 };
-
-let progress = JSON.parse(localStorage.getItem('mm_progress')) || {
-    lessons: {},   // { videoId: true }
-    exams: {},     // { moduleIndex: true }
-    final: false
-};
-
-/* =========================
-   INICIALIZAÇÃO
-========================= */
-
-function init() {
-    const container = document.getElementById('moduleContainer');
-    container.innerHTML = "";
-
-    course.forEach((mod, mIdx) => {
-        const div = document.createElement('div');
-        div.className = `module-item ${mIdx === 0 ? 'open' : ''}`;
-
-        const lessonsHTML = mod.lessons.map((les, lIdx) => `
-            <div class="lesson-item ${progress.lessons[les.v] ? 'completed' : ''}"
-                 id="les-${les.v}"
-                 onclick="play(${mIdx}, ${lIdx})">
-                 
-                <input type="checkbox"
-                    ${progress.lessons[les.v] ? 'checked' : ''}
-                    onclick="event.stopPropagation(); toggleLesson('${les.v}')">
-                    
-                <span>${lIdx + 1}. ${les.t}</span>
-            </div>
-        `).join('');
-
-        div.innerHTML = `
-            <button class="module-btn" onclick="this.parentElement.classList.toggle('open')">
-                ${mod.name}
-                <span>▼</span>
-            </button>
-
-            <div class="lessons-list">
-                ${lessonsHTML}
-                <div class="lesson-item is-quiz" onclick="openExamFile(${mIdx})">
-                    <span> PROVA DO MÓDULO</span>
-                </div>
-            </div>
-        `;
-
-        container.appendChild(div);
-    });
-
-    play(0, 0);
-    updateProgressUI();
-}
-
-/* =========================
-   PLAYER / NAVEGAÇÃO
-========================= */
-
-function play(m, l) {
-    current = { m, l };
-    const lesson = course[m].lessons[l];
-
-    document.getElementById('mainPlayer').src =
-        `https://www.youtube.com/embed/${lesson.v}?autoplay=1`;
-
-    document.getElementById('currentTitle').innerText = lesson.t;
-    document.getElementById('currentDesc').innerText = lesson.d;
-
-    document.querySelectorAll('.lesson-item')
-        .forEach(e => e.classList.remove('active'));
-
-    const active = document.getElementById(`les-${lesson.v}`);
-    if (active) active.classList.add('active');
-}
-
-function changeLesson(step) {
-    const next = current.l + step;
-    if (course[current.m].lessons[next]) {
-        play(current.m, next);
-    }
-}
-
-/* =========================
-   CONTROLE DE PROGRESSO
-========================= */
-
-function toggleLesson(videoId) {
-    progress.lessons[videoId] = !progress.lessons[videoId];
-    saveProgress();
-    updateLessonUI(videoId);
-    updateProgressUI();
-}
-
-function updateLessonUI(videoId) {
-    const el = document.getElementById(`les-${videoId}`);
-    if (!el) return;
-    el.classList.toggle('completed');
-}
-
-function updateProgressUI() {
-    const total = course.reduce((acc, m) => acc + m.lessons.length, 0);
-    const done = Object.keys(progress.lessons).filter(k => progress.lessons[k]).length;
-    const percent = Math.round((done / total) * 100);
-
-    document.getElementById('prog-txt').innerText = `${percent}% Concluído`;
-
-    const btnFinal = document.getElementById('finalBtn');
-
-    if (percent === 100) {
-        btnFinal.disabled = false;
-        btnFinal.innerText = "🚀 INICIAR ATIVIDADE FINAL";
-    } else {
-        btnFinal.disabled = true;
-        btnFinal.innerText = "🎓 ATIVIDADE FINAL (BLOQUEADA)";
-    }
-}
-
-function saveProgress() {
-    localStorage.setItem('mm_progress', JSON.stringify(progress));
-}
-
-/* =========================
-   PROVAS POR MÓDULO
-========================= */
-
-function openExamFile(mIdx) {
-    const mod = course[mIdx];
-
-    // Verifica se todas as lições do módulo foram marcadas como concluídas [cite: 2026-01-20]
-    const allLessonsDone = mod.lessons.every(
-        l => progress.lessons[l.v]
-    );
-
-    if (!allLessonsDone) {
-        alert("⚠️ Conclua todas as aulas deste módulo para liberar a prova.");
-        return;
+    function init() {
+        const container = document.getElementById('moduleContainer');
+        container.innerHTML = "";
+        course.forEach((mod, mIdx) => {
+            const div = document.createElement('div');
+            div.className = `module-item ${mIdx === 0 ? 'open' : ''}`;
+            const lessonsHTML = mod.lessons.map((les, lIdx) => {
+                const done = progress.lessons[les.v] === true;
+                return `
+                <div class="lesson-item ${done ? 'completed' : ''}" id="les-${les.v}" onclick="play(${mIdx}, ${lIdx})">
+                    <input type="checkbox" ${done ? 'checked' : ''} onclick="event.stopPropagation(); toggleLesson('${les.v}')">
+                    <span>${lIdx + 1}. ${les.t}</span>
+                </div>`;
+            }).join('');
+            div.innerHTML = `<button class="module-btn" onclick="this.parentElement.classList.toggle('open')">${mod.name}<span>▼</span></button>
+                             <div class="lessons-list">${lessonsHTML}<div class="lesson-item is-quiz" onclick="openExamFile(${mIdx})"><span>PROVA DO MÓDULO</span></div></div>`;
+            container.appendChild(div);
+        });
+        play(0, 0);
+        updateProgressUI();
     }
 
-    // O mIdx do primeiro módulo é 0. Somamos 1 para virar /prova/1 [cite: 2026-01-20]
-    const moduloReal = mIdx + 1;
-    
-    progress.exams[mIdx] = true;
-    saveProgress();
-
-    // Redireciona para o arquivo correto (prova.html, prova2.html, etc) [cite: 2026-01-20]
-    window.location.href = `/prova/${moduloReal}`;
-}
-/* =========================
-   ATIVIDADE FINAL
-========================= */
-
-function startFinal() {
-    const total = course.reduce((a, m) => a + m.lessons.length, 0);
-    const done = Object.keys(progress.lessons).filter(k => progress.lessons[k]).length;
-
-    if (done !== total) {
-        alert("⚠️ Finalize todas as aulas antes de iniciar a atividade final.");
-        return;
+    function toggleLesson(videoId) {
+        progress.lessons[videoId] = !progress.lessons[videoId];
+        localStorage.setItem('mm_progress', JSON.stringify(progress));
+        const el = document.getElementById(`les-${videoId}`);
+        if(el) el.classList.toggle('completed', progress.lessons[videoId]);
+        updateProgressUI();
     }
 
-    progress.final = true;
-    saveProgress();
+    function updateProgressUI() {
+        let total = 0, done = 0;
+        course.forEach(m => m.lessons.forEach(l => {
+            total++;
+            if(progress.lessons[l.v] === true) done++;
+        }));
+        const percent = Math.round((done / total) * 100);
+        document.getElementById('prog-txt').innerText = `${percent}% Concluído`;
+        const btn = document.getElementById('finalBtn');
+        btn.disabled = (percent < 100);
+        btn.innerText = (percent < 100) ? "🎓 ATIVIDADE FINAL (BLOQUEADA)" : "🚀 INICIAR ATIVIDADE FINAL";
+    }
 
-    window.location.href = "atividade_final.html";
-}
+    function play(m, l) {
+        current = { m, l };
+        const les = course[m].lessons[l];
+        document.getElementById('mainPlayer').src = `https://www.youtube.com/embed/${les.v}?autoplay=1`;
+        document.getElementById('currentTitle').innerText = les.t;
+        document.getElementById('currentDesc').innerText = les.d;
+        document.querySelectorAll('.lesson-item').forEach(e => e.classList.remove('active'));
+        document.getElementById(`les-${les.v}`).classList.add('active');
+    }
 
-/* =========================
-   SIDEBAR
-========================= */
+    function changeLesson(step) {
+        const next = current.l + step;
+        if(course[current.m].lessons[next]) play(current.m, next);
+    }
 
-function toggleSidebar() {
-    const sb = document.getElementById('sidebar');
-    sb.classList.toggle('closed');
-    document.querySelector('.toggle-sidebar-btn').innerText =
-        sb.classList.contains('closed') ? '❯' : '❮';
-}
+    function openExamFile(mIdx) {
+        const allDone = course[mIdx].lessons.every(l => progress.lessons[l.v]);
+        if(!allDone) return alert("Conclua todas as aulas do módulo!");
+        window.location.href = `/prova/${mIdx + 1}`;
+    }
 
-/* =========================
-   START
-========================= */
+    function startFinal() {
+        window.location.href = "/prova/6";
+    }
 
-init();
+    function toggleSidebar() {
+        const sb = document.getElementById('sidebar');
+        sb.classList.toggle('closed');
+        document.querySelector('.toggle-sidebar-btn').innerText = sb.classList.contains('closed') ? '❯' : '❮';
+    }
 
+    init();
 </script>
 </body>
 </html>
