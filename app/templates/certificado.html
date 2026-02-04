@@ -1,181 +1,177 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Certificado MilhasPRO | {{ nome }}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --gold: linear-gradient(135deg, #d4af37 0%, #f1d592 50%, #d4af37 100%);
-            --border-gold: rgba(212, 175, 55, 0.4);
-        }
-        * { box-sizing: border-box; }
-        body {
-            background: #000;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
-        }
+<meta charset="UTF-8">
+<title>Certificado MilhasPRO</title>
 
-        /* Container Principal do Certificado */
-        .cert-canvas {
-            width: 900px;
-            height: 600px;
-            padding: 20px;
-            background: #080808;
-            border: 10px solid #d4af37;
-            border-image: linear-gradient(135deg, #d4af37, #8a6d1d) 1;
-            position: relative;
-            box-shadow: 0 0 60px rgba(0,0,0,0.9);
-        }
+<style>
+@page {
+    size: A4 landscape;
+    margin: 20mm;
+}
 
-        /* Marca D'água Dinâmica */
-        .watermark {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%) rotate(-10deg);
-            font-size: 180px;
-            color: rgba(212, 175, 55, 0.03);
-            font-weight: 900;
-            pointer-events: none;
-            white-space: nowrap;
-            z-index: 0;
-        }
+body {
+    background: #ffffff;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+}
 
-        /* Moldura Interna de Luxo */
-        .inner-border {
-            border: 1px solid var(--border-gold);
-            height: 100%;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            background: radial-gradient(circle at center, #111 0%, #050505 100%);
-            position: relative;
-            z-index: 1;
-        }
+.cert-canvas {
+    width: 900px;
+    height: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #080808;
+    border: 8px solid #d4af37;
+}
 
-        .header-logo { font-size: 22px; font-weight: 900; letter-spacing: 4px; color: #fff; }
-        .header-logo span { color: #d4af37; }
+.inner-border {
+    width: 100%;
+    height: 100%;
+    border: 1px solid #c9a63a;
+    padding: 35px;
+    box-sizing: border-box;
+}
 
-        .main-title { text-align: center; }
-        .main-title h1 {
-            font-size: 55px; margin: 0; text-transform: uppercase;
-            letter-spacing: 8px; background: var(--gold);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            font-weight: 900;
-        }
+.logo {
+    font-size: 22px;
+    font-weight: bold;
+    letter-spacing: 4px;
+    color: #ffffff;
+}
 
-        .student-name {
-            font-size: 42px; color: #fff; margin: 20px 0;
-            font-weight: 700; padding-bottom: 10px;
-            border-bottom: 2px solid #d4af37; display: inline-block;
-            min-width: 450px; text-align: center;
-        }
+.logo span {
+    color: #d4af37;
+}
 
-        /* Seção de Conteúdo e Período Real */
-        .description { font-size: 16px; color: #aaa; text-align: center; max-width: 700px; line-height: 1.6; }
-        .ementa-text { color: #f1d592; font-weight: 600; display: block; margin-top: 12px; font-size: 15px; }
-        .periodo-text { 
-            color: #666; font-size: 11px; margin-top: 20px; 
-            text-transform: uppercase; letter-spacing: 2px;
-            font-weight: 700;
-        }
+h1 {
+    margin: 25px 0 5px 0;
+    font-size: 52px;
+    color: #d4af37;
+    letter-spacing: 6px;
+}
 
-        /* Rodapé com Assinaturas */
-        .footer-signatures { width: 100%; display: flex; justify-content: space-between; align-items: flex-end; }
-        .signature-box { text-align: center; width: 230px; border-top: 1px solid #333; padding-top: 12px; }
-        .signature-box p { font-size: 10px; color: #666; text-transform: uppercase; margin: 0; font-weight: 600; }
+.subtitle {
+    font-size: 11px;
+    color: #999999;
+    letter-spacing: 3px;
+    margin-bottom: 40px;
+}
 
-        .seal-container { text-align: center; margin-bottom: -10px; }
+.intro {
+    font-size: 17px;
+    color: #cccccc;
+    margin-bottom: 10px;
+}
 
-        /* Botão de Ação */
-        .download-container { margin-top: 35px; }
-        .btn-download {
-            background: var(--gold); color: #000; text-decoration: none; border: none;
-            padding: 16px 45px; border-radius: 50px; font-weight: 900; cursor: pointer;
-            display: flex; align-items: center; gap: 12px; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            text-transform: uppercase; font-size: 13px; letter-spacing: 1px;
-        }
-        .btn-download:hover { 
-            transform: scale(1.08); 
-            box-shadow: 0 15px 35px rgba(212, 175, 55, 0.4); 
-        }
-    </style>
+.student-name {
+    font-size: 40px;
+    font-weight: bold;
+    color: #ffffff;
+    margin: 20px auto;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #d4af37;
+    width: 500px;
+}
+
+.description {
+    font-size: 15px;
+    color: #aaaaaa;
+    width: 700px;
+    margin: 20px auto;
+    line-height: 1.6;
+}
+
+.ementa {
+    display: block;
+    margin-top: 10px;
+    color: #f1d592;
+    font-weight: bold;
+}
+
+.periodo {
+    font-size: 11px;
+    color: #777777;
+    letter-spacing: 2px;
+    margin-top: 25px;
+    text-transform: uppercase;
+}
+
+.footer {
+    margin-top: 70px;
+    width: 100%;
+}
+
+.assinatura {
+    width: 240px;
+    display: inline-block;
+    border-top: 1px solid #444444;
+    padding-top: 10px;
+    font-size: 10px;
+    color: #777777;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.assinatura.center {
+    margin: 0 60px;
+    color: #d4af37;
+}
+</style>
 </head>
+
 <body>
 
-    <div class="cert-canvas">
-        <div class="watermark">MILHASPRO</div>
-        
-        <div class="inner-border">
-            <div class="header-logo">MILHAS<span>PRO</span></div>
-            
-            <div class="main-title">
-                <h1>Certificado</h1>
-                <p style="color: #888; letter-spacing: 3px; text-align: center; font-size: 11px; margin:0; font-weight: 700;">
-                    TREINAMENTO ESPECIALIZADO ELITE V.2026
-                </p>
-            </div>
+<div class="cert-canvas">
+    <div class="inner-border">
 
-            <div style="text-align: center;">
-                <p style="color: #ccc; font-size: 18px; margin-bottom: 5px;">Certificamos que para os devidos fins de direito</p>
-                <div class="student-name">{{ nome }}</div>
-                
-                <p class="description">
-                    Concluiu com êxito o treinamento de alto nível <strong>Módulo {{ modulo }}</strong> do Método MilhasPro.
-                    <span class="ementa-text">Especialidade: {{ ementa }}</span>
-                </p>
-                
-                <p class="periodo-text">
-                    Período de Formação: {{ inicio }} — {{ fim }}
-                </p>
-            </div>
+        <div class="logo">MILHAS<span>PRO</span></div>
 
-            <div class="footer-signatures">
-                <div class="signature-box">
-                    <p>DIRETOR EXECUTIVO</p>
-                </div>
+        <h1>CERTIFICADO</h1>
+        <div class="subtitle">TREINAMENTO ESPECIALIZADO ELITE • 2026</div>
 
-                <div class="seal-container">
-                    <img src="https://img.icons8.com/color/96/guarantee.png" width="65" alt="Selo de Autenticidade">
-                    <p style="font-size: 8px; color: #d4af37; font-weight: 800; margin-top: 6px; letter-spacing: 1px;">AUTENTICIDADE GARANTIDA</p>
-                </div>
+        <div class="intro">Certificamos que, para os devidos fins,</div>
 
-                <div class="signature-box">
-                    <p>COORDENAÇÃO TÉCNICA</p>
-                </div>
-            </div>
+        <div class="student-name">{{ nome }}</div>
+
+        <div class="description">
+            Concluiu com êxito o treinamento avançado
+            <strong>Módulo {{ modulo }}</strong> do Método MilhasPRO.
+            <span class="ementa">Especialidade: {{ ementa }}</span>
         </div>
-    </div>
 
-    <div class="download-container">
-        <button onclick="baixarUnico()" class="btn-download">
-            <img src="https://img.icons8.com/ios-filled/22/000000/pdf.png" />
-            Baixar Certificado em PDF
-        </button>
-    </div>
+        <div class="periodo">
+            Período de Formação: {{ inicio }} — {{ fim }}
+        </div>
 
-    <script>
-        function baixarUnico() {
-            // Abre o PDF em nova aba para garantir download limpo e sem loops
-            const url = '/certificado/{{ modulo }}?download=true';
-            const win = window.open(url, '_blank');
-            if (win) {
-                win.focus();
-            } else {
-                // Fallback caso o popup seja bloqueado
-                window.location.href = url;
-            }
-        }
-    </script>
+        <div class="footer">
+            <div class="assinatura">DIRETOR EXECUTIVO</div>
+            <div class="assinatura center">AUTENTICIDADE GARANTIDA</div>
+            <div class="assinatura">COORDENAÇÃO TÉCNICA</div>
+        </div>
+
+    </div>
+</div>
+
+{% if not is_pdf %}
+<div style="margin-top: 30px;">
+    <a href="/certificado/{{ modulo }}?pdf=1"
+       style="
+        display:inline-block;
+        padding:15px 40px;
+        background:#d4af37;
+        color:#000000;
+        text-decoration:none;
+        font-weight:bold;
+        border-radius:40px;
+        letter-spacing:1px;
+        font-size:13px;">
+        BAIXAR CERTIFICADO EM PDF
+    </a>
+</div>
+{% end %}
 
 </body>
 </html>

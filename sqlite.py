@@ -1,7 +1,10 @@
 import sqlite3
 import os
+from datetime import datetime
 
-# Configuração de Caminho Absoluto
+# ===============================
+# CONFIGURAÇÃO DO BANCO
+# ===============================
 BASE_DIR = os.path.abspath(os.getcwd())
 DB_PATH = os.path.join(BASE_DIR, "usuarios.db")
 
@@ -10,8 +13,9 @@ def criar_banco():
         c = conn.cursor()
         c.execute("PRAGMA foreign_keys = ON;")
 
-        # 1. TABELA PRINCIPAL: USERS
-        # Contém dados de acesso, nome para o certificado e datas de conclusão
+        # ===============================
+        # TABELA USERS
+        # ===============================
         c.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -20,37 +24,55 @@ def criar_banco():
             password TEXT NOT NULL,
             email TEXT UNIQUE NOT NULL,
             ativo INTEGER DEFAULT 1,
+
+            created_at TEXT,
             inicio_curso TEXT,
+
             fim_modulo1 TEXT,
             fim_modulo2 TEXT,
             fim_modulo3 TEXT,
             fim_modulo4 TEXT,
-            fim_modulo5 TEXT
+            fim_modulo5 TEXT,
+
+            certificado_fin INTEGER DEFAULT 0
         );
         """)
 
-        # 2. MIGRACAO E ATUALIZAÇÃO DE COLUNAS
-        # Garante que mesmo que o banco já exista, as novas colunas sejam inseridas
+        # ===============================
+        # MIGRAÇÃO DE COLUNAS (SAFE)
+        # ===============================
         colunas_necessarias = [
             ("nome", "TEXT"),
+            ("created_at", "TEXT"),
             ("inicio_curso", "TEXT"),
             ("fim_modulo1", "TEXT"),
             ("fim_modulo2", "TEXT"),
             ("fim_modulo3", "TEXT"),
             ("fim_modulo4", "TEXT"),
-            ("fim_modulo5", "TEXT")
+            ("fim_modulo5", "TEXT"),
+            ("certificado_fin", "INTEGER DEFAULT 0")
         ]
 
         for nome_col, tipo_col in colunas_necessarias:
             try:
                 c.execute(f"ALTER TABLE users ADD COLUMN {nome_col} {tipo_col}")
-                print(f"✅ Coluna '{nome_col}' verificada/adicionada.")
+                print(f"✅ Coluna '{nome_col}' adicionada.")
             except sqlite3.OperationalError:
-                # Coluna já existe, ignora o erro
-                pass
+                pass  # coluna já existe
 
-        # 3. TABELA: RESULTADOS DAS PROVAS
-        # Onde o sistema consulta se o aluno atingiu a nota para o certificado
+        # ===============================
+        # BACKFILL: created_at (se vazio)
+        # ===============================
+        agora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        c.execute("""
+            UPDATE users
+            SET created_at = ?
+            WHERE created_at IS NULL
+        """, (agora,))
+
+        # ===============================
+        # TABELA RESULTADO DAS PROVAS
+        # ===============================
         c.execute("""
         CREATE TABLE IF NOT EXISTS provas_resultado (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -60,10 +82,12 @@ def criar_banco():
             aprovado INTEGER NOT NULL,
             data TEXT NOT NULL,
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-        )
+        );
         """)
 
-        # 4. TABELA: PROGRESSO (Aulas Assistidas)
+        # ===============================
+        # TABELA PROGRESSO
+        # ===============================
         c.execute("""
         CREATE TABLE IF NOT EXISTS progresso (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -76,7 +100,9 @@ def criar_banco():
         );
         """)
 
-        # 5. TABELA: RECUPERAÇÃO DE SENHA
+        # ===============================
+        # TABELA RECUPERAÇÃO DE SENHA
+        # ===============================
         c.execute("""
         CREATE TABLE IF NOT EXISTS password_reset (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -90,25 +116,27 @@ def criar_banco():
 
         conn.commit()
 
-# Script para preencher dados de teste e liberar o Certificado 2
-def liberar_teste(user_id=1):
+# ===============================
+# FUNÇÃO DE TESTE (LIBERAR CERTIFICADO)
+# ===============================
+def liberar_certificado_final(user_id=1):
     with sqlite3.connect(DB_PATH) as conn:
         c = conn.cursor()
-        # Define a data de hoje para o teste
-        data_hoje = "30/01/2026"
         c.execute("""
-            UPDATE users 
-            SET inicio_curso = ?, fim_modulo2 = ? 
+            UPDATE users
+            SET certificado_fin = 1
             WHERE id = ?
-        """, ("01/01/2026", data_hoje, user_id))
+        """, (user_id,))
         conn.commit()
-    print(f"⭐ Certificado Módulo 2 liberado para o usuário ID {user_id}")
 
+    print(f"🏆 Certificado FINAL liberado para o usuário ID {user_id}")
+
+# ===============================
+# EXECUÇÃO
+# ===============================
 if __name__ == "__main__":
-    print("-" * 40)
+    print("-" * 50)
     criar_banco()
-    # Descomente a linha abaixo se quiser liberar o certificado 2 manualmente para testar
-    # liberar_teste(1)
-    print("🚀 ESTRUTURA MILHASPRO ATUALIZADA COM SUCESSO")
-    print("Arquivo:", DB_PATH)
-    print("-" * 40)
+    print("🚀 BANCO ATUALIZADO COM SUCESSO")
+    print("📁 Arquivo:", DB_PATH)
+    print("-" * 50)

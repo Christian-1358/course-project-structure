@@ -3,7 +3,7 @@ import sqlite3
 import hashlib
 import random
 import os
-import datetime
+from datetime import datetime, timedelta
 import yagmail
 
 # ================== CAMINHOS ==================
@@ -23,20 +23,6 @@ def conectar():
 def hash_senha(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
-def criar_tabela_tokens():
-    conn = conectar()
-    c = conn.cursor()
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS password_reset (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER NOT NULL,
-            token TEXT UNIQUE NOT NULL,
-            expires_at TEXT NOT NULL
-        )
-    """)
-    conn.commit()
-    conn.close()
-
 # ================== HANDLER ==================
 class RecuperarSenhaHandler(tornado.web.RequestHandler):
 
@@ -44,14 +30,14 @@ class RecuperarSenhaHandler(tornado.web.RequestHandler):
         self.render("recuperar_senha.html", erro=None, sucesso=None)
 
     def post(self):
-        criar_tabela_tokens()
-
         email = self.get_argument("email", "").strip()
         token = self.get_argument("token", "").strip()
         nova_senha = self.get_argument("nova_senha", "").strip()
 
         conn = conectar()
         c = conn.cursor()
+
+        agora = datetime.utcnow()
 
         # ================== PASSO 1: ENVIAR CÓDIGO ==================
         if email and not token:
@@ -60,32 +46,50 @@ class RecuperarSenhaHandler(tornado.web.RequestHandler):
 
             if user:
                 user_id = user[0]
-                codigo = str(random.randint(100000, 999999))
-                expira = (
-                    datetime.datetime.utcnow()
-                    + datetime.timedelta(minutes=15)
-                ).isoformat()
 
-                c.execute(
-                    "DELETE FROM password_reset WHERE user_id=?",
-                    (user_id,)
-                )
-
+                # ⛔ Anti-spam: 5 minutos
                 c.execute("""
-                    INSERT INTO password_reset (user_id, token, expires_at)
-                    VALUES (?, ?, ?)
-                """, (user_id, codigo, expira))
+                    SELECT last_request FROM password_reset
+                    WHERE user_id=?
+                    ORDER BY last_request DESC
+                    LIMIT 1
+                """, (user_id,))
+                row = c.fetchone()
+
+                if row:
+                    ultima = datetime.fromisoformat(row[0])
+                    if (agora - ultima).total_seconds() < 300:
+                        conn.close()
+                        self.render(
+                            "recuperar_senha.html",
+                            erro="Aguarde alguns minutos antes de solicitar novamente.",
+                            sucesso=None
+                        )
+                        return
+
+                codigo = str(random.randint(100000, 999999))
+                expira = agora + timedelta(minutes=15)
+
+                # Limpa tokens antigos
+                c.execute("DELETE FROM password_reset WHERE user_id=?", (user_id,))
+
+                # Insere corretamente
+                c.execute("""
+                    INSERT INTO password_reset (user_id, token, expires_at, last_request)
+                    VALUES (?, ?, ?, ?)
+                """, (
+                    user_id,
+                    codigo,
+                    expira.isoformat(),
+                    agora.isoformat()
+                ))
 
                 conn.commit()
 
                 try:
                     yag = yagmail.SMTP(
                         user=EMAIL_USER,
-                        password=EMAIL_PASS,
-                        host="smtp.gmail.com",
-                        port=587,
-                        smtp_starttls=True,
-                        smtp_ssl=False
+                        password=EMAIL_PASS
                     )
 
                     html = f"""
@@ -113,41 +117,39 @@ class RecuperarSenhaHandler(tornado.web.RequestHandler):
                 except Exception as e:
                     print("ERRO AO ENVIAR EMAIL:", e)
 
+            conn.close()
             self.render(
                 "recuperar_senha.html",
                 erro=None,
                 sucesso="Se o e-mail existir, enviamos um código de verificação."
             )
-            conn.close()
             return
 
         # ================== PASSO 2: ALTERAR SENHA ==================
         if token and nova_senha:
             if len(nova_senha) < 5:
+                conn.close()
                 self.render(
                     "recuperar_senha.html",
                     erro="A senha deve ter no mínimo 5 caracteres.",
                     sucesso=None
                 )
-                conn.close()
                 return
-
-            agora = datetime.datetime.utcnow().isoformat()
 
             c.execute("""
                 SELECT user_id FROM password_reset
                 WHERE token=? AND expires_at > ?
-            """, (token, agora))
+            """, (token, agora.isoformat()))
 
             row = c.fetchone()
 
             if not row:
+                conn.close()
                 self.render(
                     "recuperar_senha.html",
                     erro="Código inválido ou expirado.",
                     sucesso=None
                 )
-                conn.close()
                 return
 
             user_id = row[0]
