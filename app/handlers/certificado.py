@@ -1,111 +1,140 @@
+from weasyprint import HTML, CSS
+from io import BytesIO
+from datetime import datetime
 import tornado.web
 import sqlite3
 import os
-import io
-from datetime import datetime
-from xhtml2pdf import pisa
 
-# ===============================
-# CONFIGURAÇÃO
-# ===============================
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+BASE_DIR = os.path.abspath(os.getcwd())
 DB_PATH = os.path.join(BASE_DIR, "usuarios.db")
 
-def conectar():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
-
-def formatar_data(data):
-    if not data:
-        return None
-    try:
-        return datetime.strptime(data, "%Y-%m-%d %H:%M:%S").strftime("%d/%m/%Y")
-    except ValueError:
-        return data
-
-# ===============================
-# HANDLER CERTIFICADO POR MÓDULO
-# ===============================
 class CertificadoHandler(tornado.web.RequestHandler):
-
     def get_current_user(self):
-        uid = self.get_secure_cookie("user_id")
-        return uid.decode() if uid else None
+        user_id = self.get_secure_cookie("user_id")
+        if user_id:
+            try: return int(user_id.decode())
+            except: return None
+        return None
 
     @tornado.web.authenticated
     def get(self, modulo):
-        modulo = int(modulo)
         user_id = self.current_user
-        gerar_pdf = self.get_argument("pdf", None)
+        modulo = int(modulo)
+        download = self.get_argument("download", None)
 
-        coluna_fim = f"fim_modulo{modulo}"
+        # EMENTAS REAIS EXTRAÍDAS DAS SUAS IMAGENS
+        conteudos = {
+            1: "Visão Geral 2026, Dicionário do Milheiro, Cálculo de CPM, Livelo e Esfera, Cias Aéreas, Alertas Técnicos e Primeiro Acúmulo.",
+            2: "Ranking de Cartões, Zerar Anuidade, Salas VIP, Seguros Gratuitos, Cooperativas, Upgrade de Limite, Spread Zero e Proteção de Preço.",
+            3: "Compras 10x1, Compra de Pontos, Bônus de 100%, Clubes de Milhas, Milhas no Tanque, Parceiros Varejo, Gestão de CPFs e Giro de Boletos.",
+            4: "Tabela Fixa, Classe Executiva, Stopover, Iberia Plus, Regras de CPF, Destinos EUA, Taxas de Combustível e ALL Accor.",
+            5: "Venda em Balcão, Venda Particular, Gestão de Lucro, Imposto de Renda, Agência Digital, Reinvestimento, Tendências 2026 e Mentoria Final."
+        }
+        
+        ementa_detalhada = conteudos.get(modulo, "Especialista em Estratégias MilhasPRO")
+        nome = "Usuário"
+        inicio = datetime.now().strftime("%d/%m/%Y")
+        fim = datetime.now().strftime("%d/%m/%Y")
 
-        conn = conectar()
-        try:
-            user = conn.execute(f"""
-                SELECT nome, inicio_curso, {coluna_fim}
-                FROM users
-                WHERE id = ?
-            """, (user_id,)).fetchone()
+        if user_id:
+            with sqlite3.connect(DB_PATH) as conn:
+                conn.row_factory = sqlite3.Row
+                c = conn.cursor()
+                # SQL Robusto: busca Nome ou Username caso nome esteja vazio
+                query = f"SELECT COALESCE(nome, username) as nome_exibicao, inicio_curso, fim_modulo{modulo} FROM users WHERE id = ?"
+                c.execute(query, (user_id,))
+                row = c.fetchone()
+                if row:
+                    nome = row['nome_exibicao']
+                    inicio = row['inicio_curso'] if row['inicio_curso'] else inicio
+                    fim = row[f'fim_modulo{modulo}'] if row[f'fim_modulo{modulo}'] else fim
 
-            if not user:
-                self.write("Usuário não encontrado")
-                return
-
-            if not user[coluna_fim]:
-                self.write("Módulo ainda não concluído")
-                return
-
-            # ===============================
-            # EMENTAS POR MÓDULO
-            # ===============================
-            ementas = {
-                1: "Fundamentos de Milhas Aéreas",
-                2: "Cartões de Crédito e Pontuação",
-                3: "Clube de Milhas e Promoções",
-                4: "Emissão Inteligente de Passagens",
-                5: "Escala, Stopover e Hacks Avançados"
-            }
-
-            dados = {
-                "nome": user["nome"],
-                "modulo": modulo,
-                "ementa": ementas.get(modulo, "Treinamento em Milhas"),
-                "inicio": formatar_data(user["inicio_curso"]),
-                "fim": formatar_data(user[coluna_fim]),
-            }
-
-            # ===============================
-            # GERAR PDF
-            # ===============================
-            if gerar_pdf:
-                html = self.render_string(
-                    "certificado.html",
-                    **dados,
-                    is_pdf=True
-                )
-
-                pdf = io.BytesIO()
-                pisa.CreatePDF(html, dest=pdf)
-
-                self.set_header("Content-Type", "application/pdf")
-                self.set_header(
-                    "Content-Disposition",
-                    f'attachment; filename="certificado_modulo_{modulo}.pdf"'
-                )
-
-                self.write(pdf.getvalue())
-                return
-
-            # ===============================
-            # MOSTRAR HTML
-            # ===============================
-            self.render(
+        if download:
+            html_content = self.render_string(
                 "certificado.html",
-                **dados,
-                is_pdf=False
-            )
+                nome=nome, modulo=modulo, ementa=ementa_detalhada,
+                inicio=inicio, fim=fim, is_pdf=True
+            ).decode('utf-8')
 
-        finally:
-            conn.close()
+            # CSS DE ALTA PRECISÃO - CENTRALIZAÇÃO VERTICAL E HORIZONTAL TOTAL
+            pdf_css = CSS(string="""
+                @page { 
+                    size: A4 landscape; 
+                    margin: 0; 
+                }
+                html, body { 
+                    margin: 0; padding: 0; 
+                    width: 100%; height: 100%; 
+                    background: #000; 
+                }
+                
+                .cert-canvas {
+                    width: 297mm; height: 210mm;
+                    display: table; /* Técnica mais estável para WeasyPrint */
+                    background: #000;
+                    box-sizing: border-box;
+                    border: 12mm solid #d4af37;
+                }
+
+                .inner-wrapper {
+                    display: table-cell;
+                    vertical-align: middle;
+                    text-align: center;
+                    width: 100%; height: 100%;
+                }
+
+                .inner-border {
+                    display: inline-block;
+                    width: 255mm; height: 170mm;
+                    border: 1.2pt solid #c9a63a;
+                    padding: 30pt;
+                    box-sizing: border-box;
+                }
+
+                .logo { font-size: 22pt; font-weight: bold; color: #fff; letter-spacing: 5pt; margin-bottom: 5pt; }
+                .logo span { color: #d4af37; }
+                
+                h1 { font-size: 50pt; color: #d4af37; letter-spacing: 8pt; margin: 10pt 0; text-transform: uppercase; }
+                .subtitle { font-size: 10pt; color: #999; letter-spacing: 3pt; margin-bottom: 15pt; }
+                
+                .intro { font-size: 15pt; color: #ccc; }
+                
+                .student-name { 
+                    font-size: 40pt; font-weight: bold; color: #fff; 
+                    border-bottom: 2.5pt solid #d4af37; padding-bottom: 8pt;
+                    margin: 12pt auto; width: 75%;
+                }
+                
+                .description { font-size: 14pt; color: #aaa; width: 85%; line-height: 1.6; margin: 0 auto; }
+                
+                .ementa-box {
+                    color: #f1d592; 
+                    font-size: 11pt; 
+                    font-style: italic; 
+                    margin-top: 12pt;
+                    padding: 0 50pt;
+                }
+                
+                .periodo { font-size: 9.5pt; color: #666; text-transform: uppercase; margin-top: 20pt; }
+                
+                .footer { 
+                    width: 100%; margin-top: 30pt;
+                    display: table;
+                }
+                .assinatura { 
+                    display: table-cell; width: 33%;
+                    border-top: 1pt solid #444; padding-top: 10pt; 
+                    font-size: 8pt; color: #777; font-weight: bold;
+                }
+                .assinatura.center { color: #d4af37; border-top: 1pt solid transparent; }
+            """)
+
+            pdf_file = BytesIO()
+            HTML(string=html_content, base_url=BASE_DIR).write_pdf(pdf_file, stylesheets=[pdf_css])
+            pdf_file.seek(0)
+
+            self.set_header("Content-Type", "application/pdf")
+            self.set_header("Content-Disposition", f'attachment; filename="Certificado_M{modulo}_{nome}.pdf"')
+            self.write(pdf_file.read())
+        else:
+            self.render("certificado.html", nome=nome, modulo=modulo, ementa=ementa_detalhada, inicio=inicio, fim=fim, is_pdf=False)

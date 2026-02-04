@@ -158,40 +158,48 @@
         <h2>Mestre em Milhagem</h2>
         <div class="score-circle" id="nota-valor">0</div>
         <p id="mensagem-final"></p>
-        <button id="btn-submit-final" class="btn-action" style="display:block;" onclick="document.getElementById('formProva').submit()">Finalizar Curso e Receber Certificado de Mestre</button>
+        <button id="btn-submit-final" class="btn-action" style="display:block;" onclick="document.getElementById('formProva').submit()">Finalizar Curso e Receber Certificado</button>
     </div>
 </div>
 
 <script>
+    // Gabarito Profissional Sincronizado
+    const gabarito = {"q1":"b","q2":"c","q3":"a","q4":"d","q5":"b","q6":"a","q7":"c","q8":"d","q9":"b","q10":"a"};
+    
     const questoes = document.querySelectorAll(".questao");
     const progressBar = document.getElementById("progress");
     let acertos = 0;
 
     questoes.forEach((q, index) => {
-        const correta = q.dataset.correta;
+        const idQuestao = `q${index + 1}`;
+        const correta = gabarito[idQuestao];
         const opcoes = q.querySelectorAll(".opcao");
         const nextBtn = q.querySelector(".btn-action");
-        const finalizarBtn = document.getElementById("finalizar-btn");
 
         opcoes.forEach(op => {
             op.onclick = () => {
                 if (q.classList.contains("respondida")) return;
                 q.classList.add("respondida");
+                
                 const selecionada = op.dataset.value;
-                document.getElementById(`q${index + 1}`).value = selecionada;
+                document.getElementById(idQuestao).value = selecionada;
 
-                if (selecionada === correta) { op.classList.add("correct"); acertos++; } 
-                else { op.classList.add("wrong"); q.querySelector(`[data-value="${correta}"]`).classList.add("correct"); }
+                if (selecionada === correta) { 
+                    op.classList.add("correct"); 
+                    acertos++; 
+                } else { 
+                    op.classList.add("wrong"); 
+                    q.querySelector(`[data-value="${correta}"]`).classList.add("correct"); 
+                }
 
                 if (nextBtn) nextBtn.style.display = "block";
-                if (index === questoes.length - 1) finalizarBtn.style.display = "block";
             };
         });
 
-        if (nextBtn) {
+        if (nextBtn && index < questoes.length - 1) {
             nextBtn.onclick = () => {
                 q.classList.remove("active");
-                questoes[index + 1].classList.add("actmediaive");
+                questoes[index + 1].classList.add("active");
                 progressBar.style.width = ((index + 2) / questoes.length) * 100 + "%";
             };
         }
@@ -201,9 +209,12 @@
         document.getElementById("quiz-content").style.display = "none";
         document.getElementById("resultado").style.display = "block";
         document.getElementById("nota-valor").textContent = acertos;
+        
         const msg = document.getElementById("mensagem-final");
-        msg.innerHTML = acertos >= 7 ? "APROVADO! Você acaba de se tornar um Mestre em Milhas Pro." : "REPROVADO! Revise os conceitos de negócio e tente novamente.";
-        msg.style.color = acertos >= 7 ? "var(--correct)" : "var(--wrong)";
+        const aprovado = acertos >= 7;
+        msg.innerHTML = aprovado ? "APROVADO! Você acaba de se tornar um Mestre em Milhas Pro." : "REPROVADO! Revise os conceitos e tente novamente.";
+        msg.style.color = aprovado ? "var(--correct)" : "var(--wrong)";
+        if(!aprovado) document.getElementById("btn-submit-final").style.display = "none";
     };
 </script>
 </body>

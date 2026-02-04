@@ -9,12 +9,18 @@
         :root {
             --bg: #0a0b0d; --panel: #161b22; --sidebar: #0d1117; --text: #e6edf3;
             --text-muted: #8b949e; --accent: #a855f7; --border: #30363d; --success: #238636;
+            --danger: #f85149;
         }
         * { box-sizing: border-box; transition: all 0.2s ease; }
         body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         header { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; background: var(--sidebar); border-bottom: 1px solid var(--border); z-index: 100; }
         .logo { font-weight: 800; font-size: 1.1rem; }
         .logo span { color: var(--accent); }
+        
+        /* Botão de Teste Estilizado */
+        .btn-test { background: rgba(248, 81, 73, 0.1); color: var(--danger); border: 1px solid var(--danger); font-size: 10px; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin-right: 10px; font-weight: bold; }
+        .btn-test:hover { background: var(--danger); color: white; }
+
         main { display: flex; flex: 1; overflow: hidden; position: relative; }
         .content-area { flex: 1; overflow-y: auto; background: var(--bg); }
         .video-container { width: 100%; background: #000; aspect-ratio: 16/9; position: relative; }
@@ -43,7 +49,10 @@
 
 <header>
     <div class="logo">✈️ MESTRE DAS <span>MILHAS</span></div>
-    <div id="prog-txt" style="font-size: 12px; background: var(--panel); padding: 5px 15px; border-radius: 20px; border: 1px solid var(--border);">0% Concluído</div>
+    <div style="display: flex; align-items: center;">
+        <button class="btn-test" onclick="bypassProvas()">🧪 MOD TESTE (100%)</button>
+        <div id="prog-txt" style="font-size: 12px; background: var(--panel); padding: 5px 15px; border-radius: 20px; border: 1px solid var(--border);">0% Concluído</div>
+    </div>
 </header>
 
 <main>
@@ -71,7 +80,6 @@
 </main>
 
 <script>
-
     const course = [
         { name: "1. Fundamentos e CPM", lessons: [
             {t: "Visão Geral 2026", d: "Entenda o mercado atual.", v: "3r6Q9tCzX4k"},
@@ -150,6 +158,25 @@
         updateProgressUI();
     }
 
+    /* FUNÇÃO DE BYPASS PARA TESTES */
+    async function bypassProvas() {
+        if(!confirm("Deseja marcar 100% de conclusão para testes?")) return;
+        
+        // 1. Marca todas as aulas no localStorage
+        course.forEach(m => m.lessons.forEach(l => progress.lessons[l.v] = true));
+        localStorage.setItem('mm_progress', JSON.stringify(progress));
+        
+        // 2. Simula envio de notas 10 para o servidor via fetch (Ajuste a rota conforme seu backend)
+        for(let i=1; i<=5; i++) {
+            console.log(`Liberando Módulo ${i}...`);
+            // Aqui você dispararia um POST para seu backend salvar a nota no SQLite
+            // fetch('/api/salvar-nota', { method: 'POST', body: JSON.stringify({modulo: i, nota: 10}) });
+        }
+
+        alert("Modo Teste Ativado! Aulas concluídas. Verifique as notas no banco para liberar o botão final.");
+        location.reload();
+    }
+
     function toggleLesson(videoId) {
         progress.lessons[videoId] = !progress.lessons[videoId];
         localStorage.setItem('mm_progress', JSON.stringify(progress));
@@ -178,7 +205,8 @@
         document.getElementById('currentTitle').innerText = les.t;
         document.getElementById('currentDesc').innerText = les.d;
         document.querySelectorAll('.lesson-item').forEach(e => e.classList.remove('active'));
-        document.getElementById(`les-${les.v}`).classList.add('active');
+        const activeEl = document.getElementById(`les-${les.v}`);
+        if(activeEl) activeEl.classList.add('active');
     }
 
     function changeLesson(step) {
@@ -193,7 +221,7 @@
     }
 
     function startFinal() {
-        window.location.href = "/prova/6";
+        window.location.href = "/prova/final";
     }
 
     function toggleSidebar() {
