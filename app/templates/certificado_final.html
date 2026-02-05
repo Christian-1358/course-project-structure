@@ -3,241 +3,270 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Certificado Final | {{ nome }}</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<title>Certificado Oficial | Mestre das Milhas</title>
 
 <style>
-:root{
-    --gold: linear-gradient(135deg,#d4af37 0%,#f1d592 50%,#d4af37 100%);
-    --border-gold: rgba(212,175,55,.4);
-}
-*{box-sizing:border-box}
-body{
-    background:#000;
-    margin:0;
-    min-height:100vh;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    font-family:'Inter',sans-serif;
-}
+    /* Reset e Fundo */
+    * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    
+    body {
+        background: #050505;
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', Roboto, Helvetica, sans-serif;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
 
-.cert-canvas{
-    width:900px;
-    height:600px;
-    padding:20px;
-    background:#080808;
-    border:10px solid #d4af37;
-    border-image:linear-gradient(135deg,#d4af37,#8a6d1d) 1;
-    position:relative;
-    box-shadow:0 0 60px rgba(0,0,0,.9);
-}
+    /* O Certificado - Ajustado para proporção A4 Paisagem */
+    .cert-canvas {
+        width: 1120px; 
+        height: 790px;
+        background: #0d0d0d !important;
+        border: 12px solid #d4af37;
+        padding: 10px;
+        position: relative;
+        box-shadow: 0 0 50px rgba(0,0,0,0.8);
+        color: #fff;
+        overflow: hidden;
+    }
 
-.watermark{
-    position:absolute;
-    top:50%;left:50%;
-    transform:translate(-50%,-50%) rotate(-12deg);
-    font-size:180px;
-    font-weight:900;
-    color:rgba(212,175,55,.04);
-    pointer-events:none;
-}
+    .inner-border {
+        width: 100%;
+        height: 100%;
+        border: 1px solid #d4af37;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        padding: 60px;
+        background: radial-gradient(circle at center, #151515 0%, #0d0d0d 100%) !important;
+    }
 
-.inner-border{
-    border:1px solid var(--border-gold);
-    height:100%;
-    padding:40px;
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
-    align-items:center;
-    background:radial-gradient(circle,#111 0%,#050505 100%);
-    position:relative;
-}
+    .header .logo {
+        font-size: 28px;
+        font-weight: 900;
+        letter-spacing: 8px;
+        color: #fff;
+        text-transform: uppercase;
+    }
+    .header .logo span { color: #d4af37; }
+    
+    .cert-title {
+        margin-top: 10px;
+        text-align: center;
+    }
+    .cert-title h1 {
+        font-size: 75px;
+        margin: 0;
+        letter-spacing: 12px;
+        color: #d4af37;
+        background: linear-gradient(to bottom, #f1d592, #d4af37, #a68524);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 800;
+    }
+    .cert-title p {
+        font-size: 14px;
+        color: #888;
+        letter-spacing: 5px;
+        text-transform: uppercase;
+        margin-top: 5px;
+    }
 
-.header-logo{
-    font-size:22px;
-    font-weight:900;
-    letter-spacing:4px;
-    color:#fff;
-}
-.header-logo span{color:#d4af37}
+    .body-text {
+        text-align: center;
+        width: 85%;
+    }
+    .body-text .intro {
+        font-size: 20px;
+        color: #bbb;
+        font-style: italic;
+    }
+    .body-text .student-name {
+        font-size: 58px;
+        font-weight: 800;
+        color: #fff;
+        margin: 10px 0;
+        border-bottom: 3px solid #d4af37;
+        display: inline-block;
+        padding: 0 40px 10px 40px;
+        text-transform: uppercase;
+    }
+    .body-text .achievement {
+        font-size: 17px;
+        line-height: 1.6;
+        color: #aaa;
+        margin-top: 15px;
+    }
 
-.main-title h1{
-    font-size:54px;
-    margin:0;
-    letter-spacing:8px;
-    text-transform:uppercase;
-    background:var(--gold);
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-    font-weight:900;
-    text-align:center;
-}
+    /* Ementa Profissional */
+    .ementa-box {
+        background: rgba(212, 175, 55, 0.05) !important;
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        padding: 20px 40px;
+        border-radius: 12px;
+        margin-top: 25px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        text-align: left;
+    }
+    .ementa-item {
+        font-size: 12px;
+        color: #d4af37;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 600;
+    }
 
-.subtitle{
-    font-size:11px;
-    color:#888;
-    letter-spacing:3px;
-    font-weight:700;
-    text-align:center;
-}
+    /* Rodapé */
+    .footer {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+    }
+    .sign-block {
+        text-align: center;
+        width: 280px;
+    }
+    .sign-line {
+        border-top: 1px solid #444;
+        margin-bottom: 10px;
+    }
+    .sign-name {
+        font-size: 12px;
+        font-weight: bold;
+        color: #777;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
 
-.student-name{
-    font-size:42px;
-    font-weight:700;
-    color:#fff;
-    margin:18px 0;
-    border-bottom:2px solid #d4af37;
-    min-width:450px;
-    text-align:center;
-    padding-bottom:8px;
-}
+    .seal {
+        width: 110px;
+        height: 110px;
+        border: 2px double #d4af37;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 9px;
+        color: #d4af37;
+        font-weight: bold;
+        text-align: center;
+        padding: 10px;
+        opacity: 0.8;
+    }
 
-.description{
-    font-size:16px;
-    color:#ccc;
-    text-align:center;
-    max-width:720px;
-    line-height:1.6;
-}
+    /* Botões */
+    .no-print { margin: 30px 0; display: flex; gap: 15px; }
+    
+    .btn-gold {
+        padding: 15px 35px;
+        background: linear-gradient(135deg, #d4af37 0%, #f1d592 50%, #d4af37 100%);
+        color: #000;
+        border: none;
+        font-weight: bold;
+        border-radius: 8px;
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: 0.3s;
+        text-decoration: none;
+        display: inline-block;
+        box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+    }
+    .btn-gold:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5); }
 
-.ementa{
-    margin-top:14px;
-    color:#f1d592;
-    font-weight:600;
-    font-size:15px;
-}
+    .btn-outline {
+        padding: 15px 35px;
+        background: transparent;
+        color: #d4af37;
+        border: 1px solid #d4af37;
+        font-weight: bold;
+        border-radius: 8px;
+        cursor: pointer;
+        text-decoration: none;
+        text-transform: uppercase;
+        transition: 0.3s;
+    }
+    .btn-outline:hover { background: rgba(212, 175, 55, 0.1); }
 
-.periodo{
-    margin-top:22px;
-    font-size:11px;
-    color:#666;
-    letter-spacing:2px;
-    font-weight:700;
-    text-transform:uppercase;
-}
-
-.footer{
-    width:100%;
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-end;
-}
-
-.signature{
-    width:230px;
-    text-align:center;
-    border-top:1px solid #333;
-    padding-top:12px;
-    font-size:10px;
-    color:#666;
-    font-weight:600;
-    text-transform:uppercase;
-}
-
-.seal{
-    text-align:center;
-}
-.seal img{width:65px}
-.seal p{
-    font-size:8px;
-    color:#d4af37;
-    font-weight:800;
-    letter-spacing:1px;
-    margin-top:6px;
-}
-
-.download{
-    margin-top:30px;
-}
-.btn-download{
-    background:var(--gold);
-    color:#000;
-    border:none;
-    padding:16px 45px;
-    border-radius:50px;
-    font-weight:900;
-    letter-spacing:1px;
-    cursor:pointer;
-    display:flex;
-    align-items:center;
-    gap:10px;
-    text-transform:uppercase;
-}
-.btn-download:hover{
-    transform:scale(1.08);
-    box-shadow:0 15px 35px rgba(212,175,55,.4);
-}
+    /* Estilos de Impressão */
+    @media print {
+        @page { size: landscape; margin: 0; }
+        body { background: #000; }
+        .no-print { display: none !important; }
+        .cert-canvas { box-shadow: none; width: 100vw; height: 100vh; border: 12px solid #d4af37 !important; }
+    }
 </style>
 </head>
 
 <body>
 
-<div class="cert-canvas">
-    <div class="watermark">MILHASPRO</div>
-
+<div class="cert-canvas" id="certificado">
     <div class="inner-border">
-        <div class="header-logo">MILHAS<span>PRO</span></div>
-
-        <div>
-            <div class="main-title">
-                <h1>Certificado</h1>
-            </div>
-            <div class="subtitle">CERTIFICAÇÃO FINAL · 2026</div>
+        
+        <div class="header">
+            <div class="logo">MESTRE DAS <span>MILHAS</span></div>
         </div>
 
-        <div style="text-align:center">
-            <p style="font-size:18px;color:#ccc;margin-bottom:6px">
-                Certificamos que
-            </p>
+        <div class="cert-title">
+            <h1>CERTIFICADO</h1>
+            <p>Formação Profissional em Arbitragem de Milhas</p>
+        </div>
 
+        <div class="body-text">
+            <div class="intro">Certificamos com distinção que o especialista</div>
             <div class="student-name">{{ nome }}</div>
-
-            <p class="description">
-                foi aprovado com êxito na <strong>Prova Final de Certificação</strong>,
-                concluindo integralmente o programa
-                <strong>Mestre das Milhas</strong>, com formação completa em:
-            </p>
-
-            <div class="ementa">
-                Fundamentos em CPM · Cartões e Benefícios · Acúmulo Estratégico ·
-                Emissões Internacionais · Milhas como Negócio
+            <div class="achievement">
+                Concluiu com êxito a certificação final e os treinamentos avançados do programa 
+                <strong>MASTER MILHAS 2026</strong>, estando apto para operar no mercado de milhas aéreas, 
+                cartões de crédito e fidelidade em nível profissional.
             </div>
 
-            <div class="periodo">
-                Período de Formação: {{ inicio }} — {{ fim }}
+            <div class="ementa-box">
+                <div class="ementa-item">✔ Engenharia de CPM Avançada</div>
+                <div class="ementa-item">✔ Gestão Estratégica de CPFs</div>
+                <div class="ementa-item">✔ Emissões Award Internacionais</div>
+                <div class="ementa-item">✔ Arbitragem e Compra Bonificada</div>
+                <div class="ementa-item">✔ Benefícios e Seguros Platinum/Infinite</div>
+                <div class="ementa-item">✔ Otimização de Spread e Cashback</div>
             </div>
         </div>
 
         <div class="footer">
-            <div class="signature">Diretor Executivo</div>
-
-            <div class="seal">
-                <img src="https://img.icons8.com/color/96/guarantee.png">
-                <p>AUTENTICIDADE GARANTIDA</p>
+            <div class="sign-block">
+                <div class="sign-line"></div>
+                <div class="sign-name">Coordenação Pedagógica</div>
             </div>
 
-            <div class="signature">Coordenação Técnica</div>
+            <div class="seal">
+                AUTENTICIDADE<br>REGISTRADA EM<br>SISTEMA
+            </div>
+
+            <div class="sign-block">
+                <div class="sign-line"></div>
+                <div class="sign-name">Mestre das Milhas Inc.</div>
+            </div>
         </div>
+
     </div>
 </div>
 
-<div class="download">
-    <button class="btn-download" onclick="baixarCertificado()">
-        <img src="https://img.icons8.com/ios-filled/22/000000/pdf.png">
-        Baixar PDF
+<div class="no-print">
+    <a href="/gerar_certificado_final?download=1" class="btn-gold">
+         Baixar PDF de Luxo
+    </a>
+    
+    <button class="btn-outline" onclick="window.print()">
+         Imprimir Rápido
     </button>
 </div>
-
-<script>
-function baixarCertificado(){
-    const url = "/certificado/final?download=true";
-    window.open(url,"_blank") || (window.location.href=url);
-}
-</script>
 
 </body>
 </html>

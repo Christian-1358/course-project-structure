@@ -1,289 +1,98 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>Painel Administrativo</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Inter', system-ui, sans-serif;
-}
-
-body {
-    min-height: 100vh;
-    background: linear-gradient(145deg, #050505, #111);
-    color: #e5e5e5;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    padding: 40px 20px;
-}
-
-.container {
-    width: 100%;
-    max-width: 1100px;
-    background: #0c0c0c;
-    padding: 35px;
-    border-radius: 18px;
-    border: 1px solid #222;
-    box-shadow: 0 25px 60px rgba(0,0,0,0.8);
-}
-
-h2 {
-    text-align: center;
-    margin-bottom: 30px;
-    font-size: 24px;
-}
-
-.message {
-    padding: 14px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    text-align: center;
-    font-weight: 500;
-}
-
-.success {
-    background: rgba(80,160,255,0.12);
-    color: #5da9ff;
-    border: 1px solid rgba(80,160,255,0.4);
-}
-
-.error {
-    background: rgba(255,70,70,0.12);
-    color: #ff5c5c;
-    border: 1px solid rgba(255,70,70,0.4);
-}
-
-.search-container {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 25px;
-}
-
-.search-container input {
-    flex: 1;
-    padding: 14px;
-    border-radius: 12px;
-    border: 1px solid #2a2a2a;
-    background: #0a0a0a;
-    color: #fff;
-}
-
-.search-container button {
-    padding: 14px 18px;
-    border-radius: 12px;
-    border: none;
-    background: #444;
-    color: #fff;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.search-container button:hover {
-    background: #666;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    border-radius: 14px;
-    overflow: hidden;
-}
-
-th {
-    background: #111;
-    padding: 14px;
-    font-size: 13px;
-    text-transform: uppercase;
-    border-bottom: 1px solid #222;
-}
-
-td {
-    padding: 14px;
-    font-size: 14px;
-    border-bottom: 1px solid #1f1f1f;
-    text-align: center;
-}
-
-tr:hover {
-    background: #1a1a1a;
-}
-
-.action-btn {
-    padding: 8px 14px;
-    border-radius: 10px;
-    border: none;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    margin: 2px;
-}
-
-.btn-senha  { background: #2ecc71; color: #fff; }
-.btn-reset  { background: #f39c12; color: #fff; }
-.btn-deletar{ background: #e74c3c; color: #fff; }
-
-@media (max-width: 768px) {
-    th, td { font-size: 12px; }
-    .action-btn { padding: 6px 10px; font-size: 12px; }
-}
-</style>
+    <meta charset="UTF-8">
+    <title>Painel Administrativo Profissional</title>
+    <style>
+        body { background: #050505; color: #eee; font-family: sans-serif; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; background: #0c0c0c; padding: 25px; border-radius: 10px; border: 1px solid #222; }
+        h2 { text-align: center; color: #a855f7; margin-bottom: 20px; }
+        .nav-btns { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        th { background: #161b22; padding: 12px; font-size: 12px; color: #888; border-bottom: 2px solid #333; }
+        td { padding: 12px; text-align: center; border-bottom: 1px solid #1a1a1a; font-size: 14px; }
+        .btn { border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 10px; margin: 2px; }
+        .btn-orange { background: #ff9f43; color: #000; }
+        .btn-green { background: #238636; color: #fff; }
+        .btn-red { background: #da3633; color: #fff; }
+        .btn-blue { background: #0062ff; color: #fff; }
+        .btn-gray { background: #444; color: #fff; }
+        input { padding: 10px; background: #000; border: 1px solid #333; color: #fff; border-radius: 5px; width: 300px; }
+    </style>
 </head>
-
 <body>
 <div class="container">
-
-<h2>Painel Administrativo</h2>
-
-{% if mensagem %}
-<div class="message success">{{ mensagem }}</div>
-{% end %}
-
-{% if erro %}
-<div class="message error">{{ erro }}</div>
-{% end %}
-
-    <div style="text-align:center;margin-top:12px;gap:8px;display:flex;align-items:center;justify-content:center;flex-direction:row">
-      <a href="/login" class="link-btn" style="background:#0f6cff;color:#fff;margin-right:8px">Voltar ao Login</a>
-      <a href="/curso" class="muted" style="color:#9a9a9a;text-decoration:none;line-height:36px;padding:0 8px;border-radius:8px">Voltar para o Curso</a>
+    <h2>PAINEL DE CONTROLE MM</h2>
+    
+    <div class="nav-btns">
+        <button class="btn btn-gray" onclick="window.location.href='/logout'">Sair</button>
+        <button class="btn btn-blue" onclick="window.location.href='/curso'">Ir para o Curso</button>
+        <button class="btn btn-green" onclick="verVendas()">Ver Vendas</button>
     </div>
-<div class="search-container">
-    <input type="text" id="busca" placeholder="Buscar por usuário ou email">
-    <button onclick="buscarUsuario()">Buscar</button>
-    <button onclick="location.href='/login_dev'">Resetar</button>
-       <button id="btn-ver-compras" style="background:#0b5; color:#000; padding:14px 16px; border-radius:12px; font-weight:700; cursor:pointer">Ver Compras</button>
 
-</div>
-<div id="compras-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);align-items:center;justify-content:center;z-index:9999">
-  <div style="background:#0c0c0c;color:#fff;padding:18px;border-radius:12px;max-width:900px;width:95%;max-height:80vh;overflow:auto;border:1px solid #222">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-      <strong>Compras</strong>
-      <button id="compras-close" style="background:#222;color:#fff;border-radius:8px;padding:6px 10px;border:none;cursor:pointer">Fechar</button>
+    <div style="text-align: center; margin-bottom: 20px;">
+        <input type="text" id="filtro" placeholder="Nome ou Email..." value="{{ mensagem.replace('Busca: ', '') if mensagem else '' }}">
+        <button class="btn btn-blue" onclick="buscar()">Filtrar</button>
+        <button class="btn btn-gray" onclick="window.location.href='/login_dev'">Limpar</button>
     </div>
-    <div id="compras-content" style="font-size:13px;color:#ddd">
-    </div>  </div>
-</div>
-<table>
-<tr>
-    <th>ID</th>
-    <th>Usuário</th>
-    <th>Email</th>
-    <th>Ações</th>
-</tr>
 
-{% for u in usuarios %}
-<tr>
-    <td>{{ u["id"] }}</td>
-    <td>{{ u["username"] }}</td>
-    <td>{{ u["email"] }}</td>
-    <td>
-        <button class="action-btn btn-senha" data-action="alterar-senha" data-id="{{ u['id'] }}">Senha</button>
-        <button class="action-btn btn-reset" data-action="resetar-senha" data-id="{{ u['id'] }}">Reset</button>
-        <button class="action-btn btn-deletar" data-action="deletar-usuario" data-id="{{ u['id'] }}">Deletar</button>
-    </td>
-</tr>
-{% end %}
-</table>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th><th>USUÁRIO / EMAIL</th><th>STATUS</th><th>AÇÕES DE DESENVOLVEDOR</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for u in usuarios %}
+            <tr>
+                <td>{{ u['id'] }}</td>
+                <td><b>{{ u['username'] }}</b><br><small>{{ u['email'] }}</small></td>
+                <td>
+                    <button class="btn {{ 'btn-green' if u['ativo'] == 1 else 'btn-red' }}" 
+                            onclick="api('/admin/alterar_status', {id: '{{ u['id'] }}', ativo: {{ 0 if u['ativo'] == 1 else 1 }} })">
+                        {{ 'Ativo' if u['ativo'] == 1 else 'Bloqueado' }}
+                    </button>
+                </td>
+                <td>
+                    <button class="btn btn-orange" onclick="api('/admin/forcar_notas', {id: '{{ u['id'] }}'})">🚀 FULL 10</button>
+                    <button class="btn btn-green" onclick="novaSenha('{{ u['id'] }}')">SENHA</button>
+                    <button class="btn btn-orange" onclick="api('/admin/resetar_senha', {id: '{{ u['id'] }}'})">RESET</button>
+                    <button class="btn btn-red" onclick="deletar('{{ u['id'] }}')">EXCLUIR</button>
+                </td>
+            </tr>
+            {% end %}
+        </tbody>
+    </table>
 
+    <h2 style="font-size: 18px;">📊 ÚLTIMAS ATIVIDADES (NOTAS)</h2>
+    <table>
+        <thead><tr><th>ALUNO</th><th>MÓDULO</th><th>NOTA</th><th>DATA/HORA</th></tr></thead>
+        <tbody>
+            {% for n in notas %}
+            <tr><td>{{ n['username'] }}</td><td>Módulo {{ n['modulo'] }}</td><td style="color:#3fb950">{{ n['nota'] }}</td><td>{{ n['data_hora'] }}</td></tr>
+            {% end %}
+        </tbody>
+    </table>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-
-    async function showCompras() {
-       const content = document.getElementById('compras-content');        content.innerHTML = 'Carregando...';
-        try {
-            const res = await fetch('/admin/compras', { credentials: 'same-origin' });
-            const data = await res.json().catch(() => null);
-            if (!res.ok || !data) {
-                content.innerHTML = '<div class="message error">Erro ao buscar compras (verifique o servidor).</div>';
-                return;
-            }
-            const purchases = data.purchases || data.rows || data.list || [];
-         const count = data.count ?? data.compradores_count ?? (Array.isArray(purchases) ? purchases.length : 0);
-           let html = `<p><strong>Compradores confirmados:</strong> ${count}</p>`;
-            if (Array.isArray(purchases) && purchases.length) {
-               html += '<table style="width:100%;border-collapse:collapse;color:#ddd"><thead><tr><th>ID</th><th>Email</th><th>Método</th><th>Valor</th><th>Status</th><th>Data</th></tr></thead><tbody>';
-               purchases.forEach(p => {
-                    const dt = p.created_at ? new Date(p.created_at * 1000).toLocaleString() : (p.created_at || '');
-                    html += `<tr style="border-top:1px solid #222"><td>${p.id||''}</td><td>${p.email||''}</td><td>${p.metodo||''}</td><td>${p.amount||''}</td><td>${p.status||''}</td><td>${dt}</td></tr>`;
-                });
-               html += '</tbody></table>';
-            } else {
-                html += '<p>Nenhuma compra registrada.</p>';
-            }
-           content.innerHTML = html;
-        } catch (err) {
-                       content.innerHTML = '<div class="message error">Erro: ' + String(err) + '</div>';
-      }
-   }
-
-    const btnVer = document.getElementById('btn-ver-compras');
-    if (btnVer) btnVer.addEventListener('click', async (ev) => {
-        ev.preventDefault();
-        await showCompras();
-        document.getElementById('compras-modal').style.display = 'flex';
-   });
-    const closeBtn = document.getElementById('compras-close');
-    if (closeBtn) closeBtn.addEventListener('click', () => document.getElementById('compras-modal').style.display = 'none');
-
-});
-    const container = document.querySelector('.container');
-
-    function postJson(url, bodyObj) {
-        const body = Object.keys(bodyObj).map(k => `${encodeURIComponent(k)}=${encodeURIComponent(bodyObj[k])}`).join('&');
-        return fetch(url, {
-            method: 'POST',
-            headers: {"Content-Type": "application/x-www-form-urlencoded"},
-            body
-        }).then(r => r.json());
+    async function api(url, data) {
+        const p = new URLSearchParams();
+        for (const k in data) p.append(k, data[k]);
+        const r = await fetch(url, { method: 'POST', body: p });
+        const res = await r.json();
+        alert(res.mensagem);
+        location.reload();
     }
-
-    container.addEventListener('click', (e) => {
-        const btn = e.target.closest('button[data-action]');
-        if (!btn) return;
-        const action = btn.dataset.action;
-        const id = parseInt(btn.dataset.id, 10);
-        if (isNaN(id)) return alert('ID inválido');
-
-        if (action === 'alterar-senha') {
-            const nova = prompt('Digite a nova senha:');
-            if (!nova) return;
-            postJson('/admin/alterar_senha', { id, senha: nova })
-            .then(data => alert(data.mensagem || 'Operação finalizada'))
-            .catch(err => alert('Erro de comunicação: ' + err));
-            return;
-        }
-
-        if (action === 'resetar-senha') {
-            if (!confirm('Resetar senha para 123456?')) return;
-            postJson('/admin/resetar_senha', { id })
-            .then(data => {
-                alert(data.mensagem || 'Operação finalizada');
-                if (data.sucesso) location.reload();
-            })
-            .catch(err => alert('Erro de comunicação: ' + err));
-            return;
-        }
-
-        if (action === 'deletar-usuario') {
-            if (!confirm('Deletar este usuário PERMANENTEMENTE?')) return;
-            postJson('/admin/deletar_usuario', { id })
-            .then(data => {
-                alert(data.mensagem || 'Operação finalizada');
-                if (data.sucesso) location.reload();
-            })
-            .catch(err => alert('Erro de comunicação: ' + err));
-            return;
-        }
-    });
-
+    function buscar() { window.location.href = '/admin/buscar_usuario?filtro=' + document.getElementById('filtro').value; }
+    function novaSenha(id) { const s = prompt("Nova senha:"); if(s) api('/admin/alterar_senha', {id: id, senha: s}); }
+    function deletar(id) { if(confirm("Excluir?")) api('/admin/deletar_usuario', {id: id}); }
+    async function verVendas() {
+        const r = await fetch('/admin/compras');
+        const res = await r.json();
+        alert("Total de vendas registradas: " + res.purchases.length);
+        console.table(res.purchases);
+    }
 </script>
 </body>
 </html>

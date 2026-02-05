@@ -17,8 +17,7 @@
         .logo { font-weight: 800; font-size: 1.1rem; }
         .logo span { color: var(--accent); }
         
-        /* Botão de Teste Estilizado */
-        .btn-test { background: rgba(248, 81, 73, 0.1); color: var(--danger); border: 1px solid var(--danger); font-size: 10px; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin-right: 10px; font-weight: bold; }
+        .btn-test { background: rgba(248, 81, 73, 0.1); color: var(--danger); border: 1px solid var(--danger); font-size: 10px; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin-right: 10px; font-weight: bold; text-transform: uppercase; }
         .btn-test:hover { background: var(--danger); color: white; }
 
         main { display: flex; flex: 1; overflow: hidden; position: relative; }
@@ -26,19 +25,25 @@
         .video-container { width: 100%; background: #000; aspect-ratio: 16/9; position: relative; }
         .video-container iframe { width: 100%; height: 100%; border: none; }
         .toggle-sidebar-btn { position: absolute; right: 0; top: 50%; transform: translateY(-50%); background: var(--accent); color: white; border: none; padding: 15px 8px; cursor: pointer; border-radius: 8px 0 0 8px; z-index: 50; }
+        
         .lesson-body { padding: 30px 40px; max-width: 1000px; }
         .nav-controls { display: flex; align-items: center; gap: 15px; margin: 25px 0; }
+        
         .sidebar { width: 380px; background: var(--sidebar); border-left: 1px solid var(--border); display: flex; flex-direction: column; }
         .sidebar.closed { width: 0; overflow: hidden; border-left: none; }
         .modules-wrapper { flex: 1; overflow-y: auto; }
         .module-item { border-bottom: 1px solid var(--border); }
         .module-btn { width: 100%; padding: 16px 20px; background: var(--panel); border: none; color: var(--text); display: flex; justify-content: space-between; cursor: pointer; font-size: 14px; font-weight: 600; text-align: left; }
+        
         .lessons-list { display: none; }
         .module-item.open .lessons-list { display: block; }
+        
         .lesson-item { padding: 15px 20px; display: flex; gap: 12px; cursor: pointer; font-size: 13px; border-bottom: 1px solid var(--border); align-items: center; }
         .lesson-item.active { background: #21262d; border-left: 4px solid var(--accent); }
         .lesson-item.completed span { color: var(--text-muted); text-decoration: line-through; }
-        .lesson-item.is-quiz { background: rgba(168, 85, 247, 0.05); color: var(--accent); font-weight: 700; border-top: 1px solid var(--border); }
+        
+        .lesson-item.is-quiz { background: rgba(168, 85, 247, 0.1); color: var(--accent); font-weight: 700; border-top: 1px solid var(--border); }
+
         .final-exam-area { padding: 20px; background: var(--panel); border-top: 2px solid var(--accent); }
         button { padding: 10px 18px; border-radius: 6px; cursor: pointer; border: 1px solid var(--border); background: var(--panel); color: var(--text); font-weight: 600; }
         .btn-accent { background: var(--accent); color: white; border: none; }
@@ -50,7 +55,7 @@
 <header>
     <div class="logo">✈️ MESTRE DAS <span>MILHAS</span></div>
     <div style="display: flex; align-items: center;">
-        <button class="btn-test" onclick="bypassProvas()">🧪 MOD TESTE (100%)</button>
+        <button class="btn-test" onclick="bypassElite()">🧪 MOD TESTE (AULAS + NOTAS 10)</button>
         <div id="prog-txt" style="font-size: 12px; background: var(--panel); padding: 5px 15px; border-radius: 20px; border: 1px solid var(--border);">0% Concluído</div>
     </div>
 </header>
@@ -62,19 +67,19 @@
             <button class="toggle-sidebar-btn" onclick="toggleSidebar()">❮</button>
         </div>
         <div class="lesson-body">
-            <h2 id="currentTitle">...</h2>
+            <h2 id="currentTitle">Carregando...</h2>
             <div class="nav-controls">
                 <button onclick="changeLesson(-1)" style="margin-left:auto">Anterior</button>
                 <button class="btn-accent" onclick="changeLesson(1)">Próxima Aula</button>
             </div>
-            <div id="currentDesc" style="color: var(--text-muted); line-height: 1.8; margin-top: 20px; background: var(--panel); padding: 20px; border-radius: 8px; border: 1px solid var(--border);"></div>
+            <div id="currentDesc"></div>
         </div>
     </div>
 
     <div class="sidebar" id="sidebar">
         <div class="modules-wrapper" id="moduleContainer"></div>
         <div class="final-exam-area">
-            <button class="btn-accent" style="width:100%" onclick="startFinal()" id="finalBtn" disabled>🎓 ATIVIDADE FINAL (BLOQUEADA)</button>
+            <button class="btn-accent" style="width:100%" onclick="window.location.href='/prova/final'" id="finalBtn" disabled>🎓 ATIVIDADE FINAL (BLOQUEADA)</button>
         </div>
     </div>
 </main>
@@ -134,7 +139,8 @@
     ];
 
     let current = { m: 0, l: 0 };
-    let progress = JSON.parse(localStorage.getItem('mm_progress')) || { lessons: {}, exams: {} };
+    // Progressão local para interface
+    let progress = JSON.parse(localStorage.getItem('mm_progress')) || { lessons: {}, exams: {1:0, 2:0, 3:0, 4:0, 5:0} };
 
     function init() {
         const container = document.getElementById('moduleContainer');
@@ -147,55 +153,31 @@
                 return `
                 <div class="lesson-item ${done ? 'completed' : ''}" id="les-${les.v}" onclick="play(${mIdx}, ${lIdx})">
                     <input type="checkbox" ${done ? 'checked' : ''} onclick="event.stopPropagation(); toggleLesson('${les.v}')">
-                    <span>${lIdx + 1}. ${les.t}</span>
+                    <span>${les.t}</span>
                 </div>`;
             }).join('');
-            div.innerHTML = `<button class="module-btn" onclick="this.parentElement.classList.toggle('open')">${mod.name}<span>▼</span></button>
-                             <div class="lessons-list">${lessonsHTML}<div class="lesson-item is-quiz" onclick="openExamFile(${mIdx})"><span>PROVA DO MÓDULO</span></div></div>`;
+            
+            div.innerHTML = `<button class="module-btn" onclick="this.parentElement.classList.toggle('open')">${mod.name} ▾</button>
+                             <div class="lessons-list">${lessonsHTML}
+                                <div class="lesson-item is-quiz" onclick="window.location.href='/prova/${mIdx+1}'">
+                                    <span>🏆 PROVA DO MÓDULO ${mIdx+1}</span>
+                                </div>
+                             </div>`;
             container.appendChild(div);
         });
         play(0, 0);
         updateProgressUI();
     }
 
-    /* FUNÇÃO DE BYPASS PARA TESTES */
-    async function bypassProvas() {
-        if(!confirm("Deseja marcar 100% de conclusão para testes?")) return;
+    async function bypassElite() {
+        if(!confirm("Ativar Modo Teste? Isso marcará progresso local, mas você ainda precisará ter as notas no Banco de Dados para liberar o servidor.")) return;
         
-        // 1. Marca todas as aulas no localStorage
         course.forEach(m => m.lessons.forEach(l => progress.lessons[l.v] = true));
+        // Nota: O bypass local libera o botão na UI, mas o servidor Tornado fará a checagem real no GET de /prova/final
         localStorage.setItem('mm_progress', JSON.stringify(progress));
         
-        // 2. Simula envio de notas 10 para o servidor via fetch (Ajuste a rota conforme seu backend)
-        for(let i=1; i<=5; i++) {
-            console.log(`Liberando Módulo ${i}...`);
-            // Aqui você dispararia um POST para seu backend salvar a nota no SQLite
-            // fetch('/api/salvar-nota', { method: 'POST', body: JSON.stringify({modulo: i, nota: 10}) });
-        }
-
-        alert("Modo Teste Ativado! Aulas concluídas. Verifique as notas no banco para liberar o botão final.");
+        alert("Modo Teste Local Ativado! Lembre-se que o acesso à Prova Final é validado pelo Servidor.");
         location.reload();
-    }
-
-    function toggleLesson(videoId) {
-        progress.lessons[videoId] = !progress.lessons[videoId];
-        localStorage.setItem('mm_progress', JSON.stringify(progress));
-        const el = document.getElementById(`les-${videoId}`);
-        if(el) el.classList.toggle('completed', progress.lessons[videoId]);
-        updateProgressUI();
-    }
-
-    function updateProgressUI() {
-        let total = 0, done = 0;
-        course.forEach(m => m.lessons.forEach(l => {
-            total++;
-            if(progress.lessons[l.v] === true) done++;
-        }));
-        const percent = Math.round((done / total) * 100);
-        document.getElementById('prog-txt').innerText = `${percent}% Concluído`;
-        const btn = document.getElementById('finalBtn');
-        btn.disabled = (percent < 100);
-        btn.innerText = (percent < 100) ? "🎓 ATIVIDADE FINAL (BLOQUEADA)" : "🚀 INICIAR ATIVIDADE FINAL";
     }
 
     function play(m, l) {
@@ -205,8 +187,26 @@
         document.getElementById('currentTitle').innerText = les.t;
         document.getElementById('currentDesc').innerText = les.d;
         document.querySelectorAll('.lesson-item').forEach(e => e.classList.remove('active'));
-        const activeEl = document.getElementById(`les-${les.v}`);
-        if(activeEl) activeEl.classList.add('active');
+        document.getElementById(`les-${les.v}`)?.classList.add('active');
+    }
+
+    function toggleLesson(videoId) {
+        progress.lessons[videoId] = !progress.lessons[videoId];
+        localStorage.setItem('mm_progress', JSON.stringify(progress));
+        updateProgressUI();
+        init();
+    }
+
+    function updateProgressUI() {
+        let total = 0, done = 0;
+        course.forEach(m => m.lessons.forEach(l => { total++; if(progress.lessons[l.v]) done++; }));
+        const percent = Math.round((done / total) * 100);
+        document.getElementById('prog-txt').innerText = `${percent}% Concluído`;
+        
+        // O botão final aponta para /prova/final que é controlado pelo ProvaFinalHandler no Python
+        const btn = document.getElementById('finalBtn');
+        btn.disabled = (percent < 100); 
+        btn.innerText = (percent < 100) ? "🎓 ATIVIDADE FINAL (BLOQUEADA)" : "🚀 ACESSAR PROVA FINAL";
     }
 
     function changeLesson(step) {
@@ -214,23 +214,12 @@
         if(course[current.m].lessons[next]) play(current.m, next);
     }
 
-    function openExamFile(mIdx) {
-        const allDone = course[mIdx].lessons.every(l => progress.lessons[l.v]);
-        if(!allDone) return alert("Conclua todas as aulas do módulo!");
-        window.location.href = `/prova/${mIdx + 1}`;
-    }
-
-    function startFinal() {
-        window.location.href = "/prova/final";
-    }
-
     function toggleSidebar() {
-        const sb = document.getElementById('sidebar');
-        sb.classList.toggle('closed');
-        document.querySelector('.toggle-sidebar-btn').innerText = sb.classList.contains('closed') ? '❯' : '❮';
+        document.getElementById('sidebar').classList.toggle('closed');
     }
 
     init();
 </script>
 </body>
 </html>
+

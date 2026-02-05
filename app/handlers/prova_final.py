@@ -19,7 +19,7 @@ class ProvaFinalHandler(tornado.web.RequestHandler):
             conn.row_factory = sqlite3.Row
             c = conn.cursor()
             
-            # Busca os resultados de todas as provas do usuário
+            # Busca os resultados das provas
             c.execute("""
                 SELECT modulo, MAX(nota) as maior_nota 
                 FROM provas_resultado 
@@ -27,30 +27,42 @@ class ProvaFinalHandler(tornado.web.RequestHandler):
                 GROUP BY modulo
             """, (user_id,))
             
-            resultados = {row['modulo']: row['maior_nota'] for row in c.fetchall()}
+            rows = c.fetchall()
+            resultados = {row['modulo']: row['maior_nota'] for row in rows}
             
-            # Verificação Profissional: Todos os 5 módulos precisam de nota >= 6
+            # Verificação de Módulos
             modulos_obrigatorios = [1, 2, 3, 4, 5]
-            aprovado_em_todos = all(resultados.get(m, 0) >= 6 for m in modulos_obrigatorios)
+            status_modulos = {m: resultados.get(m, 0) for m in modulos_obrigatorios}
+            aprovado_em_todos = all(nota >= 6 for nota in status_modulos.values())
+
+            # Log profissional no terminal para ajudar você a debugar
+            print(f"--- Verificação de Acesso (User ID: {user_id}) ---")
+            for m, nota in status_modulos.items():
+                print(f"Módulo {m}: Nota {nota}")
+            print(f"Aprovado: {'SIM' if aprovado_em_todos else 'NÃO'}")
+            print("-----------------------------------------------")
 
             if aprovado_em_todos:
-                # Libera a página da prova final
                 self.render("prova_final.html", resultados=resultados)
             else:
-                # Caso não tenha média, redireciona com mensagem de erro
-                self.write("<script>alert('Você precisa de nota mínima 6.0 em todos os módulos para liberar a Prova Final!'); window.location='/dashboard';</script>")
+                msg = "Você precisa de nota mínima 6.0 em todos os módulos!"
+                self.write(f"<script>alert('{msg}'); window.location='/curso';</script>")
 
     @tornado.web.authenticated
     def post(self):
-        # Lógica para processar o envio da prova final
-        nota_final = float(self.get_argument("nota_final", 0))
-        user_id = self.current_user
+        try:
+            nota_final = float(self.get_argument("nota_final", 0))
+            user_id = self.current_user
 
-        if nota_final >= 7.0: # Critério mais rigoroso para o certificado final
-            with sqlite3.connect(DB_PATH) as conn:
-                c = conn.cursor()
-                c.execute("UPDATE users SET certificado_fin = 1 WHERE id = ?", (user_id,))
-                conn.commit()
-            self.redirect("/certificado/final?download=true")
-        else:
-            self.write("<script>alert('Nota insuficiente na Prova Final. Estude mais e tente novamente!'); window.location='/prova/final';</script>")
+            if nota_final >= 7.0:
+                with sqlite3.connect(DB_PATH) as conn:
+                    c = conn.cursor()
+                    # Garante que a coluna certificado_fin existe ou atualiza o status
+                    c.execute("UPDATE users SET certificado_fin = 1 WHERE id = ?", (user_id,))
+                    conn.commit()
+                self.redirect("/certificado/final?download=true")
+            else:
+                self.write("<script>alert('Nota insuficiente na Prova Final!'); window.location='/prova_final';</script>")
+        except Exception as e:
+            print(f"Erro ao processar prova final: {e}")
+            self.write("Erro interno no servidor.")

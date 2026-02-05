@@ -1,12 +1,8 @@
-
-
-nome do arquivo: app/templates/prova_final.html
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Prova Final | Certificação em Milhas</title>
+<title>Prova Final | Certificação Master em Milhas</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 
@@ -47,7 +43,6 @@ body {
     position: relative;
 }
 
-/* Botão de Atalho para Teste */
 .btn-debug {
     position: absolute;
     top: 10px;
@@ -59,7 +54,7 @@ body {
     padding: 5px 10px;
     border-radius: 5px;
     cursor: pointer;
-    opacity: 0.5;
+    opacity: 0.3;
 }
 .btn-debug:hover { opacity: 1; background: #444; }
 
@@ -85,6 +80,7 @@ h2 {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     font-weight: 800;
+    margin-bottom: 5px;
 }
 
 .subtitle {
@@ -102,16 +98,17 @@ h2 {
     to { opacity: 1; transform: translateX(0); }
 }
 
-h4 { font-size: 1.2rem; margin-bottom: 20px; }
+h4 { font-size: 1.1rem; margin-bottom: 20px; line-height: 1.5; color: #f1d592; }
 
 .opcao {
-    padding: 18px;
-    border-radius: 14px;
+    padding: 16px;
+    border-radius: 12px;
     background: #1e1e1e;
     border: 1px solid var(--border);
     cursor: pointer;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     transition: var(--transition);
+    font-size: 0.95rem;
 }
 
 .opcao:hover {
@@ -155,16 +152,9 @@ h4 { font-size: 1.2rem; margin-bottom: 20px; }
     align-items: center;
     justify-content: center;
     margin: 0 auto 20px;
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 800;
     color: #d4af37;
-}
-
-.cert-list {
-    text-align: left;
-    display: inline-block;
-    margin: 20px 0;
-    line-height: 1.8;
 }
 
 #btnCertificado {
@@ -176,6 +166,7 @@ h4 { font-size: 1.2rem; margin-bottom: 20px; }
     border-radius: 14px;
     font-weight: 700;
     margin-top: 20px;
+    width: 100%;
 }
 </style>
 </head>
@@ -183,33 +174,34 @@ h4 { font-size: 1.2rem; margin-bottom: 20px; }
 <body>
 
 <div class="prova-container">
-    <button class="btn-debug" onclick="pularParaFinal()">TESTAR FINAL</button>
+    <button class="btn-debug" onclick="pularParaFinal()">MODO TESTE</button>
 
     <div class="progress-container">
         <div class="progress-bar" id="progress"></div>
     </div>
 
-    <h2>PROVA FINAL</h2>
-    <p class="subtitle">Certificação Completa em Milhas</p>
+    <h2>EXAME DE CERTIFICAÇÃO</h2>
+    <p class="subtitle">Nível Especialista: Você precisa de 80% de acerto (40/50)</p>
 
     <div id="quiz"></div>
 
-    <button class="btn-action" id="nextBtn">Próxima</button>
+    <button class="btn-action" id="nextBtn">Próxima Questão</button>
 
     <div id="resultado">
         <div class="score-circle" id="score"></div>
-        <p><strong>PROVA FINAL CONCLUÍDA</strong></p>
+        <p><strong id="statusFinal">ANALISANDO RESULTADO...</strong></p>
         
-        <div class="cert-list">
-            ✔ Fundamentos em CPM<br>
-            ✔ Cartões e Benefícios<br>
-            ✔ Acúmulo Estratégico<br>
-            ✔ Emissões Internacionais<br>
-            ✔ Milhas como Negócio
+        <div id="listaBeneficios" class="cert-list" style="display:none; margin: 20px 0; font-size: 0.9rem; color: #bbb;">
+            ✔ Registro de Especialista em Milhas<br>
+            ✔ Domínio de Emissões Internacionais<br>
+            ✔ Estrategista de Cashback e Pontos<br>
+            ✔ Operador Profissional de Arbitragem
         </div>
 
-        <a href="certificado_final.html" id="btnCertificado">GERAR CERTIFICADO</a>
-        <p id="msgReprovado" style="display:none; color: var(--wrong);">Você precisa de 40 acertos para gerar o certificado.</p>
+        <a href="/gerar_certificado_final" id="btnCertificado">EMITIR CERTIFICADO OFICIAL</a>
+        <p id="msgReprovado" style="display:none; color: var(--wrong); margin-top: 20px;">
+            Infelizmente você não atingiu a nota mínima. Estude os módulos novamente e tente em 24h.
+        </p>
     </div>
 </div>
 
@@ -219,56 +211,69 @@ let atual = 0;
 let acertos = 0;
 
 const perguntas = [
-    ["O que significa CPM?", ["Custo por Milha", "Crédito por Milha", "Custo por Mil", "Compra por Milha"], 0],
-    ["Para que serve o cálculo de CPM?", ["Gerar milhas grátis", "Cancelar cartões", "Avaliar custo-benefício", "Aumentar limite"], 2],
-    ["O que é um milheiro?", ["10.000 milhas", "1000 milhas", "100 milhas", "1 milha"], 1],
-    ["CPM baixo indica:", ["Mau negócio", "Promoção inválida", "Erro do banco", "Boa oportunidade"], 3],
-    ["Livelo e Esfera são:", ["Programas de pontos", "Companhias aéreas", "Cartões premium", "Bancos digitais"], 0],
-    ["Alertas técnicos servem para:", ["Cancelar voos", "Bloquear contas", "Identificar oportunidades", "Evitar impostos"], 2],
-    ["Primeiro acúmulo deve ser:", ["Forçado", "Planejado", "Impulsivo", "Automático"], 1],
-    ["Cias aéreas são responsáveis por:", ["Programas de milhas", "Cartões de crédito", "Cashback", "Financiamentos"], 0],
-    ["Visão geral do mercado ajuda a:", ["Gastar mais", "Perder pontos", "Evitar cartões", "Tomar decisões melhores"], 3],
-    ["CPM alto geralmente é:", ["Excelente", "Irrelevante", "Desvantajoso", "Obrigatório"], 2],
-    ["Ranking de cartões serve para:", ["Cancelar cartões", "Comparar benefícios", "Bloquear limite", "Gerar milhas"], 1],
-    ["Zerar anuidade significa:", ["Não pagar taxa anual", "Cancelar o cartão", "Reduzir limite", "Perder benefícios"], 0],
-    ["Salas VIP oferecem:", ["Cashback", "Seguro viagem", "Milhas dobradas", "Conforto e serviços"], 3],
-    ["Seguros gratuitos vêm geralmente de:", ["Programas de milhas", "Companhias aéreas", "Cartões de crédito", "Bancos centrais"], 2],
-    ["Cooperativas financeiras oferecem:", ["Hotéis", "Cartões e benefícios", "Voos internacionais", "Programas de milhas"], 1],
-    ["Upgrade de limite pode gerar:", ["Mais acúmulo", "Menos pontos", "Bloqueio do cartão", "Perda de benefícios"], 0],
-    ["Spread zero significa:", ["Sem IOF", "Sem limite", "Sem anuidade", "Sem taxa cambial"], 3],
-    ["Proteção de preço garante:", ["Upgrade automático", "Reembolso da diferença", "Milhas em dobro", "Isenção de taxas"], 1],
-    ["Cartões de alta renda geralmente:", ["Não pontuam", "Expiram pontos", "Pontuam mais", "Pontuam menos"], 2],
-    ["Benefícios dependem principalmente:", ["Do cartão", "Do CPF", "Do aeroporto", "Da companhia aérea"], 0],
-    ["Compra 10x1 significa:", ["Parcelamento", "Cashback", "Pontos multiplicados", "Desconto"], 2],
-    ["Compra de pontos deve ser:", ["Sempre evitada", "Planejada", "Obrigatória", "Aleatória"], 1],
-    ["Bônus de 100% significa:", ["Sem bônus", "Bônus parcial", "Metade dos pontos", "Dobro de pontos"], 3],
-    ["Clubes de milhas oferecem:", ["Acúmulo mensal", "Cancelamento de pontos", "Isenção total", "Voos grátis"], 0],
-    ["Milhas no tanque se refere a:", ["Hotéis", "Aeroportos", "Postos de combustível", "Restaurantes"], 2],
-    ["Parceiros varejo geram:", ["Impostos", "Pontos e milhas", "Multas", "Bloqueios"], 1],
-    ["Gestão de CPFs serve para:", ["Cancelamento", "Fraude", "Bloqueio", "Organização estratégica"], 3],
-    ["Datas sazonais afetam:", ["Promoções e preços", "CPF", "Limite", "Validade do cartão"], 0],
-    ["Giro de boletos é usado para:", ["Cancelar dívidas", "Bloquear limite", "Gerar pontos", "Evitar impostos"], 2],
-    ["Acúmulo estratégico evita:", ["Viagens", "Desperdício de milhas", "Benefícios", "Pontuação"], 1],
-    ["Tabela fixa significa:", ["Preço variável", "Promoção sazonal", "Erro do sistema", "Valor fixo em milhas"], 3],
-    ["Classe executiva oferece:", ["Mais conforto", "Menos bagagem", "Menos pontos", "Menor custo"], 0],
-    ["Stopover é:", ["Cancelamento", "Multa", "Parada prolongada", "Upgrade"], 2],
-    ["Iberia Plus é:", ["Banco", "Programa de milhas", "Cartão", "Seguro"], 1],
-    ["Regras de CPF servem para:", ["Ganhar bônus", "Evitar taxas", "Bloquear contas", "Controle e segurança"], 3],
-    ["Destinos EUA exigem atenção a:", ["Taxas e regras", "Milhas expiradas", "CPF", "Promoções"], 0],
-    ["Taxas de combustível são:", ["Milhas bônus", "Descontos", "Cobranças extras", "Isenções"], 2],
-    ["ALL Accor é programa de:", ["Companhias aéreas", "Hotéis", "Bancos", "Cartões"], 1],
-    ["Emissão internacional utiliza:", ["Pix", "Boleto", "Dinheiro físico", "Milhas"], 3],
-    ["Planejamento na emissão reduz:", ["Custos", "Conforto", "Benefícios", "Pontuação"], 0],
-    ["Questão extra 1?", ["Errada", "Certa", "Errada", "Errada"], 1],
-    ["Questão extra 2?", ["Errada", "Errada", "Certa", "Errada"], 2],
-    ["Questão extra 3?", ["Certa", "Errada", "Errada", "Errada"], 0],
-    ["Questão extra 4?", ["Errada", "Errada", "Errada", "Certa"], 3],
-    ["Questão extra 5?", ["Errada", "Certa", "Errada", "Errada"], 1],
-    ["Questão extra 6?", ["Errada", "Errada", "Certa", "Errada"], 2],
-    ["Questão extra 7?", ["Certa", "Errada", "Errada", "Errada"], 0],
-    ["Questão extra 8?", ["Errada", "Errada", "Errada", "Certa"], 3],
-    ["Questão extra 9?", ["Errada", "Certa", "Errada", "Errada"], 1],
-    ["Questão extra 10?", ["Errada", "Errada", "Certa", "Errada"], 2]
+    // --- FUNDAMENTOS E CPM ---
+    ["No cálculo de CPM, se você compra 100k pontos por R$ 3.500 e recebe 100% de bônus, qual o seu CPM real?", ["R$ 35,00", "R$ 17,50", "R$ 70,00", "R$ 21,00"], 1],
+    ["Qual a diferença técnica entre Pontos e Milhas?", ["Nenhuma, são sinônimos", "Pontos são de bancos, milhas de companhias aéreas", "Pontos nunca expiram, milhas sim", "Milhas valem mais que pontos"], 1],
+    ["Ao analisar um milheiro (1.000 milhas), o que define se a emissão é vantajosa?", ["O valor total das taxas", "O CPM da milha vs o valor da passagem em dinheiro", "A quantidade de conexões", "O modelo da aeronave"], 1],
+    ["O 'Spread' bancário em compras internacionais incide sobre:", ["Apenas o IOF", "A cotação do dólar oficial (PTAX)", "O limite do cartão", "A anuidade"], 1],
+    ["Qual o risco principal de manter milhas paradas na conta por muito tempo?", ["Taxa de custódia", "Desvalorização inflacionária (tabelas sobem)", "Bloqueio do CPF", "Perda de benefícios do cartão"], 1],
+
+    // --- CARTÕES E BENEFÍCIOS ---
+    ["O benefício 'Proteção de Preço' da Visa é válido para qual categoria?", ["Apenas Infinite", "Apenas Platinum", "Gold e Platinum", "Todas as categorias"], 2],
+    ["O que caracteriza um cartão de crédito como 'Co-branded'?", ["Cartão que não cobra anuidade", "Parceria entre banco e uma marca (ex: Azul Itaú)", "Cartão que aceita qualquer bandeira", "Cartão exclusivo para PJ"], 1],
+    ["O acesso às Salas VIP via 'LoungeKey' é sempre gratuito?", ["Sim, para qualquer cartão Black", "Não, depende da política específica do banco emissor", "Sim, apenas no exterior", "Sim, se o cartão for Infinite"], 1],
+    ["A regra de 'Giro de Carteira' serve para:", ["Aumentar o score de crédito", "Gerar pontos com gastos orgânicos", "Evitar o bloqueio do cartão por inatividade", "Isentar a anuidade por média de gastos"], 3],
+    ["Qual bandeira é conhecida pelo benefício 'Pague 1 Leve 2' em cinemas e parceiros no Brasil?", ["Visa", "Mastercard (Surpreenda)", "Elo", "Amex"], 1],
+
+    // --- ACÚMULO ESTRATÉGICO ---
+    ["Em uma promoção de 'Compra Bonificada' de 10 pontos por Real, o que é essencial verificar no regulamento?", ["A cor do produto", "Se o bônus é apenas para produtos vendidos e entregues pelo parceiro", "O limite de parcelas", "O nome do entregador"], 1],
+    ["Qual o objetivo de assinar um Clube de Pontos (ex: Clube Livelo)?", ["Apenas ganhar pontos extras", "Garantir acesso a promoções de transferência com bônus maior", "Ter desconto na fatura", "Poder sacar dinheiro no caixa"], 1],
+    ["Ao transferir pontos para a Smiles com 100% de bônus, meus 50k pontos Livelo viram quanto no destino?", ["50.000 milhas", "150.000 milhas", "100.000 milhas", "75.000 milhas"], 2],
+    ["O que significa 'Stacking' no mundo das milhas?", ["Cancelar vários cartões de uma vez", "Empilhar promoções (ex: Cupom + Compra Bonificada + Cartão)", "Usar apenas um cartão para tudo", "Vender milhas para várias empresas"], 1],
+    ["Postos de combustível (Ipiranga/Shell) são boas fontes de acúmulo quando:", ["O preço do combustível é o mais caro", "Há promoções de transferência bonificada para cias aéreas", "Você paga com dinheiro físico", "Sempre, independente da taxa de transferência"], 1],
+
+    // --- EMISSÕES E TABELAS ---
+    ["O que é uma 'Tabela Fixa' em programas de fidelidade?", ["Um valor que nunca muda, independente da data", "O preço da anuidade do cartão", "A taxa de embarque fixa", "O valor do dólar no dia"], 0],
+    ["Qual programa é famoso por permitir emissões com parceiros mundiais usando Tabela Fixa?", ["Smiles", "TudoAzul", "Interline (Iberia/TAP)", "Livelo"], 2],
+    ["O termo 'Stopover' permite que o passageiro:", ["Cancele a viagem sem custos", "Fique alguns dias em uma cidade de conexão sem pagar a mais", "Leve bagagem extra grátis", "Troque de classe no portão de embarque"], 1],
+    ["O que é a 'Tarifa Award'?", ["Passagem comprada com dinheiro", "Emissão com milhas em assentos específicos disponibilizados pela cia", "Taxa paga para entrar na sala VIP", "Premiação de funcionário do mês"], 1],
+    ["Ao emitir para os EUA com milhas, qual taxa costuma ser a mais agressiva em certas cias europeias?", ["Taxa de embarque", "Taxa de combustível (YQ)", "Taxa de emissão", "IOF"], 1],
+
+    // --- REGRAS E SEGURANÇA ---
+    ["A 'Regra dos 25 CPFs' na Smiles limita o quê?", ["O número de milhas que você pode ter", "A quantidade de pessoas diferentes para quem você pode emitir passagens", "O número de cartões cadastrados", "As transferências do banco"], 1],
+    ["O que pode causar o 'Shadow Ban' ou bloqueio de conta em programas de pontos?", ["Comprar passagens demais", "Uso excessivo de ferramentas de automação e robôs", "Esquecer a senha", "Ter dois cartões de bancos diferentes"], 1],
+    ["O 'Upgrade de Cabine' com milhas é garantido?", ["Sim, se você tiver as milhas", "Não, depende de disponibilidade e classe tarifária original", "Sim, se o voo for internacional", "Apenas para quem tem cartão Black"], 1],
+    ["Qual a validade padrão de pontos transferidos em promoções bonificadas (geralmente)?", ["Vitalícios", "6 meses a 2 anos", "10 anos", "1 mês"], 1],
+    ["O programa ALL Accor é focado em qual tipo de acúmulo/resgate?", ["Passagens aéreas", "Hospedagens e experiências em hotéis", "Aluguel de carros", "Cruzeiros"], 1],
+
+    // --- INTERMEDIÁRIO/AVANÇADO ---
+    ["A estratégia de 'Carrinho de Compras' na Livelo serve para:", ["Comprar produtos mais baratos", "Comprar milhas com desconto indireto em transferências", "Organizar a lista de desejos", "Evitar pagar anuidade"], 1],
+    ["Qual o impacto do 'Dólar Cartão' no acúmulo de pontos?", ["Nenhum, pontos são por Real", "Geralmente é maior que o comercial, encarecendo o ponto", "É menor que o oficial, ajudando o viajante", "Define o valor da milha Smiles"], 1],
+    ["O 'Seguro Proteção de Compra' protege contra:", ["Arrependimento da compra", "Roubo ou dano acidental em até 45-90 dias", "Aumento de preço no mês seguinte", "Atraso na entrega"], 1],
+    ["Emissões 'Open Jaw' são aquelas onde:", ["O passageiro volta de um aeroporto diferente do que chegou", "O passageiro viaja com a boca aberta", "O voo não tem conexões", "A passagem é só de ida"], 0],
+    ["Qual a principal vantagem da 'Tabela Interline' da TudoAzul?", ["Voar apenas dentro do Brasil", "Emitir passagens em cias parceiras (ex: TAP, United) com pontos Azul", "Ganhar cashback na fatura", "Isenção total de taxas de embarque"], 1],
+
+    // --- CENÁRIOS PRÁTICOS (QUESTÕES 31-50) ---
+    ["Se uma passagem custa R$ 2.000 ou 100k milhas, e seu CPM é R$ 15,00. O que é melhor?", ["Pagar em dinheiro", "Usar milhas (Custo real R$ 1.500)", "Não viajar", "Esperar o preço baixar"], 1],
+    ["Para quem busca Classe Executiva para Europa, qual programa costuma ter o melhor custo-benefício via parceiros?", ["TAP Miles&Go", "Smiles", "Latam Pass", "Livelo Shop"], 0],
+    ["O 'Acompanhante Grátis' (Companion Pass) é um benefício de qual cartão no Brasil?", ["Santander Unlimited", "Azul Itaú Visa Infinite", "Bradesco Prime", "Inter Black"], 1],
+    ["O que acontece se você transferir pontos de uma conta CPF 'A' para uma conta de milhas CPF 'B'?", ["Os pontos dobram", "A transação é bloqueada ou cobrada como transferência entre contas", "Os pontos chegam normalmente sem custo", "O cartão é cancelado"], 1],
+    ["Qual a melhor época para vender milhas nas plataformas?", ["Janeiro (baixa procura)", "Meses antes de períodos de alta temporada (férias/feriados)", "Qualquer dia, o preço é fixo", "Quando o dólar cai"], 1],
+    ["A estratégia de 'Pagar Boletos com Cartão' ainda é amplamente vantajosa?", ["Sim, sempre", "Não, as taxas dos apps costumam ser maiores que o valor dos pontos gerados", "Sim, apenas para boletos de impostos", "Sim, se o boleto for acima de 10k"], 1],
+    ["Qual categoria na Latam Pass oferece o benefício de 'Cupons de Upgrade'?", ["Todas", "Apenas categorias Elite (Gold, Platinum, Black)", "Nenhuma, upgrade é só com milhas", "Apenas para quem paga anuidade"], 1],
+    ["O 'Certificado de Operador de Milhas' permite:", ["Trabalhar na Receita Federal", "Executar estratégias avançadas de acúmulo e emissão com segurança", "Viajar sem passaporte", "Ter limite infinito"], 1],
+    ["O benefício 'Atraso de Bagagem' dos cartões Visa/Mastercard garante:", ["Uma mala nova", "Reembolso para despesas essenciais durante o atraso", "Milhas em dobro no voo", "Upgrade para executiva"], 1],
+    ["O que é o 'Status Match'?", ["Quando dois programas de milhas se fundem", "Quando uma cia aérea reconhece seu nível elite de outra cia parceira", "Quando o preço da milha iguala ao do banco", "Um tipo de seguro viagem"], 1],
+    ["A 'Taxa de Emissão' em voos com milhas é obrigatória em:", ["Qualquer voo", "Varia conforme o programa e o canal (online vs call center)", "Nunca é cobrada", "Apenas para bebês"], 1],
+    ["O programa 'Esfera' pertence a qual banco?", ["Bradesco", "Santander", "Itaú", "Banco do Brasil"], 1],
+    ["A Smiles pertence a qual grupo?", ["Latam", "GOL", "Azul", "TAP"], 1],
+    ["Para voar com a Qatar Airways (eleita melhor do mundo), qual milha brasileira é mais fácil de usar?", ["Azul", "Latam Pass ou Smiles (via parceiros)", "Livelo", "Esfera"], 1],
+    ["O limite de '5 beneficiários' na Latam Pass reinicia quando?", ["Todo dia 1º", "A cada 12 meses após a primeira emissão", "Nunca, é pra sempre", "Quando você cancela o cartão"], 1],
+    ["O acúmulo 'Orgânico' é aquele que vem de:", ["Compras de pontos", "Gastos do dia a dia no cartão de crédito", "Transferências bonificadas", "Bônus de assinatura"], 1],
+    ["Qual ferramenta é essencial para buscar disponibilidade em Tabela Fixa?", ["Calculadora do celular", "Sites das próprias cias ou ferramentas de busca de aliança (ex: ExpertFlyer)", "Instagram de milhas", "Chat do banco"], 1],
+    ["O 'Valor de Mercado' da milha Smiles hoje gira em torno de:", ["R$ 70,00", "R$ 14,00 a R$ 18,00", "R$ 35,00", "R$ 5,00"], 1],
+    ["Ao assinar o Clube Livelo 20.000, o foco principal é:", ["Gastar os pontos na loja Livelo", "Gerar estoque de pontos para transferências estratégicas", "Ganhar cashback", "Isentar o cartão de crédito"], 1],
+    ["A mentalidade do 'Mestre das Milhas' foca em:", ["Gastar o máximo possível", "Transformar gastos obrigatórios em viagens e lucro através de estratégia", "Ter o maior número de cartões", "Vender milhas para amigos"], 1]
 ];
 
 const quiz = document.getElementById("quiz");
@@ -311,31 +316,32 @@ function selecionar(el, i, correta) {
 nextBtn.onclick = () => {
     atual++;
     nextBtn.style.display = "none";
-
     if (atual < perguntas.length) {
         renderQuestao();
     } else {
-        finalizarProva();
+        finalizar();
     }
 };
 
-function finalizarProva() {
+function finalizar() {
     quiz.style.display = "none";
     document.getElementById("resultado").style.display = "block";
     document.getElementById("score").textContent = `${acertos}/${perguntas.length}`;
     progress.style.width = "100%";
 
     if (acertos >= NOTA_MINIMA) {
-        document.getElementById("btnCertificado").style.display = "inline-block";
+        document.getElementById("statusFinal").textContent = "🚀 PARABÉNS, ESPECIALISTA!";
+        document.getElementById("btnCertificado").style.display = "block";
+        document.getElementById("listaBeneficios").style.display = "block";
     } else {
+        document.getElementById("statusFinal").textContent = "❌ REPROVADO";
         document.getElementById("msgReprovado").style.display = "block";
     }
 }
 
-// FUNÇÃO DE TESTE: Pula para a pergunta 49 com 48 acertos
 function pularParaFinal() {
-    atual = 48; 
-    acertos = 48;
+    atual = 49;
+    acertos = 42;
     renderQuestao();
 }
 
