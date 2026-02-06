@@ -3,11 +3,13 @@ import sqlite3
 import os
 from datetime import datetime
 
+# Configuração de caminhos baseada na estrutura do projeto
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 DB_PATH = os.path.join(BASE_DIR, "usuarios.db")
 
 def conectar():
-    conn = sqlite3.connect(DB_PATH); conn.row_factory = sqlite3.Row
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
     return conn
 
 class ProvaHandler(tornado.web.RequestHandler):
@@ -20,7 +22,7 @@ class ProvaHandler(tornado.web.RequestHandler):
         user_id = self.current_user
         mod = int(modulo)
         
-        # --- TRAVA DE SEGURANÇA: Impede pular módulos via URL ---
+        # --- TRAVA DE SEGURANÇA ---
         if mod > 1:
             conn = conectar()
             anterior = conn.execute("SELECT nota FROM provas_resultado WHERE user_id = ? AND modulo = ?", (user_id, mod-1)).fetchone()
@@ -38,7 +40,8 @@ class ProvaHandler(tornado.web.RequestHandler):
 
     @tornado.web.authenticated
     def post(self, modulo):
-        user_id = self.current_user; mod = int(modulo)
+        user_id = self.current_user
+        mod = int(modulo)
         
         gabaritos = {
             1: {"q1":"b","q2":"b","q3":"c","q4":"a","q5":"b","q6":"d","q7":"a","q8":"c","q9":"a","q10":"d"},
@@ -64,22 +67,21 @@ class ProvaHandler(tornado.web.RequestHandler):
             return
 
         agora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        conn = conectar(); c = conn.cursor()
+        conn = conectar()
+        c = conn.cursor()
         
         # Salva o resultado
         c.execute("INSERT INTO provas_resultado (user_id, modulo, nota, data) VALUES (?, ?, ?, ?)", (user_id, mod, float(acertos), agora))
         
-        # Se for a PROVA 5 ou 6, atualiza o fim_modulo5 para liberar o certificado master
+        # Se for a PROVA 5 ou 6, libera o certificado final
         if mod >= 5:
             c.execute("UPDATE users SET fim_modulo5 = ? WHERE id = ?", (agora, user_id))
         
-        conn.commit(); conn.close()
+        conn.commit()
+        conn.close()
 
-        # --- LÓGICA DE REDIRECIONAMENTO ---
+        # Redirecionamento dinâmico conforme o módulo
         if mod == 6:
-            # Se terminou a PROVA FINAL (master), vai para o certificado completo
-            self.redirect("/gerar_certificado_final?download=1")
+            self.redirect("/certificado/6?download=1")
         else:
-            # Se for apenas um módulo (1, 2, 3, 4), volta para o curso com mensagem de sucesso
-            # (Ou você pode criar uma página simples de 'Parabéns' para cada módulo)
-            self.write(f"<script>alert('Parabéns! Você concluiu o Módulo {mod}.'); window.location='/curso';</script>")
+            self.redirect(f"/certificado/{mod}?download=1")

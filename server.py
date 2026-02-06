@@ -1,14 +1,11 @@
-
-#ARRUMAR O BUG QUE TEM QUE QUANDO A PESSOA GERA O CERTIFICADO QUE N SEJA O FINAL (DOS MODULOS 1 2 3 ETC, ) A PESSOA GERA O CERTIFIADO_FINAL ARRUMAR ISSO, PARA QUE GERE OS CERTIFICAODS DOS OUTROS MODULOS
-
-
 import os
 import sqlite3
 import tornado.web
 import tornado.ioloop
 from datetime import datetime   
 
-# Importações dos seus handlers (Certifique-se que os caminhos estão corretos)
+# Handlers do Usuário
+from app.handlers.prova_final import ProvaFinalHandler
 from app.handlers.sobre import Sobre
 from app.handlers.login import LoginHandler, LogoutHandler, GoogleLoginHandler
 from app.handlers.curso import CursoHandler
@@ -20,10 +17,10 @@ from app.handlers.prova import ProvaHandler
 from app.handlers.recuperacao import RecuperacaoHandler
 from app.handlers.pagamento_mensal import PagamentoMensalPage, CriarPagamentoHandler, WebhookHandler
 
-# Importação do Gerador Profissional (admin_tools.py)
+from app.handlers.certificado import CertificadoViewHandler, CertificadoPDFHandler
 from app.utils.admin_tools import (
-    LoginDevHandler, AlterarStatusHandler, AlterarSenhaHandler,
-    ResetarSenhaHandler, DeletarUsuarioHandler, BuscarUsuarioHandler,
+    LoginDevHandler, AlterarStatusHandler, 
+    BuscarUsuarioHandler,
     ForcarNotasHandler, ComprasHandler, GerarCertificadoHandler, 
     criar_tabela, criar_usuario_admin_se_nao_existe
 )
@@ -45,7 +42,6 @@ def make_app():
         cookie_secret=TORNADO_COOKIE_SECRET,
         login_url="/login",
         xsrf_cookies=False,
-        # Estrutura corrigida para evitar KeyError: 'google_oauth'
         google_oauth={
             "key": GOOGLE_CLIENT_ID, 
             "secret": GOOGLE_CLIENT_SECRET
@@ -53,31 +49,31 @@ def make_app():
     )
     
     return tornado.web.Application([
-        # --- NAVEGAÇÃO BÁSICA ---
+        # --- NAVEGAÇÃO E AUTENTICAÇÃO ---
         (r"/", LoginHandler),
         (r"/login", LoginHandler),
         (r"/logout", LogoutHandler),
-        (r"/sobre", Sobre),
-        (r"/curso", CursoHandler),
+        (r"/auth/google", GoogleLoginHandler),
         (r"/criar_conta", CriarContaHandler),
         (r"/recuperar_senha", RecuperarSenhaHandler),
-        (r"/auth/google", GoogleLoginHandler),
+        
+        # --- CONTEÚDO E CURSO ---
+        (r"/sobre", Sobre),
+        (r"/curso", CursoHandler),
         (r"/submit", SubmitCodeHandler),
         (r"/pagamento", PagamentoMensalPage),
         
         # --- PROVAS E RECUPERAÇÃO ---
         (r"/prova/([0-9]+)", ProvaHandler),
         (r"/recuperacao/([0-9]+)", RecuperacaoHandler),
+        (r"/prova_final", ProvaFinalHandler),
 
-        # --- SISTEMA DE CERTIFICADOS UNIFICADO ---
-        # Esta rota aceita o ID (1-5 para módulos, 6 para final)
-        # O GerarCertificadoHandler decide se renderiza o HTML simples ou o PDF Luxuoso
+        # --- SISTEMA DE CERTIFICADOS (CORRIGIDO) ---
+        # Captura o ID do módulo (1 a 5) ou 6 para o Final
         (r"/certificado/([0-9]+)", GerarCertificadoHandler),
-        (r"/gerar_certificado_final", GerarCertificadoHandler),
+(r"/certificado/([0-9]+)", CertificadoViewHandler),
+(r"/certificado/pdf/([0-9]+)", CertificadoPDFHandler),
 
-        # --- PAINEL ADMINISTRATIVO ---
-
-            (r"/login_dev", LoginDevHandler),
         (r"/admin/buscar_usuario", BuscarUsuarioHandler),
         (r"/admin/forcar_notas", ForcarNotasHandler),
         (r"/admin/alterar_status", AlterarStatusHandler),
@@ -85,7 +81,6 @@ def make_app():
     ], **settings)
 
 if __name__ == "__main__":
-    # Inicialização do Banco de Dados
     try:
         criar_tabela()
         criar_usuario_admin_se_nao_existe()
@@ -93,10 +88,11 @@ if __name__ == "__main__":
         print(f"Erro ao iniciar DB: {e}")
 
     app = make_app()
-    port = 8080
+    port = 8080 
     app.listen(port)
-    print(f"🚀 Sistema Mestre das Milhas Online: http://localhost:{port}")
-    print(f"🛡️ Segurança de URL Ativada: IDs manuais serão validados via Cookie.")
+    
+    print(f"\n🚀 Servidor Online: http://localhost:{port}")
+    print(f"📌 Certificados: Utilize /certificado/ID (Ex: /certificado/1 para Módulo 1)")
+    print(f"🔑 Admin: http://localhost:{port}/login_dev\n")
+
     tornado.ioloop.IOLoop.current().start()
-
-
