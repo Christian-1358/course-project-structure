@@ -227,10 +227,13 @@ input:focus { border-color:#d4af37; box-shadow:0 0 0 2px rgba(212,175,55,0.25); 
         <h1>A estratégia que transforma milhas em <span>lucro real.</span></h1>
         <p>Aprenda a acumular milhões de milhas todos os meses, acessar as melhores salas VIP do mundo e viajar com luxo gastando quase zero.</p>
         
-        <a href="#conteudo" class="cta-button">
-            QUERO COMEÇAR AGORA
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </a>
+       <a href="javascript:void(0)" class="cta-button" onclick="irParaPagamento()">
+    QUERO COMEÇAR AGORA
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+    </svg>
+</a>
+
     </div>
 
     <div class="hero-visual">
@@ -320,6 +323,10 @@ form.addEventListener("submit", function(e){
         window.location.href="/login_dev";
     }
 });
+
+function irParaPagamento() {
+    window.location.href = "/pagamento.html";
+}
 </script>
 
 </body>

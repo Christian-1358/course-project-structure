@@ -1,33 +1,29 @@
 import sqlite3
+import os
 
-conn = sqlite3.connect("curso.db")
-c = conn.cursor()
+DB_PATH = os.path.join(os.path.dirname(__file__), "usuarios.db")
 
-# USUÁRIOS
-c.execute("""
-ALTER TABLE users ADD COLUMN inicio_curso TEXT;
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT UNIQUE,
-    password TEXT,
-    ativo INTEGER DEFAULT 1,
-    inicio_curso TEXT,
-    fim_modulo1 TEXT
-)
-""")
+def conectar():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
 
-# PROVAS
-c.execute("""
-CREATE TABLE IF NOT EXISTS provas (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
-    modulo INTEGER NOT NULL,
-    nota REAL NOT NULL,
-    aprovado INTEGER NOT NULL,
-    data_prova TEXT NOT NULL
-)
-""")
+def marcar_como_pago(user_id):
+    conn = conectar()
+    c = conn.cursor()
+    c.execute("""
+        UPDATE users
+        SET pago = 1,
+            inicio_curso = datetime('now')
+        WHERE id = ?
+    """, (user_id,))
+    conn.commit()
+    conn.close()
 
-conn.commit()
-conn.close()
-
-print("Banco criado com sucesso.")
+def usuario_pagou(user_id):
+    conn = conectar()
+    c = conn.cursor()
+    c.execute("SELECT pago FROM users WHERE id = ?", (user_id,))
+    r = c.fetchone()
+    conn.close()
+    return r and r["pago"] == 1

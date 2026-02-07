@@ -48,6 +48,10 @@
         button { padding: 10px 18px; border-radius: 6px; cursor: pointer; border: 1px solid var(--border); background: var(--panel); color: var(--text); font-weight: 600; }
         .btn-accent { background: var(--accent); color: white; border: none; }
         .btn-accent:disabled { background: #333; cursor: not-allowed; opacity: 0.5; }
+        
+        /* Novo estilo para links */
+        .video-link-btn { font-size: 12px; color: var(--accent); text-decoration: none; display: inline-flex; align-items: center; gap: 5px; margin-top: 10px; cursor: pointer; }
+        .video-link-btn:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -68,7 +72,7 @@
         </div>
         <div class="lesson-body">
             <h2 id="currentTitle">Carregando...</h2>
-            <div class="nav-controls">
+            <div id="videoExternalLink"></div> <div class="nav-controls">
                 <button onclick="changeLesson(-1)" style="margin-left:auto">Anterior</button>
                 <button class="btn-accent" onclick="changeLesson(1)">Próxima Aula</button>
             </div>
@@ -139,7 +143,6 @@
     ];
 
     let current = { m: 0, l: 0 };
-    // Progressão local para interface
     let progress = JSON.parse(localStorage.getItem('mm_progress')) || { lessons: {}, exams: {1:0, 2:0, 3:0, 4:0, 5:0} };
 
     function init() {
@@ -170,22 +173,26 @@
     }
 
     async function bypassElite() {
-        if(!confirm("Ativar Modo Teste? Isso marcará progresso local, mas você ainda precisará ter as notas no Banco de Dados para liberar o servidor.")) return;
-        
+        if(!confirm("Ativar Modo Teste?")) return;
         course.forEach(m => m.lessons.forEach(l => progress.lessons[l.v] = true));
-        // Nota: O bypass local libera o botão na UI, mas o servidor Tornado fará a checagem real no GET de /prova/final
         localStorage.setItem('mm_progress', JSON.stringify(progress));
-        
-        alert("Modo Teste Local Ativado! Lembre-se que o acesso à Prova Final é validado pelo Servidor.");
         location.reload();
     }
 
     function play(m, l) {
         current = { m, l };
         const les = course[m].lessons[l];
+        
+        // Atualiza Iframe
         document.getElementById('mainPlayer').src = `https://www.youtube.com/embed/${les.v}?autoplay=1`;
         document.getElementById('currentTitle').innerText = les.t;
         document.getElementById('currentDesc').innerText = les.d;
+        
+        // Atualiza Link do Vídeo (JS Dinâmico)
+        const linkContainer = document.getElementById('videoExternalLink');
+        const youtubeUrl = `https://www.youtube.com/watch?v=${les.v}`;
+        linkContainer.innerHTML = `<a href="${youtubeUrl}" target="_blank" class="video-link-btn">🔗 Abrir no YouTube</a>`;
+
         document.querySelectorAll('.lesson-item').forEach(e => e.classList.remove('active'));
         document.getElementById(`les-${les.v}`)?.classList.add('active');
     }
@@ -203,7 +210,6 @@
         const percent = Math.round((done / total) * 100);
         document.getElementById('prog-txt').innerText = `${percent}% Concluído`;
         
-        // O botão final aponta para /prova/final que é controlado pelo ProvaFinalHandler no Python
         const btn = document.getElementById('finalBtn');
         btn.disabled = (percent < 100); 
         btn.innerText = (percent < 100) ? "🎓 ATIVIDADE FINAL (BLOQUEADA)" : "🚀 ACESSAR PROVA FINAL";
@@ -222,4 +228,3 @@
 </script>
 </body>
 </html>
-

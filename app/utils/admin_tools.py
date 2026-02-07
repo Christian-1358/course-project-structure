@@ -1,5 +1,5 @@
-import sqlite3
 import os
+import sqlite3
 import hashlib
 import tornado.web
 import json
@@ -9,7 +9,6 @@ from io import BytesIO
 from weasyprint import HTML
 
 # ------------------ CONFIGURAÇÃO DE BANCO ------------------
-# Localiza o banco de dados na raiz do projeto
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 DB = os.path.join(BASE_DIR, "usuarios.db")
 
@@ -21,8 +20,7 @@ def conectar():
 def hash_senha(text: str) -> str:
     return hashlib.md5(text.encode("utf-8")).hexdigest()
 
-# ------------------ FUNÇÕES DE APOIO ------------------
-
+# ------------------ FUNÇÕES DE APOIO PROFISSIONAIS ------------------
 def registrar_compra(email, user_id=None, metodo="PIX", amount=29.99, status="approved"):
     try:
         conn = conectar(); c = conn.cursor(); ts = int(time.time())
@@ -38,7 +36,6 @@ def forcar_notas_teste(user_id):
         uid = int(user_id)
         agora = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         c.execute("DELETE FROM provas_resultado WHERE user_id = ?", (uid,))
-        # Simula aprovação nos 5 módulos
         for m in range(1, 6):
             c.execute("INSERT INTO provas_resultado (user_id, modulo, nota, aprovado, data) VALUES (?, ?, 10.0, 1, ?)", (uid, m, agora))
             c.execute(f"UPDATE users SET fim_modulo{m} = ? WHERE id = ?", (agora, uid))
@@ -61,154 +58,128 @@ def listar_notas_geral():
     except: return []
     finally: conn.close()
 
-# ------------------ HANDLERS ADMIN (TODOS INCLUSOS) ------------------
-
-class LoginDevHandler(tornado.web.RequestHandler):
-    def get(self): 
-        self.render("painel_dev.html", usuarios=listar_usuarios(), notas=listar_notas_geral(), mensagem=None)
-
-class ForcarNotasHandler(tornado.web.RequestHandler):
-    def post(self):
-        uid = self.get_argument("id")
-        if forcar_notas_teste(uid): self.write({"sucesso": True})
-        else: self.write({"sucesso": False})
-
-class AlterarStatusHandler(tornado.web.RequestHandler):
-    def post(self):
-        uid = self.get_argument("id"); st = self.get_argument("ativo")
-        conn = conectar(); conn.execute("UPDATE users SET ativo=? WHERE id=?", (st, uid)); conn.commit(); conn.close()
-        self.write({"sucesso": True})
-
-class AlterarSenhaHandler(tornado.web.RequestHandler):
-    def post(self):
-        uid = self.get_argument("id"); pw = self.get_argument("senha")
-        conn = conectar(); conn.execute("UPDATE users SET password=? WHERE id=?", (hash_senha(pw), uid)); conn.commit(); conn.close()
-        self.write({"sucesso": True})
-
-class ResetarSenhaHandler(tornado.web.RequestHandler):
-    def post(self):
-        uid = self.get_argument("id"); conn = conectar(); conn.execute("UPDATE users SET password=? WHERE id=?", (hash_senha("123456"), uid)); conn.commit(); conn.close()
-        self.write({"sucesso": True})
-
-class DeletarUsuarioHandler(tornado.web.RequestHandler):
-    def post(self):
-        uid = self.get_argument("id"); conn = conectar(); conn.execute("DELETE FROM users WHERE id=?", (uid,)); conn.commit(); conn.close()
-        self.write({"sucesso": True})
-
-class BuscarUsuarioHandler(tornado.web.RequestHandler):
-    """ Resolve o erro de ImportError no server.py """
-    def get(self):
-        f = self.get_argument("filtro", "")
-        self.render("painel_dev.html", usuarios=listar_usuarios(f), notas=listar_notas_geral(), mensagem=f"Busca: {f}")
-
-class ComprasHandler(tornado.web.RequestHandler):
-    def get(self):
-        conn = conectar(); c = conn.cursor(); c.execute("SELECT * FROM purchases ORDER BY id DESC")
-        vendas = [dict(row) for row in c.fetchall()]; conn.close(); self.write({"purchases": vendas})
-
-# ------------------ SISTEMA DE CERTIFICADO (RESOLVIDO) ------------------
+# ------------------ SISTEMA DE CERTIFICADO MASTER ELITE ------------------
 
 class GerarCertificadoHandler(tornado.web.RequestHandler):
-    
+    def initialize(self, modulo_id=None):
+        self.modulo_id_default = modulo_id
+
     def get_current_user(self):
-        """ Essencial para o Tornado reconhecer o login """
         uid = self.get_secure_cookie("user_id")
-        if uid:
-            try: return int(uid.decode())
-            except: return None
-        return None
+        return int(uid.decode()) if uid else None
 
     @tornado.web.authenticated
-    def get(self, modulo_id):
+    def get(self, modulo_id=None):
         uid = self.current_user
-        try:
-            mid = int(modulo_id)
-        except:
-            self.write("ID de módulo inválido."); return
-
-        download_arg = self.get_argument("download", "0")
-        download = download_arg in ("1", "true", "True", "yes")
+        mid_raw = modulo_id or self.modulo_id_default
+        is_final = str(mid_raw).lower() in ["6", "final", "conclusao"]
         
         conn = conectar(); c = conn.cursor()
-        c.execute("SELECT username, nome, inicio_curso, fim_modulo5 FROM users WHERE id = ?", (uid,))
+        c.execute("SELECT username, nome FROM users WHERE id = ?", (uid,))
         user = c.fetchone()
-
-        if not user:
-            conn.close(); self.redirect("/login"); return
+        if not user: conn.close(); self.redirect("/login"); return
 
         nome_aluno = (user['nome'] if user['nome'] else user['username']).upper()
-        data_inicio = user['inicio_curso'] or "01/01/2026"
+        data_atual = datetime.now().strftime('%d/%m/%Y')
+        cert_id = hashlib.sha1(f"{uid}-{data_atual}".encode()).hexdigest()[:12].upper()
 
-        # --- FLUXO MÓDULOS 1 A 5 (Certificado por Módulo) ---
-        if 1 <= mid <= 5:
-            r = c.execute("SELECT data FROM provas_resultado WHERE user_id = ? AND modulo = ? ORDER BY id DESC", (uid, mid)).fetchone()
+        # HTML COM DESIGN DE LUXO E POSICIONAMENTO FIXO (ANTI-BUG)
+        html_master = f"""
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                @page {{ size: A4 landscape; margin: 0; }}
+                body {{ background-color: #050505; margin: 0; padding: 0; font-family: 'Helvetica', 'Arial', sans-serif; }}
+                
+                .container {{ 
+                    width: 297mm; height: 210mm; background-color: #000; 
+                    position: relative; overflow: hidden; 
+                }}
+
+                /* Moldura Externa Dupla */
+                .frame-outer {{ position: absolute; top: 25px; left: 25px; right: 25px; bottom: 25px; border: 4px solid #d4af37; }}
+                .frame-inner {{ position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px; border: 1px solid rgba(212, 175, 55, 0.3); }}
+
+                /* Conteúdo Centralizado com Alturas Fixas */
+                .logo-header {{ position: absolute; top: 60px; width: 100%; text-align: center; color: #FFF; letter-spacing: 12px; font-size: 20px; font-weight: bold; }}
+                .logo-header span {{ color: #d4af37; }}
+
+                .main-title {{ position: absolute; top: 95px; width: 100%; text-align: center; font-size: 105px; font-weight: 900; letter-spacing: 20px; color: #d4af37; margin: 0; }}
+                .sub-title {{ position: absolute; top: 210px; width: 100%; text-align: center; font-size: 14px; color: #888; letter-spacing: 8px; font-weight: bold; }}
+
+                .cert-text {{ position: absolute; top: 255px; width: 100%; text-align: center; font-size: 22px; color: #FFF; font-style: italic; opacity: 0.9; }}
+
+                .student-name {{ 
+                    position: absolute; top: 295px; width: 75%; left: 12.5%; 
+                    text-align: center; font-size: 78px; color: #FFF; font-weight: bold; 
+                    border-bottom: 3px solid #d4af37; padding-bottom: 8px; 
+                }}
+
+                .description {{ 
+                    position: absolute; top: 415px; width: 850px; left: 50%; margin-left: -425px; 
+                    text-align: center; font-size: 18px; color: #CCC; line-height: 1.7; 
+                }}
+
+                /* Grade de Habilidades Profissional */
+                .skills-grid {{ 
+                    position: absolute; top: 515px; width: 800px; left: 50%; margin-left: -400px; 
+                    display: block; border: 1px solid rgba(212, 175, 55, 0.2); 
+                    background: rgba(15, 15, 15, 0.8); padding: 20px; 
+                }}
+                .skill {{ width: 49%; display: inline-block; font-size: 13px; font-weight: bold; color: #d4af37; text-align: center; }}
+                .skill span {{ color: #FFF; margin-right: 8px; }}
+
+                /* Rodapé e Assinaturas */
+                .signature-box {{ position: absolute; bottom: 85px; width: 280px; border-top: 1px solid #444; text-align: center; font-size: 13px; color: #888; padding-top: 8px; }}
+                .sig-left {{ left: 100px; }}
+                .sig-right {{ right: 100px; }}
+
+                .date-display {{ position: absolute; bottom: 95px; width: 100%; text-align: center; font-size: 24px; font-weight: 900; color: #FFF; }}
+                .verification {{ position: absolute; bottom: 45px; right: 55px; font-size: 10px; color: #222; font-family: monospace; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="frame-outer">
+                    <div class="frame-inner">
+                        <div class="logo-header">MESTRE DAS <span>MILHAS</span></div>
+                        <h1 class="main-title">CERTIFICADO</h1>
+                        <div class="sub-title">EXECUTIVE MASTERY PROGRAM 2026</div>
+
+                        <div class="cert-text">Certificamos com máxima honra que o especialista</div>
+                        <div class="student-name">{nome_aluno}</div>
+
+                        <div class="description">
+                            Concluiu com excelência todos os módulos técnicos de inteligência financeira aplicados ao mercado de 
+                            fidelidade aérea e arbitragem de capital do programa <b>MASTER MILHAS</b>.
+                        </div>
+
+                        <div class="skills-grid">
+                            <div class="skill"><span>✦</span> ENGENHARIA DE CPM</div>
+                            <div class="skill"><span>✦</span> EMISSÕES FIRST CLASS</div>
+                            <div class="skill"><span>✦</span> GESTÃO DE SPREAD</div>
+                            <div class="skill"><span>✦</span> ARBITRAGEM ELITE</div>
+                        </div>
+
+                        <div class="signature-box sig-left">DIRETORIA PEDAGÓGICA</div>
+                        <div class="date-display">{data_atual}</div>
+                        <div class="signature-box sig-right">MESTRE DAS MILHAS INC.</div>
+                        <div class="verification">AUTH_ID: {cert_id}</div>
+                    </div>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+
+        if self.get_argument("download", "0") in ("1", "true"):
             conn.close()
-
-            if not r:
-                self.write("<h3>Acesso Negado: Conclua a prova deste módulo primeiro.</h3>")
-                return
-            
-            data_fim = r['data'].split()[0]
-            ementas = {
-                1: "Visão Geral 2026, CPM, Dicionário do Milheiro",
-                2: "Cartões, Anuidade Zero, Salas VIP",
-                3: "Compra de Pontos, Bônus, Estratégia 10x1",
-                4: "Executiva, Stopover, Iberia Plus",
-                5: "Venda de Milhas, Gestão de Lucro, IR"
-            }
-            ementa_txt = ementas.get(mid, "")
-
-            if download:
-                html = self.render_string("certificado.html", nome=nome_aluno, modulo=mid, ementa=ementa_txt, inicio=data_inicio, fim=data_fim, is_pdf=True).decode()
-                self.gerar_pdf_file(html, f"Certificado_Modulo_{mid}.pdf")
-            else:
-                self.render("certificado.html", nome=nome_aluno, modulo=mid, ementa=ementa_txt, inicio=data_inicio, fim=data_fim, is_pdf=False)
-            return
-
-        # --- FLUXO MÓDULO 6 (Certificado Final Luxuoso) ---
-        elif mid == 6:
-            if not user['fim_modulo5']:
-                conn.close()
-                self.write("<script>alert('Conclua todos os módulos primeiro!'); location='/curso'</script>")
-                return
-            
+            self.gerar_pdf_file(html_master, f"Certificado_Elite_{uid}.pdf")
+        else:
+            if is_final: self.render("certificado_final.html", nome=nome_aluno, data=data_atual)
+            else: self.write("Use ?download=1 para ver o PDF de luxo.")
             conn.close()
-            data_atual = datetime.now().strftime('%d/%m/%Y')
-
-            if download:
-                # Layout do Certificado Final direto no código para evitar erros de template
-                html_final = f"""
-                <html>
-                <head>
-                    <style>
-                        @page {{ size: A4 landscape; margin: 0; }}
-                        body {{ background-color: #000; margin: 0; padding: 0; font-family: 'Helvetica', sans-serif; color: white; }}
-                        .bg {{ background-color: #0d0d0d; width: 297mm; height: 210mm; padding: 12mm; box-sizing: border-box; }}
-                        .border {{ width: 100%; height: 100%; border: 5px double #d4af37; text-align: center; padding: 40px; position: relative; box-sizing: border-box; }}
-                        .logo {{ font-size: 20pt; font-weight: bold; letter-spacing: 5px; color: white; }}
-                        .logo span {{ color: #d4af37; }}
-                        .title {{ font-size: 60pt; color: #d4af37; font-weight: 900; margin: 20px 0; }}
-                        .name {{ font-size: 52pt; font-weight: bold; border-bottom: 3pt solid #d4af37; display: inline-block; padding: 0 40px; }}
-                        .footer {{ position: absolute; bottom: 40px; width: 100%; left: 0; color: #d4af37; font-size: 14pt; }}
-                    </style>
-                </head>
-                <body>
-                    <div class="bg"><div class="border">
-                        <div class="logo">MESTRE DAS <span>MILHAS</span></div>
-                        <div class="title">CERTIFICADO FINAL</div>
-                        <div class="name">{nome_aluno}</div>
-                        <div class="footer">{data_atual}</div>
-                    </div></div>
-                </body>
-                </html>
-                """
-                self.gerar_pdf_file(html_final, f"Certificado_Final_{nome_aluno}.pdf")
-            else:
-                self.render("certificado_final.html", nome=nome_aluno, data=data_atual)
-            return
-
-        conn.close()
-        self.set_status(404)
 
     def gerar_pdf_file(self, html_string, filename):
         pdf = BytesIO()
@@ -217,6 +188,29 @@ class GerarCertificadoHandler(tornado.web.RequestHandler):
         self.set_header("Content-Type", "application/pdf")
         self.set_header("Content-Disposition", f'attachment; filename="{filename}"')
         self.write(pdf.read())
+
+# Handlers Administrativos
+class LoginDevHandler(tornado.web.RequestHandler):
+    def get(self): self.render("painel_dev.html", usuarios=listar_usuarios(), notas=listar_notas_geral(), mensagem=None)
+
+class ForcarNotasHandler(tornado.web.RequestHandler):
+    def post(self):
+        if forcar_notas_teste(self.get_argument("id")): self.write({"sucesso": True})
+        else: self.write({"sucesso": False})
+
+class AlterarStatusHandler(tornado.web.RequestHandler):
+    def post(self):
+        uid = self.get_argument("id"); st = self.get_argument("ativo")
+        conn = conectar(); conn.execute("UPDATE users SET ativo=? WHERE id=?", (st, uid)); conn.commit(); conn.close()
+        self.write({"sucesso": True})
+
+class BuscarUsuarioHandler(tornado.web.RequestHandler):
+    def get(self): self.render("painel_dev.html", usuarios=listar_usuarios(self.get_argument("filtro", "")), notas=listar_notas_geral(), mensagem="Filtro aplicado")
+
+class ComprasHandler(tornado.web.RequestHandler):
+    def get(self):
+        conn = conectar(); c = conn.cursor(); c.execute("SELECT * FROM purchases ORDER BY id DESC")
+        vendas = [dict(row) for row in c.fetchall()]; conn.close(); self.write({"purchases": vendas})
 
 def criar_tabela(): pass
 def criar_usuario_admin_se_nao_existe(): pass

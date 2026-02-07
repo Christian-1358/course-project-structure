@@ -1,205 +1,91 @@
-
-arrumar o pdf e o 404 do certificado final
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Certificado MilhasPRO</title>
+<title>Certificado MilhasPRO - Final</title>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
 
 <style>
-/* ================= PDF ================= */
-@page {
-    size: A4 landscape;
-    margin: 0;
-}
+/* ================= PDF SETUP ================= */
+@page { size: A4 landscape; margin: 0; }
 
-/* ================= RESET ================= */
-* {
-    box-sizing: border-box;
-}
+/* ================= RESET & BASE ================= */
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: #000; font-family: "DejaVu Serif", serif; }
 
-html, body {
-    margin: 0;
-    padding: 0;
-    background: #000;
-    font-family: "DejaVu Serif", serif;
-}
-
-/* ================= VISOR ================= */
-.viewer {
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+/* ================= CONTAINER ================= */
+.viewer { min-height: 100vh; display: flex; justify-content: center; align-items: center; background: black; }
 
 /* ================= CERTIFICADO ================= */
 .certificado {
-    width: 1123px;
-    height: 794px;
-    background: radial-gradient(circle at top, #111 0%, #000 70%);
+    width: 1123px; height: 794px;
+    background: radial-gradient(circle at center, #111 0%, #000 100%);
     border: 20px solid #d4b038;
-    padding: 14px;
+    padding: 15px;
+    box-shadow: 0 0 50px rgba(0,0,0,0.5);
 }
 
-/* ================= BORDA INTERNA ================= */
 .inner {
-    width: 100%;
-    height: 100%;
-    border: 2px solid rgba(212,176,56,.9);
-    padding: 70px 100px;
+    width: 100%; height: 100%;
+    border: 2px solid rgba(212,176,56,0.8);
+    padding: 60px 80px;
     text-align: center;
     color: #eaeaea;
     position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 /* ================= MARCA D'ÁGUA ================= */
 .inner::before {
     content: "MILHASPRO";
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 120px;
-    letter-spacing: 12px;
-    color: rgba(255,255,255,0.035);
-    transform: rotate(-12deg);
-    pointer-events: none;
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 130px; letter-spacing: 15px;
+    color: rgba(255,255,255,0.03);
+    transform: rotate(-15deg); pointer-events: none;
+    z-index: 0;
 }
 
-/* ================= LOGO ================= */
-.logo {
-    font-size: 18px;
-    letter-spacing: 6px;
-    margin-bottom: 35px;
-}
+/* ================= ELEMENTOS ================= */
+.logo { font-size: 18px; letter-spacing: 8px; margin-bottom: 20px; z-index: 1; }
+.logo span { color: #d4b038; font-weight: bold; }
 
-.logo span {
-    color: #d4b038;
-    font-weight: bold;
-}
+.titulo { font-size: 64px; letter-spacing: 10px; color: #d4b038; font-weight: 400; margin-bottom: 5px; z-index: 1; }
+.subtitulo { font-size: 14px; letter-spacing: 4px; color: #888; margin-bottom: 40px; z-index: 1; }
 
-/* ================= TITULO ================= */
-.titulo {
-    font-size: 52px;
-    letter-spacing: 6px;
-    color: #d4b038;
-    margin-bottom: 12px;
-}
+.texto-cert { font-size: 20px; color: #ccc; margin-bottom: 10px; z-index: 1; }
+.nome { font-size: 48px; font-weight: bold; color: #fff; margin: 10px 0; z-index: 1; text-transform: uppercase; }
+.nome span { border-bottom: 3px solid #d4b038; padding: 0 30px 10px; display: inline-block; }
 
-/* ================= SUB ================= */
-.subtitulo {
-    font-size: 14px;
-    letter-spacing: 3px;
-    color: #aaa;
-    margin-bottom: 45px;
-}
+.conclusao { font-size: 19px; margin-top: 20px; color: #ddd; z-index: 1; }
+.conclusao strong { color: #fff; }
 
-/* ================= TEXTO ================= */
-.texto {
-    font-size: 18px;
-    margin-bottom: 20px;
-}
-
-/* ================= NOME ================= */
-.nome {
-    font-size: 38px;
-    font-weight: bold;
-    color: #fff;
-    margin: 26px 0 16px;
-}
-
-.nome span {
-    display: inline-block;
-    padding: 0 28px 8px;
-    border-bottom: 2px solid #d4b038;
-}
-
-/* ================= MODULO ================= */
-.modulo {
-    margin-top: 18px;
-    font-size: 18px;
-}
-
-.modulo strong {
-    color: #fff;
-}
-
-/* ================= ESPECIALIDADE ================= */
-.especialidade {
-    margin-top: 22px;
-    font-size: 14px;
-    letter-spacing: 1px;
-    color: #d4b038;
-}
+.especialidade { font-size: 13px; color: #d4b038; margin-top: 15px; letter-spacing: 1px; z-index: 1; }
 
 /* ================= ASSINATURAS ================= */
-.assinaturas {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 55px;
-    padding: 0 40px;
+.assinaturas { display: flex; justify-content: space-around; margin-top: 50px; z-index: 1; }
+.assinatura-box { width: 320px; text-align: center; }
+
+.rubrica { 
+    font-family: 'Great Vibes', cursive; 
+    font-size: 32px; 
+    color: #fff; 
+    margin-bottom: -5px; 
+    height: 40px;
 }
 
-.assinatura {
-    width: 260px;
-    border-top: 1px solid #777;
-    padding-top: 8px;
-    font-size: 13px;
-    color: #aaa;
-}
+.linha-ass { border-top: 1px solid #555; padding-top: 10px; }
+.nome-ass { font-size: 14px; font-weight: bold; color: #fff; letter-spacing: 1px; margin-bottom: 3px; }
+.cargo-ass { font-size: 11px; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
 
 /* ================= RODAPÉ ================= */
-.rodape {
-    margin-top: 35px;
-    font-size: 12px;
-    color: #888;
-    letter-spacing: 2px;
-}
+.rodape { font-size: 11px; color: #555; letter-spacing: 2px; line-height: 1.6; z-index: 1; }
 
-/* ================= BOTÕES ================= */
-.acoes {
-    text-align: center;
-    margin-top: 25px;
-}
-
-.btn {
-    display: inline-block;
-    background: linear-gradient(135deg, #f1d26a, #b58b2e);
-    color: #000;
-    padding: 14px 28px;
-    font-size: 14px;
-    font-weight: bold;
-    border-radius: 6px;
-    text-decoration: none;
-}
-
-/* ================= PRINT (WEASYPRINT) ================= */
 @media print {
-
-    html, body {
-        width: 297mm;
-        height: 210mm;
-        background: #000;
-    }
-
-    .viewer {
-        display: block;
-        min-height: auto;
-    }
-
-    .certificado {
-        width: 100%;
-        height: 100%;
-        border-width: 18px;
-        margin: 0 auto;
-    }
-
-    .acoes {
-        display: none;
-    }
+    .viewer { background: none; }
+    .certificado { box-shadow: none; }
 }
 </style>
 </head>
@@ -210,64 +96,48 @@ html, body {
     <div class="certificado">
         <div class="inner">
 
-            <div class="logo">
-                MILHAS<span>PRO</span>
+            <div class="logo">MILHAS<span>PRO</span></div>
+
+            <div>
+                <div class="titulo">CERTIFICADO</div>
+                <div class="subtitulo">TREINAMENTO ESPECIALIZADO ELITE • 2026</div>
             </div>
 
-            <div class="titulo">CERTIFICADO</div>
-
-            <div class="subtitulo">
-                TREINAMENTO ESPECIALIZADO ELITE • 2026
-            </div>
-
-            <div class="texto">
-                Certificamos que o especialista
-            </div>
-
-            <div class="nome">
-                <span>{{ nome }}</span>
-            </div>
-
-            <div class="modulo">
-                Concluiu com êxito o treinamento avançado
-                <strong>
-                {% if modulo < 6 %}
-                    Módulo {{ modulo }}
-                {% else %}
-                    Formação Completa
-                {% end %}
-                </strong>.
-            </div>
-
-            <div class="especialidade">
-                ESPECIALIDADE: {{ ementa }}
+            <div>
+                <div class="texto-cert">Certificamos que o especialista</div>
+                <div class="nome"><span>{{ nome }}</span></div>
+                <div class="conclusao">
+                    Concluiu com êxito o treinamento avançado 
+                    <strong>{% if modulo < 6 %} Módulo {{ modulo }} {% else %} Formação Completa {% end %}</strong>.
+                </div>
+                <div class="especialidade">ESPECIALIDADE: {{ ementa }}</div>
             </div>
 
             <div class="assinaturas">
-                <div class="assinatura">
-                    Coordenação Acadêmica
+                <div class="assinatura-box">
+                    <div class="rubrica">Raquele Posso</div>
+                    <div class="linha-ass">
+                        <div class="nome-ass">RAQUELE POSSO</div>
+                        <div class="cargo-ass">Coordenação Acadêmica</div>
+                    </div>
                 </div>
-                <div class="assinatura">
-                    Direção MilhasPRO
+                <div class="assinatura-box">
+                    <div class="rubrica">Raquele Posso</div>
+                    <div class="linha-ass">
+                        <div class="nome-ass">RAQUELE POSSO</div>
+                        <div class="cargo-ass">Direção MilhasPRO</div>
+                    </div>
                 </div>
             </div>
 
             <div class="rodape">
                 AUTENTICIDADE GARANTIDA • SISTEMA MILHASPRO 2026<br>
-                PERÍODO: {{ inicio }} ATÉ {{ fim }}
+                PERÍODO DE REALIZAÇÃO: {{ inicio }} A {{ fim }}
             </div>
 
         </div>
     </div>
 </div>
-
-{% if not is_pdf %}
-<div class="acoes">
-    <a class="btn" href="/certificado/{{ modulo }}?pdf=1" target="_blank">
-        ⬇ BAIXAR PDF DE LUXO
-    </a>
-</div>
-{% end %}
 
 </body>
 </html>

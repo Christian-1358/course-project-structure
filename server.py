@@ -4,7 +4,9 @@ import tornado.web
 import tornado.ioloop
 from datetime import datetime   
 
-# Handlers do Usuário
+# ===============================
+# HANDLERS DO USUÁRIO
+# ===============================
 from app.handlers.prova_final import ProvaFinalHandler
 from app.handlers.sobre import Sobre
 from app.handlers.login import LoginHandler, LogoutHandler, GoogleLoginHandler
@@ -15,9 +17,21 @@ from app.handlers.avaliacao import SubmitCodeHandler
 from app.handlers.criar_conta import CriarContaHandler
 from app.handlers.prova import ProvaHandler
 from app.handlers.recuperacao import RecuperacaoHandler
-from app.handlers.pagamento_mensal import PagamentoMensalPage, CriarPagamentoHandler, WebhookHandler
 
+# 👉 PAGAMENTO
+from app.handlers.pagamento import PagamentoPageHandler, ConfirmarPagamentoHandler
+
+# 👉 (se quiser manter mensal depois)
+# from app.handlers.pagamento_mensal import PagamentoMensalPage, CriarPagamentoHandler, WebhookHandler
+
+# ===============================
+# CERTIFICADOS
+# ===============================
 from app.handlers.certificado import CertificadoViewHandler, CertificadoPDFHandler
+
+# ===============================
+# ADMIN
+# ===============================
 from app.utils.admin_tools import (
     LoginDevHandler, AlterarStatusHandler, 
     BuscarUsuarioHandler,
@@ -25,14 +39,17 @@ from app.utils.admin_tools import (
     criar_tabela, criar_usuario_admin_se_nao_existe
 )
 
-# Configurações de Caminho
+# ===============================
+# CONFIG
+# ===============================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "usuarios.db")
 
-# Configurações de Segurança
 TORNADO_COOKIE_SECRET = "a9f3d2c1e8f74b6b9c2e0f1a7b8c6d5e123456789"
+
 GOOGLE_CLIENT_ID = "899997122020-0v0hokvnet5l9nnt1cufg071tbq60rdc.apps.googleusercontent.com"
 GOOGLE_CLIENT_SECRET = "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"
+
 
 def make_app():
     settings = dict(
@@ -49,36 +66,63 @@ def make_app():
     )
     
     return tornado.web.Application([
-        # --- NAVEGAÇÃO E AUTENTICAÇÃO ---
-        (r"/", LoginHandler),
-        (r"/login", LoginHandler),
-        (r"/logout", LogoutHandler),
-        (r"/auth/google", GoogleLoginHandler),
-        (r"/criar_conta", CriarContaHandler),
-        (r"/recuperar_senha", RecuperarSenhaHandler),
-        
-        # --- CONTEÚDO E CURSO ---
-        (r"/sobre", Sobre),
-        (r"/curso", CursoHandler),
-        (r"/submit", SubmitCodeHandler),
-        (r"/pagamento", PagamentoMensalPage),
-        
-        # --- PROVAS E RECUPERAÇÃO ---
-        (r"/prova/([0-9]+)", ProvaHandler),
-        (r"/recuperacao/([0-9]+)", RecuperacaoHandler),
-        (r"/prova_final", ProvaFinalHandler),
 
-        # --- SISTEMA DE CERTIFICADOS (CORRIGIDO) ---
-        # Captura o ID do módulo (1 a 5) ou 6 para o Final
-        (r"/certificado/([0-9]+)", GerarCertificadoHandler),
-(r"/certificado/([0-9]+)", CertificadoViewHandler),
-(r"/certificado/pdf/([0-9]+)", CertificadoPDFHandler),
+        # ===============================
+        # ARQUIVOS ESTÁTICOS
+        # ===============================
+        (r"/static/(.*)", tornado.web.StaticFileHandler, {
+            "path": settings["static_path"]
+        }),
 
-        (r"/admin/buscar_usuario", BuscarUsuarioHandler),
-        (r"/admin/forcar_notas", ForcarNotasHandler),
-        (r"/admin/alterar_status", AlterarStatusHandler),
-        (r"/admin/compras", ComprasHandler),
+        # ===============================
+        # LOGIN / AUTENTICAÇÃO
+        # ===============================
+        (r"/?", LoginHandler),
+        (r"/login/?", LoginHandler),
+        (r"/logout/?", LogoutHandler),
+        (r"/auth/google/?", GoogleLoginHandler),
+        (r"/criar_conta/?", CriarContaHandler),
+        (r"/recuperar_senha/?", RecuperarSenhaHandler),
+
+        # ===============================
+        # PAGAMENTO (OBRIGATÓRIO)
+        # ===============================
+        (r"/pagamento/?", PagamentoPageHandler),
+        (r"/confirmar_pagamento/?", ConfirmarPagamentoHandler),
+
+        # ===============================
+        # CONTEÚDO (BLOQUEADO SE NÃO PAGOU)
+        # ===============================
+        (r"/curso/?", CursoHandler),
+        (r"/sobre/?", Sobre),
+        (r"/submit/?", SubmitCodeHandler),
+
+        # ===============================
+        # PROVAS
+        # ===============================
+        (r"/prova/([0-9]+)/?", ProvaHandler),
+        (r"/recuperacao/([0-9]+)/?", RecuperacaoHandler),
+        (r"/prova/final/?", ProvaFinalHandler),
+
+        # ===============================
+        # CERTIFICADOS
+        # ===============================
+        (r"/certificado/([0-9]+)/?", GerarCertificadoHandler),
+        (r"/certificado/view/([0-9]+)/?", CertificadoViewHandler),
+        (r"/certificado/pdf/([0-9]+)/?", CertificadoPDFHandler),
+        (r"/gerar_certificado_final/?", GerarCertificadoHandler, dict(modulo_id="final")),
+
+        # ===============================
+        # ADMIN
+        # ===============================
+        (r"/login_dev/?", LoginDevHandler),
+        (r"/admin/buscar_usuario/?", BuscarUsuarioHandler),
+        (r"/admin/forcar_notas/?", ForcarNotasHandler),
+        (r"/admin/alterar_status/?", AlterarStatusHandler),
+        (r"/admin/compras/?", ComprasHandler),
+
     ], **settings)
+
 
 if __name__ == "__main__":
     try:
@@ -90,9 +134,9 @@ if __name__ == "__main__":
     app = make_app()
     port = 8080 
     app.listen(port)
-    
+
     print(f"\n🚀 Servidor Online: http://localhost:{port}")
-    print(f"📌 Certificados: Utilize /certificado/ID (Ex: /certificado/1 para Módulo 1)")
-    print(f"🔑 Admin: http://localhost:{port}/login_dev\n")
+    print(f"🔑 Google Login Ativo: {GOOGLE_CLIENT_ID[:15]}...")
+    print(f"🔒 Admin: http://localhost:{port}/login_dev\n")
 
     tornado.ioloop.IOLoop.current().start()

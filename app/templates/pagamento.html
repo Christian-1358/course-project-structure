@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Pagamento</title>
+
+    <style>
+        body {
+            background: #0b0b0b;
+            color: #fff;
+            font-family: Arial, Helvetica, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .box {
+            background: #111;
+            padding: 40px;
+            width: 400px;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0,255,180,0.3);
+            text-align: center;
+        }
+
+        h1 {
+            color: #00ffb4;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #ccc;
+            margin-bottom: 25px;
+        }
+
+        button {
+            background: #00ffb4;
+            color: #000;
+            border: none;
+            padding: 15px;
+            width: 100%;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #00cc90;
+        }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h1>Pagamento</h1>
+    <p>Para acessar o curso, é necessário confirmar o pagamento.</p>
+
+    <form method="post" action="/confirmar_pagamento">
+        <button type="submit">CONFIRMAR PAGAMENTO</button>
+    </form>
+</div>
+
+</body>
+</html>

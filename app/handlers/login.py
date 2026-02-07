@@ -6,6 +6,8 @@ import hashlib
 import uuid
 import os
 
+from app.utils.pagamento_utils import usuario_pagou
+
 # ===============================
 # CONFIG DB
 # ===============================
@@ -87,6 +89,12 @@ class LoginHandler(tornado.web.RequestHandler):
 
         self.set_secure_cookie("user", user["username"])
         self.set_secure_cookie("user_id", str(user["id"]))
+
+        # 🔒 BLOQUEIO SE NÃO PAGOU
+        if not usuario_pagou(user["id"]):
+            self.redirect("/pagamento")
+            return
+
         self.redirect("/curso")
 
 
@@ -127,7 +135,7 @@ class GoogleLoginHandler(
             c = conn.cursor()
 
             c.execute("""
-                SELECT id, ativo, inicio_curso
+                SELECT id, ativo
                 FROM users
                 WHERE email=?
             """, (email,))
@@ -136,21 +144,17 @@ class GoogleLoginHandler(
 
             if not row:
                 senha_fake = hash_senha(str(uuid.uuid4()))
-                inicio = datetime.now().strftime("%d/%m/%Y")
-
                 c.execute("""
                     INSERT INTO users
-                    (username, password, email, ativo, inicio_curso)
-                    VALUES (?, ?, ?, 1, ?)
-                """, (username, senha_fake, email, inicio))
-
+                    (username, password, email, ativo)
+                    VALUES (?, ?, ?, 1)
+                """, (username, senha_fake, email))
                 user_id = c.lastrowid
             else:
                 if row["ativo"] == 0:
                     conn.close()
                     self.write("Conta bloqueada pelo administrador.")
                     return
-
                 user_id = row["id"]
 
             conn.commit()
@@ -158,6 +162,12 @@ class GoogleLoginHandler(
 
             self.set_secure_cookie("user", username)
             self.set_secure_cookie("user_id", str(user_id))
+
+            # 🔒 BLOQUEIO SE NÃO PAGOU
+            if not usuario_pagou(user_id):
+                self.redirect("/pagamento")
+                return
+
             self.redirect("/curso")
 
         else:
