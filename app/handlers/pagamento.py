@@ -1,111 +1,146 @@
-arrumar isso do mercado pago, e fazer isso dar certo 
-. Obter sua Credencial (Onde mora o seu Pix)
-
-    Acesse o painel Mercado Pago Developers [cite: 2026-01-20].
-
-    Vá em Credenciais de Produção [cite: 2026-01-20].
-
-    Copie o campo Access Token (uma chave longa que começa com APP_USR-...) [cite: 2026-01-20].
-
-    Importante: Verifique se sua conta no Mercado Pago tem uma chave Pix cadastrada (CPF, E-mail ou Aleatória) para que o recebimento seja processado [cite: 2026-01-20].
-
-
-Para gerar o seu Access Token e as demais credenciais necessárias para que o Pix caia na sua conta, você deve acessar o portal oficial de desenvolvedores do Mercado Pago.
-
-Aqui estão os links diretos e as instruções profissionais para você configurar seu checkout agora:
-1. Links Oficiais para Credenciais
-
-    Painel de Credenciais: https://www.mercadopago.com.br/developers/panel/credentials [cite: 2026-01-20]
-
-        Neste link, você encontrará o Access Token (usado no seu arquivo .py) e a Public Key (usada no seu .html) [cite: 2026-01-20].
-
-    Documentação do Pix: https://www.mercadopago.com.br/developers/pt/docs/checkout-api/integration-configuration/pix [cite: 2026-01-20]
-import tornado.web
-import sqlite3
+# server.py
 import os
-import requests
+import sqlite3
 import json
+import uuid
 from datetime import datetime
+import tornado.ioloop
+import tornado.web
 
-# Localização do banco de dados
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-DB = os.path.join(BASE_DIR, "usuarios.db")
-
-# DADOS OBRIGATÓRIOS: Cole seu Access Token gerado no link acima
-MP_ACCESS_TOKEN = "APP_USR-COLE-SEU-TOKEN-AQUI"
+# ===============================
+# CONFIGURAÇÃO DE BANCO
+# ===============================
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB = os.path.join(BASE_DIR, "checkout.db")
 
 def conectar():
     conn = sqlite3.connect(DB)
     conn.row_factory = sqlite3.Row
     return conn
 
-class PagamentoPageHandler(tornado.web.RequestHandler):
-    def get(self):
-        user_id = self.get_secure_cookie("user_id")
-        if not user_id:
-            self.redirect("/login")
-            return
-        # Renderiza com variáveis nulas para evitar erro de 'not defined' no HTML [cite: 2026-01-20]
-        self.render("pagamento.html", pix_code=None, qr_img=None)
+def criar_tabelas():
+    conn = conectar()
+    cursor = conn.cursor()
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        email TEXT,
+        created_at TEXT
+    )
+    """)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS orders (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        product_name TEXT,
+        amount REAL,
+        payment_method TEXT,
+        status TEXT,
+        created_at TEXT
+    )
+    """)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS payments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        order_id INTEGER,
+        payment_code TEXT,
+        status TEXT,
+        created_at TEXT
+    )
+    """)
+    conn.commit()
+    conn.close()
 
-class ConfirmarPagamentoHandler(tornado.web.RequestHandler):
-    """Gera o pagamento real via API vinculada ao seu CPF/Conta [cite: 2026-01-20]"""
-    async def post(self):
-        user_id = self.get_secure_cookie("user_id")
-        if not user_id: 
-            self.set_status(403)
-            return
-        
-        user_id_int = int(user_id.decode())
-        
-        # Estrutura de dados profissional para o Mercado Pago [cite: 2026-01-20]
-        payload = {
-            "transaction_amount": 49.90,
-            "description": "Matricula MentorMilhas Elite",
-            "payment_method_id": "pix",
-            "external_reference": str(user_id_int),
-            "payer": {
-                "email": "aluno@mentormilhas.com", # Email do pagador exigido pela API [cite: 2026-01-20]
-                "first_name": "Aluno",
-                "last_name": "Premium"
-            }
-        }
-        
-        headers = {
-            "Authorization": f"Bearer {MP_ACCESS_TOKEN}",
-            "Content-Type": "application/json"
-        }
+criar_tabelas()
 
-        try:
-            response = requests.post(
-                "https://api.mercadopago.com/v1/payments",
-                headers=headers,
-                data=json.dumps(payload),
-                timeout=10
-            )
-            data = response.json()
-            
-            if response.status_code == 201:
-                # Extrai o código 'Copia e Cola' e a imagem em Base64 [cite: 2026-01-20]
-                pix_code = data['point_of_interaction']['transaction_data']['qr_code']
-                qr_img = data['point_of_interaction']['transaction_data']['qr_code_base64']
-                self.render("pagamento.html", pix_code=pix_code, qr_img=qr_img)
-            else:
-                self.write(f"Erro na API: {data.get('message', 'Erro desconhecido')}")
-        except Exception:
-            self.write("Falha na conexão com o sistema de pagamentos.")
+# ===============================
+# HANDLERS
+# ===============================
+class BaseHandler(tornado.web.RequestHandler):
+    def write_json(self, data):
+        self.set_header("Content-Type", "application/json")
+        self.write(json.dumps(data))
 
-class CheckStatusHandler(tornado.web.RequestHandler):
-    """Verifica se o aluno já pagou para redirecionar automaticamente [cite: 2026-01-20]"""
-    def get(self):
-        user_id = self.get_secure_cookie("user_id")
-        if not user_id: 
-            self.write({"status": "error"})
-            return
-        
+class CheckoutHandler(BaseHandler):
+    async def post(self, method):
+        """
+        Recebe o tipo de pagamento: pix, card, paypal, boleto
+        e processa simuladamente
+        """
+        data = json.loads(self.request.body.decode())
+        product = data.get("product_name", "Mentoria Mestre das Milhas")
+        amount = data.get("amount", 200.00)
+        user_id = data.get("user_id", 1)  # por agora fixo
+        now = datetime.now().isoformat()
+
         conn = conectar()
-        user = conn.execute("SELECT pago FROM users WHERE id = ?", (int(user_id.decode()),)).fetchone()
+        cursor = conn.cursor()
+
+        # Criar order
+        cursor.execute(
+            "INSERT INTO orders (user_id, product_name, amount, payment_method, status, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+            (user_id, product, amount, method, "pending", now)
+        )
+        order_id = cursor.lastrowid
+        conn.commit()
+
+        # Processamento simulado
+        if method == "pix":
+            code = f"PIX{uuid.uuid4().hex[:20]}"
+            status = "waiting"
+        elif method == "card":
+            code = f"CARD{uuid.uuid4().hex[:20]}"
+            status = "paid"
+        elif method == "paypal":
+            code = f"PAYPAL{uuid.uuid4().hex[:20]}"
+            status = "redirect"  # front vai redirecionar
+        elif method == "boleto":
+            code = f"BOLETO{uuid.uuid4().hex[:20]}"
+            status = "waiting"
+        else:
+            self.set_status(400)
+            self.write_json({"error": "Método inválido"})
+            return
+
+        # Salvar payment
+        cursor.execute(
+            "INSERT INTO payments (order_id, payment_code, status, created_at) VALUES (?, ?, ?, ?)",
+            (order_id, code, status, now)
+        )
+        conn.commit()
         conn.close()
-        
-        status = "pago" if user and user['pago'] == 1 else "pendente"
-        self.write({"status": status})
+
+        # Retornar dados para o frontend
+        self.write_json({
+            "order_id": order_id,
+            "payment_code": code,
+            "status": status
+        })
+
+class OrdersHandler(BaseHandler):
+    def get(self):
+        """
+        Retorna todas as orders (para admin/testes)
+        """
+        conn = conectar()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM orders")
+        orders = [dict(row) for row in cursor.fetchall()]
+        conn.close()
+        self.write_json({"orders": orders})
+
+# ===============================
+# ROTAS
+# ===============================
+def make_app():
+    return tornado.web.Application([
+        (r"/checkout/([a-zA-Z]+)", CheckoutHandler),
+        (r"/orders", OrdersHandler),
+    ], debug=True)
+
+if __name__ == "__main__":
+    app = make_app()
+    app.listen(8888)
+    print("🚀 Servidor rodando em http://localhost:8888")
+    tornado.ioloop.IOLoop.current().start()

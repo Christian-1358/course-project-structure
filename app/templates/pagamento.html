@@ -1,32 +1,318 @@
-<div class="checkout-container">
-    <h2>Pagamento</h2>
-    <div class="payment-methods">
-        <form action="/confirmar_pagamento" method="POST">
-            <input type="hidden" name="metodo" value="PIX">
-            <button type="submit" class="btn-payment btn-pix">Gerar Pix para Pagamento</button>
-        </form>
-    </div>
-</div>
+    <!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Finalizar Pagamento | Mestre das Milhas</title>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+        <style>
+            :root {
+                --gold: linear-gradient(135deg, #d4af37 0%, #f1d592 50%, #d4af37 100%);
+                --gold-solid: #d4af37;
+                --bg: #050505;
+                --card-bg: rgba(20, 20, 20, 0.9);
+                --input-bg: #0f0f0f;
+                --border: rgba(255, 255, 255, 0.08);
+                --text-main: #ffffff;
+                --text-dim: #888888;
+                --success: #10b981;
+                --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
 
-{% if qr_img %}
-<div class="modal-overlay" style="display: flex; position: fixed; inset: 0; background: rgba(0,0,0,0.9); align-items: center; justify-content: center; z-index: 9999;">
-    <div class="modal-content" style="background: #fff; padding: 30px; border-radius: 12px; text-align: center; color: #000; width: 320px;">
-        <h3 style="font-size: 1rem; margin-bottom: 15px;">Escaneie o QR Code</h3>
-        <img src="data:image/png;base64, {{ qr_img }}" style="width: 200px; height: 200px; margin-bottom: 15px;">
-        <div style="background: #f4f4f5; padding: 10px; font-size: 0.7rem; word-break: break-all; border: 1px solid #ddd; margin-bottom: 10px;">{{ pix_code }}</div>
-        <p style="font-size: 0.8rem; color: #16a34a; font-weight: bold;">Aguardando confirmação...</p>
-        <button onclick="window.location.href='/pagamento'" style="margin-top: 15px; cursor: pointer; background: none; border: none; color: #71717a; font-size: 0.8rem;">Fechar</button>
-    </div>
-</div>
+            * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+            
+            body { 
+                background: var(--bg); 
+                background-image: radial-gradient(circle at 50% -20%, #1a1a1a 0%, #050505 80%);
+                color: var(--text-main); 
+                font-family: 'Inter', sans-serif; 
+                margin: 0; 
+                display: flex; 
+                align-items: center; 
+                justify-content: center; 
+                min-height: 100vh; 
+                padding: 20px;
+            }
 
-<script>
-    // Inicia o rastreio automático apenas se o QR Code existir
-    setInterval(async () => {
-        try {
-            const res = await fetch('/check-status');
-            const data = await res.json();
-            if (data.status === 'pago') window.location.href = '/curso';
-        } catch (e) {}
-    }, 3000);
-</script>
-{% end %}
+            .checkout-main {
+                width: 100%;
+                max-width: 550px;
+                background: var(--card-bg);
+                backdrop-filter: blur(20px);
+                padding: 40px;
+                border-radius: 28px;
+                border: 1px solid var(--border);
+                box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+                text-align: center;
+            }
+
+            /* HEADER & PRICE */
+            .header-info { margin-bottom: 30px; }
+            
+            .price-tag {
+                font-size: 2.5rem;
+                font-weight: 800;
+                background: var(--gold);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                margin: 10px 0;
+            }
+
+            .product-name {
+                color: var(--text-dim);
+                font-size: 0.9rem;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                font-weight: 600;
+            }
+
+            .timer-badge {
+                background: rgba(212, 175, 55, 0.1);
+                color: var(--gold-solid);
+                padding: 6px 15px;
+                border-radius: 100px;
+                font-size: 0.75rem;
+                font-weight: 700;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                margin-bottom: 20px;
+            }
+
+            /* METHODS */
+            .methods-tabs {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 12px;
+                margin: 30px 0;
+            }
+
+            .tab {
+                background: var(--input-bg);
+                border: 1px solid var(--border);
+                padding: 15px 5px;
+                border-radius: 16px;
+                cursor: pointer;
+                transition: var(--transition);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+                font-size: 0.7rem;
+                color: var(--text-dim);
+                font-weight: 700;
+            }
+
+            .tab svg { width: 22px; height: 22px; fill: currentColor; }
+            .tab.active { 
+                border-color: var(--gold-solid); 
+                background: rgba(212, 175, 55, 0.08); 
+                color: #fff;
+                transform: translateY(-3px);
+                box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            }
+
+            /* DYNAMIC CONTENT */
+            .form-group { margin-bottom: 20px; text-align: left; animation: fadeIn 0.4s ease; }
+            label { display: block; font-size: 0.7rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
+            
+            input, select {
+                width: 100%;
+                background: var(--input-bg);
+                border: 1px solid var(--border);
+                padding: 15px;
+                border-radius: 12px;
+                color: #fff;
+                font-size: 0.95rem;
+                transition: var(--transition);
+            }
+            input:focus { border-color: var(--gold-solid); background: #151515; }
+
+            .pix-container {
+                background: #000;
+                padding: 25px;
+                border-radius: 20px;
+                border: 1px dashed var(--border);
+            }
+
+            .qr-code {
+                width: 180px;
+                height: 180px;
+                background: #fff;
+                margin: 0 auto 20px;
+                padding: 10px;
+                border-radius: 12px;
+            }
+
+            .btn-pay {
+                width: 100%;
+                background: var(--gold);
+                color: #000;
+                border: none;
+                padding: 20px;
+                border-radius: 16px;
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: 1.5px;
+                cursor: pointer;
+                transition: var(--transition);
+                margin-top: 15px;
+            }
+
+            .btn-pay:hover { transform: scale(1.02); filter: brightness(1.1); box-shadow: 0 15px 30px rgba(212, 175, 55, 0.25); }
+
+            .security-info {
+                margin-top: 30px;
+                display: flex;
+                justify-content: center;
+                gap: 15px;
+                font-size: 0.65rem;
+                color: var(--text-dim);
+                opacity: 0.6;
+            }
+
+            .toast {
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: var(--success);
+                padding: 12px 25px;
+                border-radius: 50px;
+                font-weight: 700;
+                display: none;
+                z-index: 1000;
+                box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+            }
+
+            @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        </style>
+    </head>
+    <body>
+
+    <div class="toast" id="toast">✅ Código copiado com sucesso!</div>
+
+    <main class="checkout-main">
+        <div class="header-info">
+            <div class="timer-badge">⏱ Oferta expira em: <span id="timer">10:00</span></div>
+            <div class="product-name">Mentoria Mestre das Milhas</div>
+            <div class="price-tag">R$ 200,00</div>
+        </div>
+
+        <div class="methods-tabs">
+            <div class="tab active" onclick="setTab('pix', this)">
+                <svg viewBox="0 0 24 24"><path d="M12 2L4.5 9.5 12 17l7.5-7.5L12 2zm0 13l-4-4 4-4 4 4-4 4z"/></svg>
+                Pix
+            </div>
+            <div class="tab" onclick="setTab('card', this)">
+                <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+                Cartão
+            </div>
+            <div class="tab" onclick="setTab('paypal', this)">
+                <svg viewBox="0 0 24 24"><path d="M20 4H4v16h16V4zM7 7h10v2H7V7zm0 4h10v2H7v-2zm0 4h7v2H7v-2z"/></svg>
+                PayPal
+            </div>
+            <div class="tab" onclick="setTab('boleto', this)">
+                <svg viewBox="0 0 24 24"><path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z"/></svg>
+                Boleto
+            </div>
+        </div>
+
+        <div id="payment-content">
+            </div>
+
+        <div class="security-info">
+            <span>🔒 Criptografia SSL</span>
+            <span>✅ Compra Segura</span>
+            <span>🚀 Acesso Imediato</span>
+        </div>
+    </main>
+
+    <script>
+        const content = {
+            pix: `
+                <div class="pix-container">
+                    <div class="qr-code">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=CHAVE_PIX_EXEMPLO" style="width:100%">
+                    </div>
+                    <label>Código Pix Copia e Cola</label>
+                    <div style="background:#111; padding:15px; border-radius:12px; display:flex; align-items:center; border:1px solid var(--border); cursor:pointer" onclick="copyPix()">
+                        <span id="p-code" style="font-family:monospace; font-size:0.75rem; color:var(--gold-solid); overflow:hidden; text-overflow:ellipsis; flex:1">00020126330014BR.GOV.BCB.PIX011100000000000</span>
+                        <small style="margin-left:15px; font-weight:800; color:#fff">COPIAR</small>
+                    </div>
+                </div>`,
+            card: `
+                <div class="form-group">
+                    <label>Número do Cartão</label>
+                    <input type="text" placeholder="0000 0000 0000 0000">
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px">
+                    <div class="form-group">
+                        <label>Validade</label>
+                        <input type="text" placeholder="MM/AA">
+                    </div>
+                    <div class="form-group">
+                        <label>CVV</label>
+                        <input type="text" placeholder="123">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Parcelamento</label>
+                    <select>
+                        <option>1x de R$ 200,00 (Sem juros)</option>
+                        <option>12x de R$ 21,50</option>
+                    </select>
+                </div>
+                <button class="btn-pay" onclick="load(this)">Finalizar Pagamento</button>`,
+            paypal: `
+                <div style="padding:20px 0">
+                    <p style="color:var(--text-dim); font-size:0.9rem; margin-bottom:20px">Você será redirecionado para concluir no PayPal.</p>
+                    <button class="btn-pay" style="background:#0070ba; color:#fff" onclick="load(this)">Pagar com PayPal</button>
+                </div>`,
+            boleto: `
+                <div style="padding:20px 0">
+                    <p style="color:var(--text-dim); font-size:0.9rem; margin-bottom:20px">O boleto será gerado para pagamento à vista com vencimento em 3 dias.</p>
+                    <button class="btn-pay" onclick="load(this)">Gerar Boleto Agora</button>
+                </div>`
+        };
+
+        function setTab(type, el) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById('payment-content').innerHTML = content[type];
+        }
+
+        function copyPix() {
+            const code = document.getElementById('p-code').innerText;
+            navigator.clipboard.writeText(code);
+            const toast = document.getElementById('toast');
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 2500);
+        }
+
+        function load(btn) {
+            const original = btn.innerText;
+            btn.innerText = "Processando...";
+            btn.style.opacity = "0.6";
+            setTimeout(() => { 
+                alert("Ação iniciada com sucesso!"); 
+                btn.innerText = original; 
+                btn.style.opacity = "1"; 
+            }, 1500);
+        }
+
+        // Timer
+        let s = 600;
+        setInterval(() => {
+            if(s <= 0) return;
+            s--;
+            let m = Math.floor(s/60);
+            let sec = s%60;
+            document.getElementById('timer').innerText = `${m}:${sec < 10 ? '0'+sec : sec}`;
+        }, 1000);
+
+        // Init
+        setTab('pix', document.querySelector('.tab'));
+    </script>
+    </body>
+    </html>

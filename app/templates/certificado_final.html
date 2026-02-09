@@ -139,11 +139,17 @@
         margin-bottom: 10px;
     }
     .sign-name {
-        font-size: 12px;
+        font-size: 14px;
         font-weight: bold;
-        color: #777;
+        color: #d4af37;
         text-transform: uppercase;
         letter-spacing: 1px;
+        margin-bottom: 2px;
+    }
+    .sign-title {
+        font-size: 10px;
+        color: #777;
+        text-transform: uppercase;
     }
 
     .seal {
@@ -160,6 +166,7 @@
         text-align: center;
         padding: 10px;
         opacity: 0.8;
+        background: rgba(212, 175, 55, 0.05);
     }
 
     /* Botões */
@@ -225,8 +232,8 @@
             <div class="student-name">{{ nome }}</div>
             <div class="achievement">
                 Concluiu com êxito a certificação final e os treinamentos avançados do programa 
-                <strong>MASTER MILHAS 2026</strong>, estando apto para operar no mercado de milhas aéreas, 
-                cartões de crédito e fidelidade em nível profissional.
+                <strong>MASTER MILHAS 2026</strong>, sob orientação técnica e pedagógica, 
+                estando plenamente apto para operar no mercado de milhas e fidelidade.
             </div>
 
             <div class="ementa-box">
@@ -242,16 +249,18 @@
         <div class="footer">
             <div class="sign-block">
                 <div class="sign-line"></div>
-                <div class="sign-name">Coordenação Pedagógica</div>
+                <div class="sign-name">Raquele Posso</div>
+                <div class="sign-title">Instrutora e Especialista Senior</div>
             </div>
 
             <div class="seal">
-                AUTENTICIDADE<br>REGISTRADA EM<br>SISTEMA
+                QUALIDADE<br>MESTRE DAS MILHAS<br>CERTIFICADO VÁLIDO
             </div>
 
             <div class="sign-block">
                 <div class="sign-line"></div>
-                <div class="sign-name">Mestre das Milhas Inc.</div>
+                <div class="sign-name">Diretoria Acadêmica</div>
+                <div class="sign-title">Mestre das Milhas Inc.</div>
             </div>
         </div>
 
@@ -259,10 +268,9 @@
 </div>
 
 <div class="no-print">
-    <a href="/gerar_certificado_final?download=1" class="btn-gold">
+    <a href="javascript:void(0)" class="btn-gold" onclick="window.print()">
          Baixar PDF de Luxo
     </a>
-    
     <button class="btn-outline" onclick="window.print()">
          Imprimir Rápido
     </button>

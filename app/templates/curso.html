@@ -4,54 +4,193 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mestre das Milhas | Plataforma de Certificação</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0a0b0d; --panel: #161b22; --sidebar: #0d1117; --text: #e6edf3;
-            --text-muted: #8b949e; --accent: #a855f7; --border: #30363d; --success: #238636;
-            --danger: #f85149;
+            --gold: linear-gradient(135deg, #d4af37 0%, #f1d592 50%, #d4af37 100%);
+            --gold-solid: #d4af37;
+            --bg: #0a0a0a;
+            --card-bg: #141414;
+            --sidebar-bg: #0d0d0d;
+            --border: #2a2a2a;
+            --text-main: #ffffff;
+            --text-dim: #a0a0a0;
+            --accent-bg: rgba(212, 175, 55, 0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        * { box-sizing: border-box; transition: all 0.2s ease; }
-        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        header { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; background: var(--sidebar); border-bottom: 1px solid var(--border); z-index: 100; }
-        .logo { font-weight: 800; font-size: 1.1rem; }
-        .logo span { color: var(--accent); }
-        
-        .btn-test { background: rgba(248, 81, 73, 0.1); color: var(--danger); border: 1px solid var(--danger); font-size: 10px; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin-right: 10px; font-weight: bold; text-transform: uppercase; }
-        .btn-test:hover { background: var(--danger); color: white; }
 
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; transition: var(--transition); }
+
+        body {
+            background: var(--bg);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* HEADER */
+        header {
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            background: var(--sidebar-bg);
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+        }
+
+        .logo { 
+            font-weight: 800; 
+            font-size: 1.2rem; 
+            letter-spacing: -0.5px;
+        }
+        .logo span { 
+            background: var(--gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-test { 
+            background: rgba(239, 68, 68, 0.1); 
+            color: #ef4444; 
+            border: 1px solid #ef4444; 
+            font-size: 10px; 
+            padding: 6px 12px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            margin-right: 15px; 
+            font-weight: 800;
+        }
+        .btn-test:hover { background: #ef4444; color: white; }
+
+        #prog-txt {
+            font-size: 12px;
+            font-weight: 600;
+            background: var(--card-bg);
+            padding: 6px 16px;
+            border-radius: 50px;
+            border: 1px solid var(--border);
+            color: var(--gold-solid);
+        }
+
+        /* LAYOUT PRINCIPAL */
         main { display: flex; flex: 1; overflow: hidden; position: relative; }
+
         .content-area { flex: 1; overflow-y: auto; background: var(--bg); }
-        .video-container { width: 100%; background: #000; aspect-ratio: 16/9; position: relative; }
+
+        .video-container { 
+            width: 100%; 
+            background: #000; 
+            aspect-ratio: 16/9; 
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
         .video-container iframe { width: 100%; height: 100%; border: none; }
-        .toggle-sidebar-btn { position: absolute; right: 0; top: 50%; transform: translateY(-50%); background: var(--accent); color: white; border: none; padding: 15px 8px; cursor: pointer; border-radius: 8px 0 0 8px; z-index: 50; }
-        
-        .lesson-body { padding: 30px 40px; max-width: 1000px; }
-        .nav-controls { display: flex; align-items: center; gap: 15px; margin: 25px 0; }
-        
-        .sidebar { width: 380px; background: var(--sidebar); border-left: 1px solid var(--border); display: flex; flex-direction: column; }
+
+        .toggle-sidebar-btn { 
+            position: absolute; right: 0; top: 50%; transform: translateY(-50%); 
+            background: var(--gold-solid); color: #000; border: none; 
+            padding: 20px 10px; cursor: pointer; border-radius: 12px 0 0 12px; 
+            z-index: 50; font-weight: bold;
+        }
+
+        .lesson-body { padding: 40px; max-width: 1100px; margin: 0 auto; }
+
+        h2#currentTitle {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: var(--gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        #currentDesc { color: var(--text-dim); line-height: 1.6; font-size: 1.1rem; }
+
+        .nav-controls { 
+            display: flex; align-items: center; gap: 15px; margin: 30px 0; 
+            padding-top: 20px; border-top: 1px solid var(--border);
+        }
+
+        /* SIDEBAR */
+        .sidebar { 
+            width: 400px; 
+            background: var(--sidebar-bg); 
+            border-left: 1px solid var(--border); 
+            display: flex; flex-direction: column; 
+        }
         .sidebar.closed { width: 0; overflow: hidden; border-left: none; }
+
         .modules-wrapper { flex: 1; overflow-y: auto; }
+
         .module-item { border-bottom: 1px solid var(--border); }
-        .module-btn { width: 100%; padding: 16px 20px; background: var(--panel); border: none; color: var(--text); display: flex; justify-content: space-between; cursor: pointer; font-size: 14px; font-weight: 600; text-align: left; }
+        .module-btn { 
+            width: 100%; padding: 20px; background: transparent; border: none; 
+            color: var(--text-main); display: flex; justify-content: space-between; 
+            cursor: pointer; font-size: 15px; font-weight: 700; text-align: left;
+        }
+        .module-btn:hover { background: var(--card-bg); }
         
-        .lessons-list { display: none; }
+        .lessons-list { display: none; background: #080808; }
         .module-item.open .lessons-list { display: block; }
         
-        .lesson-item { padding: 15px 20px; display: flex; gap: 12px; cursor: pointer; font-size: 13px; border-bottom: 1px solid var(--border); align-items: center; }
-        .lesson-item.active { background: #21262d; border-left: 4px solid var(--accent); }
-        .lesson-item.completed span { color: var(--text-muted); text-decoration: line-through; }
+        .lesson-item { 
+            padding: 16px 20px; display: flex; gap: 12px; cursor: pointer; 
+            font-size: 14px; border-bottom: 1px solid #1a1a1a; align-items: center;
+            color: var(--text-dim);
+        }
+        .lesson-item:hover { background: var(--card-bg); color: #fff; }
+        .lesson-item.active { 
+            background: var(--accent-bg); 
+            border-left: 4px solid var(--gold-solid); 
+            color: var(--gold-solid);
+            font-weight: 600;
+        }
+        .lesson-item.completed span { color: #555; text-decoration: line-through; }
         
-        .lesson-item.is-quiz { background: rgba(168, 85, 247, 0.1); color: var(--accent); font-weight: 700; border-top: 1px solid var(--border); }
+        .lesson-item.is-quiz { 
+            background: var(--accent-bg); 
+            color: var(--gold-solid); 
+            font-weight: 800; 
+        }
 
-        .final-exam-area { padding: 20px; background: var(--panel); border-top: 2px solid var(--accent); }
-        button { padding: 10px 18px; border-radius: 6px; cursor: pointer; border: 1px solid var(--border); background: var(--panel); color: var(--text); font-weight: 600; }
-        .btn-accent { background: var(--accent); color: white; border: none; }
-        .btn-accent:disabled { background: #333; cursor: not-allowed; opacity: 0.5; }
+        /* BOTÕES */
+        button { 
+            padding: 12px 24px; border-radius: 12px; cursor: pointer; 
+            border: 1px solid var(--border); background: var(--card-bg); 
+            color: var(--text-main); font-weight: 700; 
+        }
         
-        /* Novo estilo para links */
-        .video-link-btn { font-size: 12px; color: var(--accent); text-decoration: none; display: inline-flex; align-items: center; gap: 5px; margin-top: 10px; cursor: pointer; }
-        .video-link-btn:hover { text-decoration: underline; }
+        .btn-accent { 
+            background: var(--gold); color: #000; border: none; 
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+        .btn-accent:hover { transform: translateY(-2px); opacity: 0.9; }
+        .btn-accent:disabled { background: #222; color: #555; cursor: not-allowed; box-shadow: none; }
+
+        .final-exam-area { padding: 25px; background: var(--sidebar-bg); border-top: 1px solid var(--border); }
+        
+        .video-link-btn { 
+            font-size: 13px; color: var(--gold-solid); text-decoration: none; 
+            display: inline-flex; align-items: center; gap: 8px; margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        input[type="checkbox"] {
+            accent-color: var(--gold-solid);
+            width: 18px; height: 18px; cursor: pointer;
+        }
+
+        /* Scrollbar Customizada */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--gold-solid); }
     </style>
 </head>
 <body>
@@ -59,24 +198,26 @@
 <header>
     <div class="logo">✈️ MESTRE DAS <span>MILHAS</span></div>
     <div style="display: flex; align-items: center;">
-        <button class="btn-test" onclick="bypassElite()">🧪 MOD TESTE (AULAS + NOTAS 10)</button>
-        <div id="prog-txt" style="font-size: 12px; background: var(--panel); padding: 5px 15px; border-radius: 20px; border: 1px solid var(--border);">0% Concluído</div>
+       <!--  <button class="btn-test" onclick="bypassElite()">🧪 MODO TESTE</button> -->
+        <div id="prog-txt">0% Concluído</div>
     </div>
 </header>
 
 <main>
     <div class="content-area">
         <div class="video-container">
-            <iframe id="mainPlayer" src=""></iframe>
+            <iframe id="mainPlayer" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
             <button class="toggle-sidebar-btn" onclick="toggleSidebar()">❮</button>
         </div>
         <div class="lesson-body">
+            <div id="videoExternalLink"></div>
             <h2 id="currentTitle">Carregando...</h2>
-            <div id="videoExternalLink"></div> <div class="nav-controls">
-                <button onclick="changeLesson(-1)" style="margin-left:auto">Anterior</button>
+            <div id="currentDesc"></div>
+            
+            <div class="nav-controls">
+                <button onclick="changeLesson(-1)" style="margin-left:auto">Aula Anterior</button>
                 <button class="btn-accent" onclick="changeLesson(1)">Próxima Aula</button>
             </div>
-            <div id="currentDesc"></div>
         </div>
     </div>
 
@@ -91,110 +232,101 @@
 <script>
     const course = [
         { name: "1. Fundamentos e CPM", lessons: [
-            {t: "Visão Geral 2026", d: "Entenda o mercado atual.", v: "3r6Q9tCzX4k"},
-            {t: "Dicionário do Milheiro", d: "Termos técnicos essenciais.", v: "8pTEmbeENF4"},
-            {t: "Cálculo de CPM", d: "Matemática do lucro.", v: "Z9z8Z2f3nGQ"},
-            {t: "Livelo e Esfera", d: "Acúmulo bancário.", v: "yJz8QyYw7l8"},
-            {t: "Cias Aéreas", d: "Diferenças entre programas.", v: "p7HKvqRI_Bo"},
-            {t: "Alertas Técnicos", d: "Monitoramento em tempo real.", v: "dZ9gY8JwqfE"},
-            {t: "Primeiro Acúmulo", d: "Passo a passo prático.", v: "5Y3G6a2Z8sU"}
+            {t: "Visão Geral 2026", d: "Entenda o mercado atual e as novas oportunidades do setor.", v: "3r6Q9tCzX4k"},
+            {t: "Dicionário do Milheiro", d: "Termos técnicos essenciais para não ficar perdido nas operações.", v: "8pTEmbeENF4"},
+            {t: "Cálculo de CPM", d: "A matemática por trás do lucro. Aprenda a calcular o custo por milheiro.", v: "Z9z8Z2f3nGQ"},
+            {t: "Livelo e Esfera", d: "Tudo sobre os maiores programas de fidelidade bancários do Brasil.", v: "yJz8QyYw7l8"},
+            {t: "Cias Aéreas", d: "As diferenças estratégicas entre Smiles, Latam Pass e Azul Fidelidade.", v: "p7HKvqRI_Bo"},
+            {t: "Alertas Técnicos", d: "Como configurar seu monitoramento para promoções em tempo real.", v: "dZ9gY8JwqfE"},
+            {t: "Primeiro Acúmulo", d: "Passo a passo prático para sua primeira operação lucrativa.", v: "5Y3G6a2Z8sU"}
         ]},
         { name: "2. Cartões e Benefícios", lessons: [
-            {t: "Ranking de Cartões", d: "Melhores cartões 2026.", v: "Qv2L8g1m3kM"},
-            {t: "Zerar Anuidade", d: "Scripts de negociação.", v: "7J9x8w3QX2M"},
-            {t: "Salas VIP", d: "LoungeKey e DragonPass.", v: "1b9QX5M0H8I"},
-            {t: "Seguros Gratuitos", d: "Economia em viagens.", v: "L8z1p9Y0QH4"},
-            {t: "Cooperativas", d: "Sicredi e Unicred.", v: "C8QZ3y9mF4s"},
-            {t: "Upgrade de Limite", d: "Conquistando o Black.", v: "9X3ZLkQ8P2s"},
-            {t: "Spread Zero", d: "Compras internacionais.", v: "M8LZ9Q2KX1A"},
-            {t: "Proteção de Preço", d: "Dinheiro de volta.", v: "wZ8L9Ck3m0E"}
+            {t: "Ranking de Cartões", d: "Análise completa dos melhores cartões de crédito para 2026.", v: "Qv2L8g1m3kM"},
+            {t: "Zerar Anuidade", d: "Scripts prontos para negociar e zerar taxas com os bancos.", v: "7J9x8w3QX2M"},
+            {t: "Salas VIP", d: "Acesso ilimitado via LoungeKey, DragonPass e Priority Pass.", v: "1b9QX5M0H8I"},
+            {t: "Seguros Gratuitos", d: "Economize centenas de dólares em seguros de viagem e veículos.", v: "L8z1p9Y0QH4"},
+            {t: "Cooperativas", d: "O poder do Sicredi e Unicred no acúmiluo de milhas.", v: "C8QZ3y9mF4s"},
+            {t: "Upgrade de Limite", d: "Estratégias para conquistar o tão sonhado cartão Black.", v: "9X3ZLkQ8P2s"},
+            {t: "Spread Zero", d: "Como economizar em compras internacionais com cartões específicos.", v: "M8LZ9Q2KX1A"},
+            {t: "Proteção de Preço", d: "Receba dinheiro de volta se o preço do produto cair após a compra.", v: "wZ8L9Ck3m0E"}
         ]},
         { name: "3. Acúmulo Estratégico", lessons: [
-            {t: "Compras 10x1", d: "10 pontos por real.", v: "P9Zk3L8QX4s"},
-            {t: "Compra de Pontos", d: "Análise de custo.", v: "Q9ZL2X8M3F4"},
-            {t: "Bônus de 100%", d: "Transferência certa.", v: "dZ9gY8JwqfE"},
-            {t: "Clubes de Milhas", d: "ROI de assinaturas.", v: "3r6Q9tCzX4k"},
-            {t: "Milhas no Tanque", d: "Shell e Ipiranga.", v: "8pTEmbeENF4"},
-            {t: "Parceiros Varejo", d: "Amazon e Magalu.", v: "Z9z8Z2f3nGQ"},
-            {t: "Gestão de CPFs", d: "Escalando o acúmulo.", v: "yJz8QyYw7l8"},
-            {t: "Datas Sazonais", d: "Black Friday.", v: "p7HKvqRI_Bo"},
-            {t: "Giro de Boletos", d: "Pontuando em contas.", v: "dZ9gY8JwqfE"}
+            {t: "Compras 10x1", d: "Como multiplicar seu acúmulo em compras do dia a dia.", v: "P9Zk3L8QX4s"},
+            {t: "Compra de Pontos", d: "Análise fria: quando vale a pena comprar pontos diretamente.", v: "Q9ZL2X8M3F4"},
+            {t: "Bônus de 100%", d: "O momento exato de transferir seus pontos para a Cia Aérea.", v: "dZ9gY8JwqfE"},
+            {t: "Clubes de Milhas", d: "Análise de ROI sobre as assinaturas mensais.", v: "3r6Q9tCzX4k"},
+            {t: "Milhas no Tanque", d: "Abasteça e acumule com Shell Box e Ipiranga Km de Vantagens.", v: "8pTEmbeENF4"},
+            {t: "Parceiros Varejo", d: "Estratégias para Amazon, Magalu e Casas Bahia.", v: "Z9z8Z2f3nGQ"},
+            {t: "Gestão de CPFs", d: "Como escalar seu negócio usando contas de familiares.", v: "yJz8QyYw7l8"},
+            {t: "Datas Sazonais", d: "Preparação para Black Friday e aniversários de programas.", v: "p7HKvqRI_Bo"},
+            {t: "Giro de Boletos", d: "Aprenda a pontuar pagando contas básicas de consumo.", v: "dZ9gY8JwqfE"}
         ]},
         { name: "4. Emissões Internacionais", lessons: [
-            {t: "Tabela Fixa", d: "Segredos da emissão.", v: "5Y3G6a2Z8sU"},
-            {t: "Classe Executiva", d: "Luxo barato.", v: "Qv2L8g1m3kM"},
-            {t: "Stopover", d: "Destinos extras.", v: "7J9x8w3QX2M"},
-            {t: "Iberia Plus", d: "Foco na Europa.", v: "1b9QX5M0H8I"},
-            {t: "Regras de CPF", d: "Evitando bloqueios.", v: "L8z1p9Y0QH4"},
-            {t: "Destinos EUA", d: "Miami e NY.", v: "C8QZ3y9mF4s"},
-            {t: "Taxas de Combustível", d: "Identificando taxas.", v: "9X3ZLkQ8P2s"},
-            {t: "ALL Accor", d: "Hotéis com pontos.", v: "M8LZ9Q2KX1A"}
+            {t: "Tabela Fixa", d: "O 'Santo Graal' das milhas: como emitir voos sem variação de preço.", v: "5Y3G6a2Z8sU"},
+            {t: "Classe Executiva", d: "Como viajar com luxo pagando menos que uma classe econômica.", v: "Qv2L8g1m3kM"},
+            {t: "Stopover", d: "Adicione destinos extras na sua viagem sem custo adicional.", v: "7J9x8w3QX2M"},
+            {t: "Iberia Plus", d: "Foco total em emissões baratas para a Europa via Madrid.", v: "1b9QX5M0H8I"},
+            {t: "Regras de CPF", d: "Entenda o limite de beneficiários para não ser bloqueado.", v: "L8z1p9Y0QH4"},
+            {t: "Destinos EUA", d: "Melhores rotas para Miami, Orlando e Nova York.", v: "C8QZ3y9mF4s"},
+            {t: "Taxas de Combustível", d: "Como fugir das taxas abusivas em emissões internacionais.", v: "9X3ZLkQ8P2s"},
+            {t: "ALL Accor", d: "Transforme milhas em hospedagens em hotéis de luxo pelo mundo.", v: "M8LZ9Q2KX1A"}
         ]},
         { name: "5. Milhas como Negócio", lessons: [
-            {t: "Venda em Balcão", d: "Max e Hotmilhas.", v: "wZ8L9Ck3m0E"},
-            {t: "Venda Particular", d: "Margem de lucro.", v: "P9Zk3L8QX4s"},
-            {t: "Gestão de Lucro", d: "Planilha de controle.", v: "Q9ZL2X8M3F4"},
-            {t: "Imposto de Renda", d: "Declaração legal.", v: "dZ9gY8JwqfE"},
-            {t: "Agência Digital", d: "Sua própria agência.", v: "3r6Q9tCzX4k"},
-            {t: "Reinvestimento", d: "Giro de capital.", v: "8pTEmbeENF4"},
-            {t: "Tendências 2026", d: "Futuro do mercado.", v: "Z9z8Z2f3nGQ"},
-            {t: "Mentoria Final", d: "Encerramento.", v: "yJz8QyYw7l8"}
+            {t: "Venda em Balcão", d: "Como operar com plataformas como MaxMilhas e HotMilhas.", v: "wZ8L9Ck3m0E"},
+            {t: "Venda Particular", d: "Aumente sua margem vendendo passagens direto para clientes.", v: "P9Zk3L8QX4s"},
+            {t: "Gestão de Lucro", d: "Planilha de controle financeiro para operações de milhas.", v: "Q9ZL2X8M3F4"},
+            {t: "Imposto de Renda", d: "Como declarar seus ganhos com milhas de forma legal.", v: "dZ9gY8JwqfE"},
+            {t: "Agência Digital", d: "Transforme seu conhecimento em uma agência de viagens.", v: "3r6Q9tCzX4k"},
+            {t: "Reinvestimento", d: "O ciclo do dinheiro: como girar capital para crescer.", v: "8pTEmbeENF4"},
+            {t: "Tendências 2026", d: "O que esperar do futuro do mercado de fidelidade.", v: "Z9z8Z2f3nGQ"},
+            {t: "Mentoria Final", d: "Encerramento do curso e próximos passos na sua jornada.", v: "yJz8QyYw7l8"}
         ]}
     ];
 
     let current = { m: 0, l: 0 };
-    let progress = JSON.parse(localStorage.getItem('mm_progress')) || { lessons: {}, exams: {1:0, 2:0, 3:0, 4:0, 5:0} };
+    let progress = JSON.parse(localStorage.getItem('mm_progress')) || { lessons: {}, exams: {} };
 
     function init() {
         const container = document.getElementById('moduleContainer');
         container.innerHTML = "";
         course.forEach((mod, mIdx) => {
             const div = document.createElement('div');
-            div.className = `module-item ${mIdx === 0 ? 'open' : ''}`;
+            div.className = `module-item ${mIdx === current.m ? 'open' : ''}`;
             const lessonsHTML = mod.lessons.map((les, lIdx) => {
                 const done = progress.lessons[les.v] === true;
                 return `
-                <div class="lesson-item ${done ? 'completed' : ''}" id="les-${les.v}" onclick="play(${mIdx}, ${lIdx})">
+                <div class="lesson-item ${done ? 'completed' : ''} ${mIdx === current.m && lIdx === current.l ? 'active' : ''}" id="les-${les.v}" onclick="play(${mIdx}, ${lIdx})">
                     <input type="checkbox" ${done ? 'checked' : ''} onclick="event.stopPropagation(); toggleLesson('${les.v}')">
                     <span>${les.t}</span>
                 </div>`;
             }).join('');
             
-            div.innerHTML = `<button class="module-btn" onclick="this.parentElement.classList.toggle('open')">${mod.name} ▾</button>
+            div.innerHTML = `<button class="module-btn" onclick="this.parentElement.classList.toggle('open')">
+                                <span>${mod.name}</span> <span>▾</span>
+                             </button>
                              <div class="lessons-list">${lessonsHTML}
                                 <div class="lesson-item is-quiz" onclick="window.location.href='/prova/${mIdx+1}'">
-                                    <span>🏆 PROVA DO MÓDULO ${mIdx+1}</span>
+                                    <span> PROVA DO MÓDULO ${mIdx+1}</span>
                                 </div>
                              </div>`;
             container.appendChild(div);
         });
-        play(0, 0);
         updateProgressUI();
-    }
-
-    async function bypassElite() {
-        if(!confirm("Ativar Modo Teste?")) return;
-        course.forEach(m => m.lessons.forEach(l => progress.lessons[l.v] = true));
-        localStorage.setItem('mm_progress', JSON.stringify(progress));
-        location.reload();
     }
 
     function play(m, l) {
         current = { m, l };
         const les = course[m].lessons[l];
         
-        // Atualiza Iframe
-        document.getElementById('mainPlayer').src = `https://www.youtube.com/embed/${les.v}?autoplay=1`;
+        document.getElementById('mainPlayer').src = `https://www.youtube.com/embed/${les.v}?autoplay=1&rel=0&modestbranding=1`;
         document.getElementById('currentTitle').innerText = les.t;
         document.getElementById('currentDesc').innerText = les.d;
         
-        // Atualiza Link do Vídeo (JS Dinâmico)
         const linkContainer = document.getElementById('videoExternalLink');
-        const youtubeUrl = `https://www.youtube.com/watch?v=${les.v}`;
-        linkContainer.innerHTML = `<a href="${youtubeUrl}" target="_blank" class="video-link-btn">🔗 Abrir no YouTube</a>`;
 
         document.querySelectorAll('.lesson-item').forEach(e => e.classList.remove('active'));
-        document.getElementById(`les-${les.v}`)?.classList.add('active');
+        const activeItem = document.getElementById(`les-${les.v}`);
+        if(activeItem) activeItem.classList.add('active');
     }
 
     function toggleLesson(videoId) {
@@ -212,19 +344,43 @@
         
         const btn = document.getElementById('finalBtn');
         btn.disabled = (percent < 100); 
-        btn.innerText = (percent < 100) ? "🎓 ATIVIDADE FINAL (BLOQUEADA)" : "🚀 ACESSAR PROVA FINAL";
+        btn.innerText = (percent < 100) ? "🎓 ATIVIDADE FINAL (BLOQUEADA)" : " ACESSAR PROVA FINAL";
     }
 
     function changeLesson(step) {
-        const next = current.l + step;
-        if(course[current.m].lessons[next]) play(current.m, next);
+        let nextL = current.l + step;
+        let nextM = current.m;
+
+        if (nextL >= course[current.m].lessons.length) {
+            nextM++;
+            nextL = 0;
+        } else if (nextL < 0) {
+            nextM--;
+            if (nextM >= 0) nextL = course[nextM].lessons.length - 1;
+        }
+
+        if (course[nextM] && course[nextM].lessons[nextL]) {
+            play(nextM, nextL);
+            init();
+        }
+    }
+
+    async function bypassElite() {
+        if(!confirm("Deseja ativar o Modo Desenvolvedor para testes?")) return;
+        course.forEach(m => m.lessons.forEach(l => progress.lessons[l.v] = true));
+        localStorage.setItem('mm_progress', JSON.stringify(progress));
+        location.reload();
     }
 
     function toggleSidebar() {
         document.getElementById('sidebar').classList.toggle('closed');
+        const btn = document.querySelector('.toggle-sidebar-btn');
+        btn.innerText = document.getElementById('sidebar').classList.contains('closed') ? "❯" : "❮";
     }
 
+    // Inicialização
     init();
+    play(0, 0);
 </script>
 </body>
 </html>
