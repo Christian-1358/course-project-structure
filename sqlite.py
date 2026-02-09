@@ -5,150 +5,179 @@ from datetime import datetime
 # ===============================
 # CONFIGURAÇÃO DO BANCO
 # ===============================
-BASE_DIR = os.path.abspath(os.getcwd())
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "usuarios.db")
 
+
+def conectar():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
 # ===============================
-# CRIAÇÃO / ATUALIZAÇÃO DO BANCO
+# CRIAÇÃO / MIGRAÇÃO DO BANCO
 # ===============================
 def criar_banco():
-    with sqlite3.connect(DB_PATH) as conn:
-        c = conn.cursor()
-        c.execute("PRAGMA foreign_keys = ON;")
+    conn = conectar()
+    c = conn.cursor()
 
-        # ==================================================
-        # TABELA USERS
-        # ==================================================
-        c.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT UNIQUE NOT NULL,
-            nome TEXT,
-            password TEXT NOT NULL,
-            email TEXT UNIQUE NOT NULL,
-            ativo INTEGER DEFAULT 1,
+    c.execute("PRAGMA foreign_keys = ON;")
 
-            pago INTEGER DEFAULT 0,
+    # ===============================
+    # TABELA USERS
+    # ===============================
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE NOT NULL,
+        nome TEXT,
+        password TEXT NOT NULL,
+        email TEXT UNIQUE NOT NULL,
+        ativo INTEGER DEFAULT 1,
 
-            created_at TEXT,
-            inicio_curso TEXT,
+        pago INTEGER DEFAULT 0,
+        data_pagamento TEXT,
 
-            fim_modulo1 TEXT,
-            fim_modulo2 TEXT,
-            fim_modulo3 TEXT,
-            fim_modulo4 TEXT,
-            fim_modulo5 TEXT,
+        created_at TEXT,
+        inicio_curso TEXT,
 
-            certificado_fin INTEGER DEFAULT 0
-        );
-        """)
+        fim_modulo1 TEXT,
+        fim_modulo2 TEXT,
+        fim_modulo3 TEXT,
+        fim_modulo4 TEXT,
+        fim_modulo5 TEXT,
 
-        # ==================================================
-        # TABELA RESULTADO DAS PROVAS
-        # ==================================================
-        c.execute("""
-        CREATE TABLE IF NOT EXISTS provas_resultado (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER NOT NULL,
-            modulo INTEGER NOT NULL,
-            nota REAL NOT NULL,
-            aprovado INTEGER NOT NULL,
-            data TEXT NOT NULL,
-            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-        );
-        """)
+        certificado_fin INTEGER DEFAULT 0
+    );
+    """)
 
-        # ==================================================
-        # TABELA PROGRESSO
-        # ==================================================
-        c.execute("""
-        CREATE TABLE IF NOT EXISTS progresso (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER NOT NULL,
-            modulo INTEGER NOT NULL,
-            aula INTEGER NOT NULL,
-            concluida INTEGER DEFAULT 0,
-            UNIQUE(user_id, modulo, aula),
-            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-        );
-        """)
+    # ===============================
+    # PROVAS
+    # ===============================
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS provas_resultado (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        modulo INTEGER NOT NULL,
+        nota REAL NOT NULL,
+        aprovado INTEGER NOT NULL,
+        data TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+    """)
 
-        # ==================================================
-        # TABELA RECUPERAÇÃO DE SENHA
-        # ==================================================
-        c.execute("""
-        CREATE TABLE IF NOT EXISTS password_reset (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER NOT NULL,
-            token TEXT UNIQUE NOT NULL,
-            expires_at TEXT NOT NULL,
-            last_request TEXT NOT NULL,
-            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-        );
-        """)
+    # ===============================
+    # PROGRESSO
+    # ===============================
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS progresso (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        modulo INTEGER NOT NULL,
+        aula INTEGER NOT NULL,
+        concluida INTEGER DEFAULT 0,
+        UNIQUE(user_id, modulo, aula),
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+    """)
 
-        # ==================================================
-        # MIGRAÇÃO DE COLUNAS (SAFE)
-        # ==================================================
-        colunas_necessarias = [
-            ("nome", "TEXT"),
-            ("created_at", "TEXT"),
-            ("inicio_curso", "TEXT"),
-            ("fim_modulo1", "TEXT"),
-            ("fim_modulo2", "TEXT"),
-            ("fim_modulo3", "TEXT"),
-            ("fim_modulo4", "TEXT"),
-            ("fim_modulo5", "TEXT"),
-            ("pago", "INTEGER DEFAULT 0"),
-            ("certificado_fin", "INTEGER DEFAULT 0"),
-        ]
+    # ===============================
+    # RECUPERAÇÃO DE SENHA
+    # ===============================
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS password_reset (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        token TEXT UNIQUE NOT NULL,
+        expires_at TEXT NOT NULL,
+        last_request TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+    """)
 
-        for nome_col, tipo_col in colunas_necessarias:
-            try:
-                c.execute(f"ALTER TABLE users ADD COLUMN {nome_col} {tipo_col}")
-            except sqlite3.OperationalError:
-                pass
+    # ===============================
+    # MIGRAÇÃO SEGURA DE COLUNAS
+    # ===============================
+    colunas = [
+        ("nome", "TEXT"),
+        ("created_at", "TEXT"),
+        ("inicio_curso", "TEXT"),
+        ("pago", "INTEGER DEFAULT 0"),
+        ("data_pagamento", "TEXT"),
+        ("certificado_fin", "INTEGER DEFAULT 0"),
+    ]
 
-        # ==================================================
-        # BACKFILL DE DADOS
-        # ==================================================
-        agora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    for coluna, tipo in colunas:
+        try:
+            c.execute(f"ALTER TABLE users ADD COLUMN {coluna} {tipo}")
+        except sqlite3.OperationalError:
+            pass
 
-        c.execute("""
-            UPDATE users
-            SET created_at = ?
-            WHERE created_at IS NULL
-        """, (agora,))
+    # ===============================
+    # BACKFILL
+    # ===============================
+    agora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        conn.commit()
+    c.execute("""
+        UPDATE users
+        SET created_at = ?
+        WHERE created_at IS NULL
+    """, (agora,))
+
+    conn.commit()
+    conn.close()
+
 
 # ===============================
-# FUNÇÕES AUXILIARES (ADMIN / TESTE)
+# FUNÇÕES DE NEGÓCIO
 # ===============================
-def liberar_certificado_final(user_id):
-    with sqlite3.connect(DB_PATH) as conn:
-        c = conn.cursor()
-        c.execute("""
-            UPDATE users
-            SET certificado_fin = 1
-            WHERE id = ?
-        """, (user_id,))
-        conn.commit()
+def usuario_pagou(user_id):
+    conn = conectar()
+    c = conn.cursor()
 
-    print(f"🏆 Certificado FINAL liberado | user_id={user_id}")
+    c.execute("SELECT pago FROM users WHERE id = ?", (user_id,))
+    row = c.fetchone()
+
+    conn.close()
+    return bool(row and row["pago"] == 1)
+
 
 def liberar_pagamento(user_id):
-    with sqlite3.connect(DB_PATH) as conn:
-        c = conn.cursor()
-        c.execute("""
-            UPDATE users
-            SET pago = 1,
-                inicio_curso = ?
-            WHERE id = ?
-        """, (datetime.now().strftime("%Y-%m-%d %H:%M:%S"), user_id))
-        conn.commit()
+    conn = conectar()
+    c = conn.cursor()
 
+    c.execute("""
+        UPDATE users
+        SET pago = 1,
+            data_pagamento = ?,
+            inicio_curso = ?
+        WHERE id = ?
+    """, (
+        datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        user_id
+    ))
+
+    conn.commit()
+    conn.close()
     print(f"💳 Pagamento liberado | user_id={user_id}")
+
+
+def liberar_certificado_final(user_id):
+    conn = conectar()
+    c = conn.cursor()
+
+    c.execute("""
+        UPDATE users
+        SET certificado_fin = 1
+        WHERE id = ?
+    """, (user_id,))
+
+    conn.commit()
+    conn.close()
+    print(f"🏆 Certificado FINAL liberado | user_id={user_id}")
+
 
 # ===============================
 # EXECUÇÃO DIRETA
@@ -156,6 +185,6 @@ def liberar_pagamento(user_id):
 if __name__ == "__main__":
     print("-" * 60)
     criar_banco()
-    print("🚀 BANCO ATUALIZADO COM SUCESSO")
-    print("📁 Arquivo:", DB_PATH)
+    print("🚀 BANCO CRIADO / ATUALIZADO COM SUCESSO")
+    print("📁 Banco:", DB_PATH)
     print("-" * 60)

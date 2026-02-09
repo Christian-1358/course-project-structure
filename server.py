@@ -20,7 +20,6 @@ from app.handlers.recuperacao import RecuperacaoHandler
 
 # 👉 PAGAMENTO
 from app.handlers.pagamento import PagamentoPageHandler, ConfirmarPagamentoHandler
-
 # 👉 (se quiser manter mensal depois)
 # from app.handlers.pagamento_mensal import PagamentoMensalPage, CriarPagamentoHandler, WebhookHandler
 
@@ -121,6 +120,8 @@ def make_app():
         (r"/admin/alterar_status/?", AlterarStatusHandler),
         (r"/admin/compras/?", ComprasHandler),
 
+        (r"/pagamento/?", PagamentoPageHandler),
+(r"/confirmar_pagamento/?", ConfirmarPagamentoHandler),
     ], **settings)
 
 
