@@ -18,7 +18,7 @@ from app.handlers.criar_conta import CriarContaHandler
 from app.handlers.prova import ProvaHandler
 from app.handlers.recuperacao import RecuperacaoHandler
 
-from app.handlers.pagamento import BaseHandler, OrdersHandler, CheckoutHandler, PagamentoPageHandler, MercadoPagoCreateHandler, MercadoPagoWebhookHandler
+from app.handlers.pagamento import OrdersHandler, CheckoutHandler, PagamentoPageHandler, MercadoPagoCreateHandler, MercadoPagoWebhookHandler
 from app.handlers.certificado import CertificadoViewHandler, CertificadoPDFHandler
 
 # ===============================
@@ -123,7 +123,7 @@ def make_app():
         (r"/pagamento/webhook/?", MercadoPagoWebhookHandler),
         (r"/checkout/([a-zA-Z]+)", CheckoutHandler),
         (r"/orders", OrdersHandler),
-        (r"/pagamento/?", BaseHandler)
+        (r"/pagamento/?", PagamentoPageHandler)
     ], **settings)
 
 

@@ -9,6 +9,7 @@ from datetime import datetime
 import tornado.ioloop
 import tornado.web
 from app.utils.pagamento_utils import usuario_pagou, marcar_como_pago
+from app.handlers.base import BaseHandler
 
 # MercadoPago token (use sandbox access token). Set via env var `MP_ACCESS_TOKEN`.
 MP_ACCESS_TOKEN = os.environ.get("MP_ACCESS_TOKEN", "")
@@ -153,7 +154,7 @@ criar_tabelas()
 # ===============================
 # HANDLERS
 # ===============================
-class BaseHandler(tornado.web.RequestHandler):
+class PagamentoPageHandler(BaseHandler):
     def write_json(self, data):
         self.set_header("Content-Type", "application/json")
         self.write(json.dumps(data))
@@ -174,8 +175,9 @@ class BaseHandler(tornado.web.RequestHandler):
             mp_available = mp_client is not None
             
             self.render("pagamento.html", user_id=user_id, amount=200.0, mp_available=mp_available)
-        except Exception:
+        except Exception as e:
             # Fallback simples se o template não existir
+            print(f"[pagamento] erro ao renderizar template: {e}")
             self.set_status(200)
             self.write("<h1>Página de pagamento</h1><p>Implemente o front-end de pagamento.</p>")
 
@@ -281,7 +283,7 @@ class MercadoPagoWebhookHandler(tornado.web.RequestHandler):
 
         self.write("ok")
 
-class CheckoutHandler(BaseHandler):
+class CheckoutHandler(PagamentoPageHandler):
     async def post(self, method):
         """
         Recebe o tipo de pagamento: pix, card, paypal, boleto
@@ -337,7 +339,7 @@ class CheckoutHandler(BaseHandler):
             "status": status
         })
 
-class OrdersHandler(BaseHandler):
+class OrdersHandler(PagamentoPageHandler):
     def get(self):
         """
         Retorna todas as orders (para admin/testes)
