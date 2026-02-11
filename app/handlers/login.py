@@ -86,15 +86,28 @@ class LoginHandler(tornado.web.RequestHandler):
             conn.commit()
 
         conn.close()
+        # 🔒 BLOQUEIO SE NÃO PAGOU (verifica antes de criar cookies)
+        pago_status = False
+        try:
+            pago_status = usuario_pagou(user["id"])
+        except Exception as e:
+            print(f"[DEBUG] erro ao checar pagamento user_id={user['id']}: {e}")
 
-        self.set_secure_cookie("user", user["username"])
-        self.set_secure_cookie("user_id", str(user["id"]))
+        print(f"[DEBUG] usuario_pagou({user['id']}) -> {pago_status}")
 
-        # 🔒 BLOQUEIO SE NÃO PAGOU
-        if not usuario_pagou(user["id"]):
-            self.redirect("/pagamento")
+        if not pago_status:
+            conn.close()
+            self.render(
+                "login.html",
+                erro="Conta não liberada: pagamento pendente",
+                mensagem=None,
+                usuario_prefill=username
+            )
             return
 
+        # cria cookies apenas se o usuário pagou
+        self.set_secure_cookie("user", user["username"])
+        self.set_secure_cookie("user_id", str(user["id"]))
         self.redirect("/curso")
 
 
@@ -159,15 +172,13 @@ class GoogleLoginHandler(
 
             conn.commit()
             conn.close()
+            # 🔒 BLOQUEIO SE NÃO PAGOU (verifica antes de criar cookies)
+            if not usuario_pagou(user_id):
+                self.write("Conta não liberada: pagamento pendente")
+                return
 
             self.set_secure_cookie("user", username)
             self.set_secure_cookie("user_id", str(user_id))
-
-            # 🔒 BLOQUEIO SE NÃO PAGOU
-            if not usuario_pagou(user_id):
-                self.redirect("/pagamento")
-                return
-
             self.redirect("/curso")
 
         else:

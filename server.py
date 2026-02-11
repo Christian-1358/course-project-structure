@@ -18,14 +18,7 @@ from app.handlers.criar_conta import CriarContaHandler
 from app.handlers.prova import ProvaHandler
 from app.handlers.recuperacao import RecuperacaoHandler
 
-# 👉 PAGAMENTO
-from app.handlers.pagamento import PagamentoPageHandler, ConfirmarPagamentoHandler
-# 👉 (se quiser manter mensal depois)
-# from app.handlers.pagamento_mensal import PagamentoMensalPage, CriarPagamentoHandler, WebhookHandler
-
-# ===============================
-# CERTIFICADOS
-# ===============================
+from app.handlers.pagamento import BaseHandler, OrdersHandler, CheckoutHandler, PagamentoPageHandler, MercadoPagoCreateHandler, MercadoPagoWebhookHandler
 from app.handlers.certificado import CertificadoViewHandler, CertificadoPDFHandler
 
 # ===============================
@@ -35,7 +28,9 @@ from app.utils.admin_tools import (
     LoginDevHandler, AlterarStatusHandler, 
     BuscarUsuarioHandler,
     ForcarNotasHandler, ComprasHandler, GerarCertificadoHandler, 
-    criar_tabela, criar_usuario_admin_se_nao_existe
+    criar_tabela, criar_usuario_admin_se_nao_existe,
+    MarcarPagoHandler, RemoverPagamentoHandler, BloquearUsuarioHandler, DesbloquearUsuarioHandler,
+    AlterarSenhaHandler, ResetarSenhaHandler
 )
 
 # ===============================
@@ -83,11 +78,6 @@ def make_app():
         (r"/criar_conta/?", CriarContaHandler),
         (r"/recuperar_senha/?", RecuperarSenhaHandler),
 
-        # ===============================
-        # PAGAMENTO (OBRIGATÓRIO)
-        # ===============================
-        (r"/pagamento/?", PagamentoPageHandler),
-        (r"/confirmar_pagamento/?", ConfirmarPagamentoHandler),
 
         # ===============================
         # CONTEÚDO (BLOQUEADO SE NÃO PAGOU)
@@ -118,10 +108,22 @@ def make_app():
         (r"/admin/buscar_usuario/?", BuscarUsuarioHandler),
         (r"/admin/forcar_notas/?", ForcarNotasHandler),
         (r"/admin/alterar_status/?", AlterarStatusHandler),
+        (r"/admin/marcar_pago/?", MarcarPagoHandler),
+        (r"/admin/remover_pago/?", RemoverPagamentoHandler),
+        (r"/admin/bloquear_usuario/?", BloquearUsuarioHandler),
+        (r"/admin/desbloquear_usuario/?", DesbloquearUsuarioHandler),
+        (r"/admin/alterar_senha/?", AlterarSenhaHandler),
+        (r"/admin/resetar_senha/?", ResetarSenhaHandler),
         (r"/admin/compras/?", ComprasHandler),
 
-        (r"/pagamento/?", PagamentoPageHandler),
-(r"/confirmar_pagamento/?", ConfirmarPagamentoHandler),
+
+
+        (r"/pagamentotrue/?", PagamentoPageHandler),
+        (r"/pagamento/criar/?", MercadoPagoCreateHandler),
+        (r"/pagamento/webhook/?", MercadoPagoWebhookHandler),
+        (r"/checkout/([a-zA-Z]+)", CheckoutHandler),
+        (r"/orders", OrdersHandler),
+        (r"/pagamento/?", BaseHandler)
     ], **settings)
 
 

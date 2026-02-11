@@ -185,6 +185,44 @@
                 box-shadow: 0 10px 20px rgba(0,0,0,0.4);
             }
 
+            
+            /* Efeito de saída suave para o corpo da página */
+body {
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.page-exit {
+    opacity: 0;
+    transform: translateY(-20px);
+    pointer-events: none;
+}
+
+/* Estilo profissional do botão */
+.btn-back {
+    background: transparent;
+    border: none;
+    color: #888888;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 25px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 100px;
+}
+
+.btn-back:hover { 
+    color: #ffffff; 
+    background: rgba(255, 255, 255, 0.05);
+    transform: translateX(-5px); 
+}
+            
+            
+            
+            
             @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         </style>
     </head>
@@ -225,7 +263,12 @@
             <span>🔒 Criptografia SSL</span>
             <span>✅ Compra Segura</span>
             <span>🚀 Acesso Imediato</span>
+            
         </div>
+        <button class="btn-back" onclick="goBack()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    Voltar ao login
+</button>
     </main>
 
     <script>
@@ -313,6 +356,17 @@
 
         // Init
         setTab('pix', document.querySelector('.tab'));
+
+        function goBack() {
+    // Adiciona a classe de animação ao body
+    document.body.classList.add('page-exit');
+    
+    // Aguarda a animação (500ms) antes de mudar de página
+    setTimeout(() => {
+window.location.href = "login.html";    }, 500);
+}
     </script>
     </body>
     </html>
+
+

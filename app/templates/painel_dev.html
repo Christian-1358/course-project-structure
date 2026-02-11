@@ -55,6 +55,10 @@
                 </td>
                 <td>
                     <button class="btn btn-orange" onclick="api('/admin/forcar_notas', {id: '{{ u['id'] }}'})">🚀 FULL 10</button>
+                    <button class="btn btn-green" onclick="api('/admin/marcar_pago', {id: '{{ u['id'] }}'})">PAGAR</button>
+                    <button class="btn btn-gray" onclick="api('/admin/remover_pago', {id: '{{ u['id'] }}'})">REM PAG</button>
+                    <button class="btn btn-orange" onclick="bloquear('{{ u['id'] }}')">BLOQUEAR</button>
+                    <button class="btn btn-blue" onclick="api('/admin/desbloquear_usuario', {id: '{{ u['id'] }}'})">DESBLOQ</button>
                     <button class="btn btn-green" onclick="novaSenha('{{ u['id'] }}')">SENHA</button>
                     <button class="btn btn-orange" onclick="api('/admin/resetar_senha', {id: '{{ u['id'] }}'})">RESET</button>
                     <button class="btn btn-red" onclick="deletar('{{ u['id'] }}')">EXCLUIR</button>
