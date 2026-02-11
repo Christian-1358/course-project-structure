@@ -2,6 +2,7 @@ import tornado.web
 import sqlite3
 import os
 from datetime import datetime
+from app.handlers.base import require_owner, require_auth
 
 # Configuração de caminhos baseada na estrutura do projeto
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
@@ -17,6 +18,7 @@ class ProvaHandler(tornado.web.RequestHandler):
         uid = self.get_secure_cookie("user_id")
         return uid.decode() if uid else None
 
+    @require_owner
     @tornado.web.authenticated
     def get(self, modulo):
         user_id = self.current_user

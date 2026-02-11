@@ -3,6 +3,7 @@ import sqlite3
 import tornado.ioloop
 import tornado.web
 from datetime import datetime
+from app.handlers.base import require_owner, require_auth
 
 try:
     from weasyprint import HTML
@@ -68,12 +69,14 @@ def render_html_certificado(nome, modulo, ementa, inicio, fim, is_pdf=False):
 """
 
 class CertificadoViewHandler(tornado.web.RequestHandler):
+    @require_owner
     def get(self, modulo_id):
         # Aqui você buscaria no banco. Exemplo estático:
         html = render_html_certificado("NOME DO ALUNO", modulo_id, "Expert em Milhas", "01/01/2026", "07/02/2026", False)
         self.write(html)
 
 class CertificadoPDFHandler(tornado.web.RequestHandler):
+    @require_owner
     def get(self, modulo_id):
         if not HTML:
             self.set_status(500)
