@@ -18,7 +18,8 @@ class BaseHandler(tornado.web.RequestHandler):
             if not usuario_pagou(uid):
                 return None
         except Exception:
-            # Em caso de erro ao checar pagamento, não autentica
+            # Em caso de erro ao checar pagamento, não
+            # utentica
             return None
 
         return uid

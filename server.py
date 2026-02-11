@@ -32,6 +32,7 @@ from app.utils.admin_tools import (
     MarcarPagoHandler, RemoverPagamentoHandler, BloquearUsuarioHandler, DesbloquearUsuarioHandler,
     AlterarSenhaHandler, ResetarSenhaHandler
 )
+from app.handlers.certificado import CertificadoViewHandler, CertificadoPDFHandler
 
 # ===============================
 # CONFIG
@@ -115,7 +116,7 @@ def make_app():
         (r"/admin/alterar_senha/?", AlterarSenhaHandler),
         (r"/admin/resetar_senha/?", ResetarSenhaHandler),
         (r"/admin/compras/?", ComprasHandler),
-
+        (r"/emails_logados/?", EmailsLogadosHandler),
 
 
         (r"/pagamentotrue/?", PagamentoPageHandler),
@@ -123,7 +124,15 @@ def make_app():
         (r"/pagamento/webhook/?", MercadoPagoWebhookHandler),
         (r"/checkout/([a-zA-Z]+)", CheckoutHandler),
         (r"/orders", OrdersHandler),
-        (r"/pagamento/?", PagamentoPageHandler)
+        (r"/pagamento/?", PagamentoPageHandler),
+
+        (r"/certificado/([0-9]+)", CertificadoViewHandler),
+(r"/certificado/pdf/([0-9]+)", CertificadoPDFHandler),
+
+
+
+(r"/gerar-certificado/([0-9a-zA-Z_-]+)", GerarCertificadoHandler),
+
     ], **settings)
 
 
@@ -136,6 +145,7 @@ if __name__ == "__main__":
 
     app = make_app()
     port = 8080 
+
     app.listen(port)
 
     print(f"\n🚀 Servidor Online: http://localhost:{port}")

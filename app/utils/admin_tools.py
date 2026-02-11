@@ -71,124 +71,64 @@ class GerarCertificadoHandler(tornado.web.RequestHandler):
     @tornado.web.authenticated
     def get(self, modulo_id=None):
         uid = self.current_user
-        mid_raw = modulo_id or self.modulo_id_default
-        is_final = str(mid_raw).lower() in ["6", "final", "conclusao"]
+        mid_raw = str(modulo_id or self.modulo_id_default).lower()
         
-        conn = conectar(); c = conn.cursor()
+        # Identifica se é o certificado final
+        is_final = mid_raw in ["6", "final", "conclusao"]
+        
+        # Converte para INT para os IFs do HTML não quebrarem
+        try:
+            modulo_int = int(mid_raw) if mid_raw.isdigit() else 6
+        except:
+            modulo_int = 6
+
+        # Busca dados do usuário (apenas colunas que existem: id, username, nome)
+        conn = conectar()
+        c = conn.cursor()
         c.execute("SELECT username, nome FROM users WHERE id = ?", (uid,))
         user = c.fetchone()
-        if not user: conn.close(); self.redirect("/login"); return
+        conn.close()
 
+        if not user:
+            self.redirect("/login")
+            return
+
+        # Tratamento de dados
         nome_aluno = (user['nome'] if user['nome'] else user['username']).upper()
         data_atual = datetime.now().strftime('%d/%m/%Y')
-        cert_id = hashlib.sha1(f"{uid}-{data_atual}".encode()).hexdigest()[:12].upper()
-
-        # HTML COM DESIGN DE LUXO E POSICIONAMENTO FIXO (ANTI-BUG)
-        html_master = f"""
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <style>
-                @page {{ size: A4 landscape; margin: 0; }}
-                body {{ background-color: #050505; margin: 0; padding: 0; font-family: 'Helvetica', 'Arial', sans-serif; }}
-                
-                .container {{ 
-                    width: 297mm; height: 210mm; background-color: #000; 
-                    position: relative; overflow: hidden; 
-                }}
-
-                /* Moldura Externa Dupla */
-                .frame-outer {{ position: absolute; top: 25px; left: 25px; right: 25px; bottom: 25px; border: 4px solid #d4af37; }}
-                .frame-inner {{ position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px; border: 1px solid rgba(212, 175, 55, 0.3); }}
-
-                /* Conteúdo Centralizado com Alturas Fixas */
-                .logo-header {{ position: absolute; top: 60px; width: 100%; text-align: center; color: #FFF; letter-spacing: 12px; font-size: 20px; font-weight: bold; }}
-                .logo-header span {{ color: #d4af37; }}
-
-                .main-title {{ position: absolute; top: 95px; width: 100%; text-align: center; font-size: 105px; font-weight: 900; letter-spacing: 20px; color: #d4af37; margin: 0; }}
-                .sub-title {{ position: absolute; top: 210px; width: 100%; text-align: center; font-size: 14px; color: #888; letter-spacing: 8px; font-weight: bold; }}
-
-                .cert-text {{ position: absolute; top: 255px; width: 100%; text-align: center; font-size: 22px; color: #FFF; font-style: italic; opacity: 0.9; }}
-
-                .student-name {{ 
-                    position: absolute; top: 295px; width: 75%; left: 12.5%; 
-                    text-align: center; font-size: 78px; color: #FFF; font-weight: bold; 
-                    border-bottom: 3px solid #d4af37; padding-bottom: 8px; 
-                }}
-
-                .description {{ 
-                    position: absolute; top: 415px; width: 850px; left: 50%; margin-left: -425px; 
-                    text-align: center; font-size: 18px; color: #CCC; line-height: 1.7; 
-                }}
-
-                /* Grade de Habilidades Profissional */
-                .skills-grid {{ 
-                    position: absolute; top: 515px; width: 800px; left: 50%; margin-left: -400px; 
-                    display: block; border: 1px solid rgba(212, 175, 55, 0.2); 
-                    background: rgba(15, 15, 15, 0.8); padding: 20px; 
-                }}
-                .skill {{ width: 49%; display: inline-block; font-size: 13px; font-weight: bold; color: #d4af37; text-align: center; }}
-                .skill span {{ color: #FFF; margin-right: 8px; }}
-
-                /* Rodapé e Assinaturas */
-                .signature-box {{ position: absolute; bottom: 85px; width: 280px; border-top: 1px solid #444; text-align: center; font-size: 13px; color: #888; padding-top: 8px; }}
-                .sig-left {{ left: 100px; }}
-                .sig-right {{ right: 100px; }}
-
-                .date-display {{ position: absolute; bottom: 95px; width: 100%; text-align: center; font-size: 24px; font-weight: 900; color: #FFF; }}
-                .verification {{ position: absolute; bottom: 45px; right: 55px; font-size: 10px; color: #222; font-family: monospace; }}
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="frame-outer">
-                    <div class="frame-inner">
-                        <div class="logo-header">MESTRE DAS <span>MILHAS</span></div>
-                        <h1 class="main-title">CERTIFICADO</h1>
-                        <div class="sub-title">EXECUTIVE MASTERY PROGRAM 2026</div>
-
-                        <div class="cert-text">Certificamos com máxima honra que o especialista</div>
-                        <div class="student-name">{nome_aluno}</div>
-
-                        <div class="description">
-                            Concluiu com excelência todos os módulos técnicos de inteligência financeira aplicados ao mercado de 
-                            fidelidade aérea e arbitragem de capital do programa <b>MASTER MILHAS</b>.
-                        </div>
-
-                        <div class="skills-grid">
-                            <div class="skill"><span>✦</span> ENGENHARIA DE CPM</div>
-                            <div class="skill"><span>✦</span> EMISSÕES FIRST CLASS</div>
-                            <div class="skill"><span>✦</span> GESTÃO DE SPREAD</div>
-                            <div class="skill"><span>✦</span> ARBITRAGEM ELITE</div>
-                        </div>
-
-                        <div class="signature-box sig-left">DIRETORIA PEDAGÓGICA</div>
-                        <div class="date-display">{data_atual}</div>
-                        <div class="signature-box sig-right">MESTRE DAS MILHAS INC.</div>
-                        <div class="verification">AUTH_ID: {cert_id}</div>
-                    </div>
-                </div>
-            </div>
-        </body>
-        </html>
-        """
-
-        if self.get_argument("download", "0") in ("1", "true"):
-            conn.close()
-            self.gerar_pdf_file(html_master, f"Certificado_Elite_{uid}.pdf")
+        
+        # Define ementa e carga horária por tipo de módulo
+        if is_final:
+            ementa_texto = "FORMAÇÃO ESPECIALISTA EM MILHAS AÉREAS"
+            carga_horaria = "40h"
+            template_alvo = "certificado_final.html"
         else:
-            if is_final: self.render("certificado_final.html", nome=nome_aluno, data=data_atual)
-            else: self.write("Use ?download=1 para ver o PDF de luxo.")
-            conn.close()
+            ementa_texto = f"MÓDULO {modulo_int} - EXECUTIVO DE MILHAS"
+            carga_horaria = "5h"
+            template_alvo = "certificado.html"
+
+        # Renderização com o KIT COMPLETO de variáveis para matar qualquer NameError
+        return self.render(
+            template_alvo,
+            nome=nome_aluno,
+            data=data_atual,
+            modulo=modulo_int,
+            ementa=ementa_texto,
+            inicio=data_atual,    # Data de início (usando atual por segurança)
+            fim=data_atual,       # <--- CORRIGIDO: Variável 'fim' adicionada aqui
+            horas=carga_horaria   # Carga horária
+        )
 
     def gerar_pdf_file(self, html_string, filename):
+        from weasyprint import HTML
+        from io import BytesIO
         pdf = BytesIO()
         HTML(string=html_string).write_pdf(pdf)
         pdf.seek(0)
         self.set_header("Content-Type", "application/pdf")
         self.set_header("Content-Disposition", f'attachment; filename="{filename}"')
         self.write(pdf.read())
-
+        self.finish()
 # Handlers Administrativos
 class LoginDevHandler(tornado.web.RequestHandler):
     def get(self): self.render("painel_dev.html", usuarios=listar_usuarios(), notas=listar_notas_geral(), mensagem=None)
@@ -347,3 +287,5 @@ class AlterarSenhaHandler(tornado.web.RequestHandler):
             self.write({"sucesso": True, "mensagem": "Senha alterada com sucesso"})
         except Exception as e:
             self.write({"sucesso": False, "mensagem": str(e)})
+
+            

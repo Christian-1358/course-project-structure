@@ -2,9 +2,8 @@ import tornado.web
 import sqlite3
 import os
 from datetime import datetime
-from app.handlers.base import require_owner, require_auth
 
-# Configuração de caminhos baseada na estrutura do projeto
+
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 DB_PATH = os.path.join(BASE_DIR, "usuarios.db")
 
@@ -13,25 +12,45 @@ def conectar():
     conn.row_factory = sqlite3.Row
     return conn
 
+def validar_provas_anteriores(user_id, modulo_atual):
+    """
+    Valida se o usuário passou em todas as provas anteriores.
+    Retorna True se passou em todas, False caso contrário.
+    """
+    if modulo_atual <= 1:
+        return True  # Primeira prova não tem pré-requisitos
+    
+    conn = conectar()
+    # Verifica todas as provas de 1 até modulo_atual - 1
+    for mod in range(1, modulo_atual):
+        resultado = conn.execute(
+            "SELECT nota FROM provas_resultado WHERE user_id = ? AND modulo = ?", 
+            (user_id, mod)
+        ).fetchone()
+        
+        # Se não completou a prova ou nota < 6, bloqueia
+        if not resultado or resultado['nota'] < 6:
+            conn.close()
+            return False
+    
+    conn.close()
+    return True
+
 class ProvaHandler(tornado.web.RequestHandler):
     def get_current_user(self):
         uid = self.get_secure_cookie("user_id")
         return uid.decode() if uid else None
 
-    @require_owner
     @tornado.web.authenticated
     def get(self, modulo):
         user_id = self.current_user
         mod = int(modulo)
         
-        # --- TRAVA DE SEGURANÇA ---
-        if mod > 1:
-            conn = conectar()
-            anterior = conn.execute("SELECT nota FROM provas_resultado WHERE user_id = ? AND modulo = ?", (user_id, mod-1)).fetchone()
-            conn.close()
-            if not anterior or anterior['nota'] < 6:
-                self.write("<script>alert('Você precisa passar na prova anterior primeiro!'); window.location='/curso';</script>")
-                return
+        # --- TRAVA DE SEGURANÇA: Validar todas as provas anteriores ---
+        # Esta é a validação correta: usuário pode acessar a prova se passou nas anteriores
+        if not validar_provas_anteriores(user_id, mod):
+            self.write("<script>alert('Você precisa passar em todas as provas anteriores com nota >= 6 para continuar!'); window.location='/curso';</script>")
+            return
 
         conn = conectar()
         user = conn.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
@@ -44,6 +63,11 @@ class ProvaHandler(tornado.web.RequestHandler):
     def post(self, modulo):
         user_id = self.current_user
         mod = int(modulo)
+        
+        # --- TRAVA DE SEGURANÇA: Validar todas as provas anteriores ---
+        if not validar_provas_anteriores(user_id, mod):
+            self.write("<script>alert('Você precisa passar em todas as provas anteriores com nota >= 6 para continuar!'); window.location='/curso';</script>")
+            return
         
         gabaritos = {
             1: {"q1":"b","q2":"b","q3":"c","q4":"a","q5":"b","q6":"d","q7":"a","q8":"c","q9":"a","q10":"d"},
