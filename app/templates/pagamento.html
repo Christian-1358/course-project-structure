@@ -269,9 +269,19 @@ body {
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
     Voltar ao login
 </button>
-    </main>
+    </main> 
 
     <script>
+        // =====================================
+        // VARIÁVEIS GLOBAIS (injetadas do template)
+        // =====================================
+        const USER_ID = {{ user_id if user_id else "null" }};
+        const DEFAULT_AMOUNT = {{ amount if amount else 200.0 }};
+        const MP_SDK_AVAILABLE = {% raw %}{{ mp_available }}{% endraw %};
+
+        // =====================================
+        // CONTEÚDO DE PAGAMENTO POR ABA
+        // =====================================
         const content = {
             pix: `
                 <div class="pix-container">
@@ -287,64 +297,177 @@ body {
             card: `
                 <div class="form-group">
                     <label>Número do Cartão</label>
-                    <input type="text" placeholder="0000 0000 0000 0000">
+                    <input type="text" placeholder="0000 0000 0000 0000" id="card-number">
                 </div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px">
                     <div class="form-group">
                         <label>Validade</label>
-                        <input type="text" placeholder="MM/AA">
+                        <input type="text" placeholder="MM/AA" id="card-expiry">
                     </div>
                     <div class="form-group">
                         <label>CVV</label>
-                        <input type="text" placeholder="123">
+                        <input type="text" placeholder="123" id="card-cvv">
                     </div>
                 </div>
                 <div class="form-group">
                     <label>Parcelamento</label>
-                    <select>
+                    <select id="installments">
                         <option>1x de R$ 200,00 (Sem juros)</option>
                         <option>12x de R$ 21,50</option>
                     </select>
                 </div>
-                <button class="btn-pay" onclick="load(this)">Finalizar Pagamento</button>`,
+                <button class="btn-pay" onclick="processPayment('card')">Finalizar Pagamento</button>`,
             paypal: `
                 <div style="padding:20px 0">
                     <p style="color:var(--text-dim); font-size:0.9rem; margin-bottom:20px">Você será redirecionado para concluir no PayPal.</p>
-                    <button class="btn-pay" style="background:#0070ba; color:#fff" onclick="load(this)">Pagar com PayPal</button>
+                    <button class="btn-pay" style="background:#0070ba; color:#fff" onclick="processPayment('paypal')">Pagar com PayPal</button>
                 </div>`,
             boleto: `
                 <div style="padding:20px 0">
                     <p style="color:var(--text-dim); font-size:0.9rem; margin-bottom:20px">O boleto será gerado para pagamento à vista com vencimento em 3 dias.</p>
-                    <button class="btn-pay" onclick="load(this)">Gerar Boleto Agora</button>
+                    <button class="btn-pay" onclick="processPayment('boleto')">Gerar Boleto Agora</button>
                 </div>`
         };
 
+        // =====================================
+        // FUNÇÕES DE PAGAMENTO
+        // =====================================
+
+        /**
+         * Processa pagamento via MercadoPago (quando SDK disponível)
+         * ou simula localmente (fallback)
+         */
+        async function processPayment(method) {
+            if (!USER_ID) {
+                showError("⚠️ Erro: usuário não identificado. Faça login primeiro.");
+                return;
+            }
+
+            // Se método é PIX, card ou outro - chama endpoint para criar preferência
+            try {
+                const btn = event.target;
+                const originalText = btn.innerText;
+                btn.innerText = "Processando...";
+                btn.style.opacity = "0.6";
+                btn.disabled = true;
+
+                const response = await fetch('/pagamento/criar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: USER_ID,
+                        amount: DEFAULT_AMOUNT,
+                        title: "Mentoria Mestre das Milhas",
+                        method: method
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.status === 503) {
+                    // SDK não configurado - usar fallback local
+                    showWarning("⚠️ Pagamento via MercadoPago não configurado (sem token). Usando modo local...");
+                    simulatePaymentLocal(method);
+                } else if (response.ok && data.preference) {
+                    // SDK configurado e preferência criada com sucesso
+                    const preference = data.preference;
+                    if (preference.init_point) {
+                        // Redireciona para checkout do MercadoPago
+                        window.location.href = preference.init_point;
+                    }
+                } else {
+                    showError(`Erro ao criar preferência: ${data.error || 'Desconhecido'}`);
+                    btn.innerText = originalText;
+                    btn.style.opacity = "1";
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                showError(`Erro na requisição: ${err.message}`);
+                const btn = event.target;
+                btn.innerText = "Finalizar Pagamento";
+                btn.style.opacity = "1";
+                btn.disabled = false;
+            }
+        }
+
+        /**
+         * Simula pagamento localmente (fallback quando SDK não está disponível)
+         */
+        function simulatePaymentLocal(method) {
+            setTimeout(() => {
+                // Marca usuário como pago localmente (via admin endpoint)
+                fetch(`/admin/marcar_pago?user_id=${USER_ID}`, { method: 'POST' })
+                    .then(() => {
+                        showSuccess("✅ Pagamento simulado com sucesso! Redirecionando para o curso...");
+                        setTimeout(() => {
+                            window.location.href = "/curso";
+                        }, 2000);
+                    })
+                    .catch(err => {
+                        showError(`Erro ao registrar pagamento: ${err.message}`);
+                    });
+            }, 1500);
+        }
+
+        /**
+         * Copia código PIX para a área de transferência
+         */
+        function copyPix() {
+            const code = document.getElementById('p-code').innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                const toast = document.getElementById('toast');
+                toast.style.display = 'block';
+                setTimeout(() => toast.style.display = 'none', 2500);
+            }).catch(() => {
+                showError("Erro ao copiar código");
+            });
+        }
+
+        /**
+         * Muda entre abas de método de pagamento
+         */
         function setTab(type, el) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             el.classList.add('active');
             document.getElementById('payment-content').innerHTML = content[type];
         }
 
-        function copyPix() {
-            const code = document.getElementById('p-code').innerText;
-            navigator.clipboard.writeText(code);
+        /**
+         * Mostra mensagem de erro
+         */
+        function showError(msg) {
             const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.style.background = '#ef4444';
             toast.style.display = 'block';
-            setTimeout(() => toast.style.display = 'none', 2500);
+            setTimeout(() => toast.style.display = 'none', 4000);
         }
 
-        function load(btn) {
-            const original = btn.innerText;
-            btn.innerText = "Processando...";
-            btn.style.opacity = "0.6";
-            setTimeout(() => { 
-                alert("Ação iniciada com sucesso!"); 
-                btn.innerText = original; 
-                btn.style.opacity = "1"; 
-            }, 1500);
+        /**
+         * Mostra mensagem de sucesso
+         */
+        function showSuccess(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.style.background = '#10b981';
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 4000);
         }
 
-        // Timer
+        /**
+         * Mostra mensagem de aviso
+         */
+        function showWarning(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.style.background = '#f59e0b';
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 4000);
+        }
+
+        // =====================================
+        // TIMER
+        // =====================================
         let s = 600;
         setInterval(() => {
             if(s <= 0) return;
@@ -354,17 +477,26 @@ body {
             document.getElementById('timer').innerText = `${m}:${sec < 10 ? '0'+sec : sec}`;
         }, 1000);
 
-        // Init
-        setTab('pix', document.querySelector('.tab'));
+        // =====================================
+        // INICIALIZAÇÃO
+        // =====================================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Init com PIX como padrão
+            setTab('pix', document.querySelector('.tab'));
+            
+            // Log de debug
+            console.log(`[pagamento.html] USER_ID=${USER_ID}, AMOUNT=${DEFAULT_AMOUNT}, MP_SDK=${MP_SDK_AVAILABLE}`);
+        });
 
+        /**
+         * Volta para login
+         */
         function goBack() {
-    // Adiciona a classe de animação ao body
-    document.body.classList.add('page-exit');
-    
-    // Aguarda a animação (500ms) antes de mudar de página
-    setTimeout(() => {
-window.location.href = "login.html";    }, 500);
-}
+            document.body.classList.add('page-exit');
+            setTimeout(() => {
+                window.location.href = "/login";
+            }, 500);
+        }
     </script>
     </body>
     </html>

@@ -169,7 +169,11 @@ class BaseHandler(tornado.web.RequestHandler):
                     user_id = int(cookie.decode() if isinstance(cookie, bytes) else cookie)
                 except Exception:
                     user_id = None
-            self.render("pagamento.html", user_id=user_id, amount=200.0)
+            
+            # Verifica se MercadoPago está disponível
+            mp_available = mp_client is not None
+            
+            self.render("pagamento.html", user_id=user_id, amount=200.0, mp_available=mp_available)
         except Exception:
             # Fallback simples se o template não existir
             self.set_status(200)
