@@ -277,7 +277,7 @@ body {
         // =====================================
         const USER_ID = {{ user_id if user_id else "null" }};
         const DEFAULT_AMOUNT = {{ amount if amount else 200.0 }};
-        const MP_SDK_AVAILABLE = {% raw %}{{ mp_available }}{% endraw %};
+        const MP_SDK_AVAILABLE = {{ mp_available }};
 
         // =====================================
         // CONTEÚDO DE PAGAMENTO POR ABA
