@@ -2,6 +2,7 @@ import tornado.web
 import sqlite3
 import os
 from datetime import datetime
+from app.utils.security import set_flow_allowed_if_referer, consume_flow_allowed
 
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
@@ -46,6 +47,11 @@ class ProvaHandler(tornado.web.RequestHandler):
         user_id = self.current_user
         mod = int(modulo)
         
+        # Central verify: autenticado, pago e fluxo válido
+        from app.utils.security import verify_flow_and_payment
+        if not verify_flow_and_payment(self, 'prova', mod):
+            return
+
         # --- TRAVA DE SEGURANÇA: Validar todas as provas anteriores ---
         # Esta é a validação correta: usuário pode acessar a prova se passou nas anteriores
         if not validar_provas_anteriores(user_id, mod):
@@ -64,6 +70,11 @@ class ProvaHandler(tornado.web.RequestHandler):
         user_id = self.current_user
         mod = int(modulo)
         
+        # Central verify: autenticado, pago e fluxo válido
+        from app.utils.security import verify_flow_and_payment
+        if not verify_flow_and_payment(self, 'prova', mod):
+            return
+
         # --- TRAVA DE SEGURANÇA: Validar todas as provas anteriores ---
         if not validar_provas_anteriores(user_id, mod):
             self.write("<script>alert('Você precisa passar em todas as provas anteriores com nota >= 6 para continuar!'); window.location='/curso';</script>")
@@ -89,6 +100,13 @@ class ProvaHandler(tornado.web.RequestHandler):
         acertos = sum(1 for i in range(1, total + 1) if self.get_body_argument(f"q{i}", "") == gabaritos.get(mod, {}).get(f"q{i}"))
 
         if acertos < minimo:
+            # registrar tentativa falhada para controle de recuperação
+            try:
+                from app.utils.recuperacao_utils import increment_attempt
+                increment_attempt(int(user_id), mod)
+            except Exception:
+                pass
+
             self.write(f"<script>alert('Sua nota: {acertos}. Você precisa de {minimo} para passar.'); window.location='/prova/{mod}';</script>")
             return
 

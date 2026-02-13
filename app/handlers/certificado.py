@@ -5,9 +5,23 @@ import tornado.web
 from datetime import datetime
 
 try:
-    from weasyprint import HTML
+    import weasyprint
+    from weasyprint import HTML, CSS
+    # FontConfiguration location changed across versions; try common locations
+    try:
+        from weasyprint import FontConfiguration
+    except Exception:
+        try:
+            from weasyprint.document import FontConfiguration
+        except Exception:
+            try:
+                from weasyprint.text.fonts import FontConfiguration
+            except Exception:
+                FontConfiguration = None
 except ImportError:
     HTML = None
+    CSS = None
+    FontConfiguration = None
 
 from app.utils.certificado_security import (
     registrar_certificado,
@@ -17,10 +31,16 @@ from app.utils.certificado_security import (
     detectar_acesso_suspeito,
     bloquear_ip
 )
+from app.utils.security import set_flow_allowed_if_referer, consume_flow_allowed
+import asyncio
+try:
+    from pyppeteer import launch as pyppeteer_launch
+except Exception:
+    pyppeteer_launch = None
 
 # ================== CONFIG ==================
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, "usuarios.db")
+# Usa a conexão centralizada (aponta para usuarios.db na raiz do projeto)
+from app.utils.admin_tools import conectar
 
 # Definições dos módulos com ementas
 MODULOS_INFO = {
@@ -32,10 +52,7 @@ MODULOS_INFO = {
     6: {"titulo": "Prova Final", "ementa": "Mestre das Milhas - Avaliação Completa", "questoes": 50},
 }
 
-def conectar():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
+# usa `conectar()` importada de `app.utils.admin_tools`
 
 def obter_dados_certificado(user_id, modulo):
     """
@@ -135,23 +152,23 @@ def render_html_certificado(nome, email, nota, data_conclusao, modulo, is_pdf=Fa
         .codigo {{ font-size: 11px; color: #666; margin-top: 10px; font-family: monospace; }}
     </style>
 </head>
-<body>
-    <div class="viewer">
-        <div class="certificado">
-            <div class="inner">
-                <div class="header">
-                    <div class="logo">🏆 MESTRE DAS MILHAS</div>
-                    <div class="titulo">CERTIFICADO</div>
-                    <div class="subtitulo">DE CONCLUSÃO</div>
-                </div>
-                
-                <div class="content">
-                    <div class="texto">Certificamos que</div>
-                    <div class="nome">
-                        <div class="nome-underline">{nome}</div>
-                    </div>
-                    <div class="texto">
-                        <strong>completou com êxito</strong> o
+        try:
+            print(f"[cert_pdf_chrome] Rendering URL: {url} for user_id={user_id}")
+            # debug: show if cookie exists in incoming request
+            try:
+                cookie_obj = self.request.cookies.get('user_id')
+                print(f"[cert_pdf_chrome] incoming cookie user_id present: {bool(cookie_obj)}")
+            except Exception:
+                pass
+            # Run the async render in Tornado's current IOLoop to avoid nested event loop
+            pdf_bytes = tornado.ioloop.IOLoop.current().run_sync(_render)
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            print(f"[cert_pdf_chrome] exception: {e}")
+            self.set_status(500)
+            self.write(f'Erro ao renderizar PDF via Chromium: {e}')
+            return
                     </div>
                     <div class="modulo-info" style="font-size: 20px; color: #d4b038; font-weight: bold;">
                         {titulo_mod}
@@ -176,6 +193,39 @@ def render_html_certificado(nome, email, nota, data_conclusao, modulo, is_pdf=Fa
 </html>
 """
 
+
+def obter_ou_criar_certificado(user_id, modulo, nota, data_conclusao):
+    """
+    Helper compartilhado: obtém certificado existente ou cria um novo.
+    Retorna dict com 'id' e 'token' ou None em caso de erro.
+    """
+    conn = conectar()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT id, token FROM certificados
+        WHERE user_id = ? AND modulo = ?
+        LIMIT 1
+        """,
+        (user_id, modulo)
+    )
+    existente = cursor.fetchone()
+
+    if existente:
+        conn.close()
+        return {"id": existente[0], "token": existente[1]}
+
+    try:
+        cert_info = registrar_certificado(user_id, modulo, nota, data_conclusao)
+        conn.close()
+        return cert_info
+    except Exception as e:
+        conn.close()
+        print(f"Erro ao criar certificado: {e}")
+        return None
+
+
 class CertificadoViewHandler(tornado.web.RequestHandler):
 
     def get_current_user(self):
@@ -194,6 +244,27 @@ class CertificadoViewHandler(tornado.web.RequestHandler):
 
         user_id = self.current_user
         ip_address = self.get_ip_address()
+
+        # Central verify: autenticado, pago e fluxo válido para certificado PDF
+        try:
+            mod_check = int(modulo_id)
+        except Exception:
+            mod_check = None
+
+        from app.utils.security import verify_flow_and_payment
+        if mod_check and not verify_flow_and_payment(self, 'certificado', mod_check):
+            registrar_acesso_certificado(user_id, None, ip_address, "denied_direct_pdf")
+            return
+        # Central verify: autenticado, pago e fluxo válido para certificado
+        try:
+            mod_check = int(modulo_id)
+        except Exception:
+            mod_check = None
+
+        from app.utils.security import verify_flow_and_payment
+        if mod_check and not verify_flow_and_payment(self, 'certificado', mod_check):
+            registrar_acesso_certificado(user_id, None, ip_address, "denied_direct_url")
+            return
 
         # 🔒 Verificar se IP está bloqueado
         if ip_esta_bloqueado(ip_address):
@@ -245,7 +316,7 @@ class CertificadoViewHandler(tornado.web.RequestHandler):
             return
 
         # ✅ Registrar ou obter token do certificado
-        cert_info = self._obter_ou_criar_certificado(user_id, modulo, resultado["nota"], resultado["data"])
+        cert_info = obter_ou_criar_certificado(user_id, modulo, resultado["nota"], resultado["data"])
         
         if not cert_info:
             self.set_status(500)
@@ -256,51 +327,36 @@ class CertificadoViewHandler(tornado.web.RequestHandler):
 
         # ✅ Registrar acesso bem-sucedido
         registrar_acesso_certificado(user_id, token, ip_address, "view")
+        # Renderizar usando templates existentes para manter o layout
+        nome_aluno = self.get_user_nome(user_id)
+        mod_info = MODULOS_INFO.get(modulo, {})
+        ementa = mod_info.get("ementa", "Curso Online")
 
-        html = render_html_certificado(
-            nome=self.get_user_nome(user_id),
-            email="",
-            nota=resultado["nota"],
-            data_conclusao=resultado["data"],
-            modulo=modulo,
-            is_pdf=False,
-            token=token
-        )
+        # preparar datas (sqlite3.Row -> usar indexação)
+        inicio = resultado["data"] if resultado["data"] else datetime.now().strftime("%d/%m/%Y")
+        fim = inicio
 
-        self.write(html)
+        if modulo == 6:
+            # prova final -> usar template final
+            try:
+                self.render("certificado_final.html", nome=nome_aluno, data=inicio, modulo=modulo, ementa=ementa, inicio=inicio, fim=fim)
+                return
+            except Exception:
+                # fallback para HTML gerado quando template não estiver disponível
+                html = render_html_certificado(nome_aluno, "", resultado["nota"], resultado["data"], modulo, is_pdf=False, token=token)
+                self.write(html)
+                return
 
-    def _obter_ou_criar_certificado(self, user_id, modulo, nota, data_conclusao):
-        """
-        Obtém o certificado existente ou cria um novo com token único.
-        """
-        conn = conectar()
-        cursor = conn.cursor()
-
-        # Verificar se já existe certificado
-        cursor.execute("""
-            SELECT id, token FROM certificados
-            WHERE user_id = ? AND modulo = ?
-            LIMIT 1
-        """, (user_id, modulo))
-
-        existente = cursor.fetchone()
-
-        if existente:
-            conn.close()
-            return {
-                "id": existente[0],
-                "token": existente[1]
-            }
-
-        # Criar novo certificado com segurança
+        # módulos normais -> usa template certificado.html
         try:
-            cert_info = registrar_certificado(user_id, modulo, nota, data_conclusao)
-            conn.close()
-            return cert_info
-        except Exception as e:
-            conn.close()
-            print(f"Erro ao criar certificado: {e}")
-            return None
+            self.render("certificado.html", nome=nome_aluno, inicio=inicio, fim=fim, modulo=modulo, ementa=ementa)
+        except Exception:
+            # fallback em caso de erro no template
+            html = render_html_certificado(nome_aluno, "", resultado["nota"], resultado["data"], modulo, is_pdf=False, token=token)
+            self.write(html)
+        return
+
+    # nota: agora usamos a função module-level `obter_ou_criar_certificado`
 
     def get_user_nome(self, user_id):
         conn = conectar()
@@ -373,16 +429,58 @@ class CertificadoPDFHandler(tornado.web.RequestHandler):
             (user_id, modulo)
         ).fetchone()
 
+        # Para o certificado final (modulo 6) permitimos geração mesmo se não existir linha em provas_resultado,
+        # desde que o usuário tenha `certificado_fin = 1` ou `nota_final >= 7`.
+        if modulo == 6:
+            user_row = conn.execute("SELECT nota_final, certificado_fin, inicio_curso FROM users WHERE id = ?", (user_id,)).fetchone()
+            # sqlite3.Row não tem .get(), usar indexação segura
+            certificado_fin_val = None
+            nota_final_val = None
+            inicio_curso_val = None
+            if user_row:
+                try:
+                    certificado_fin_val = user_row['certificado_fin']
+                except Exception:
+                    certificado_fin_val = None
+                try:
+                    nota_final_val = user_row['nota_final']
+                except Exception:
+                    nota_final_val = None
+                try:
+                    inicio_curso_val = user_row['inicio_curso']
+                except Exception:
+                    inicio_curso_val = None
+
+            if user_row and ((certificado_fin_val == 1) or (nota_final_val is not None and int(nota_final_val) >= 7)):
+                # montar resultado fake a partir dos dados do usuário
+                fake_nota = nota_final_val if nota_final_val is not None else 0
+                fake_data = inicio_curso_val or datetime.now().strftime('%d/%m/%Y')
+                resultado = {'nota': fake_nota, 'data': fake_data, 'aprovado': 1}
+            else:
+                resultado = conn.execute(
+                    """SELECT nota, data, aprovado 
+                       FROM provas_resultado 
+                       WHERE user_id = ? AND modulo = ?""",
+                    (user_id, modulo)
+                ).fetchone()
+        else:
+            resultado = conn.execute(
+                """SELECT nota, data, aprovado 
+                   FROM provas_resultado 
+                   WHERE user_id = ? AND modulo = ?""",
+                (user_id, modulo)
+            ).fetchone()
+
         conn.close()
 
-        if not resultado or resultado["aprovado"] != 1:
+        if not resultado or (isinstance(resultado, dict) and resultado.get('aprovado') != 1) or (not isinstance(resultado, dict) and resultado["aprovado"] != 1):
             self.set_status(403)
             self.write("Você não foi aprovado neste módulo.")
             registrar_acesso_certificado(user_id, None, ip_address, "denied_pdf_nao_aprovado")
             return
 
         # ✅ Obter ou criar certificado com token
-        cert_info = self._obter_ou_criar_certificado(user_id, modulo, resultado["nota"], resultado["data"])
+        cert_info = obter_ou_criar_certificado(user_id, modulo, resultado["nota"], resultado["data"])
         
         if not cert_info:
             self.set_status(500)
@@ -401,7 +499,43 @@ class CertificadoPDFHandler(tornado.web.RequestHandler):
             token=token
         )
 
-        pdf_bytes = HTML(string=html_content).write_pdf()
+        # Melhor geração de PDF: para o certificado final usamos HTML totalmente inline
+        try:
+            font_config = FontConfiguration() if FontConfiguration else None
+            base_url = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static')
+            if modulo == 6:
+                # Prefer renderizar o template Tornado para que o PDF reproduza fielmente o HTML visto no navegador
+                try:
+                    rendered = self.render_string("certificado_final.html", nome=user["username"].upper(), data=resultado["data"], modulo=modulo, ementa=MODULOS_INFO.get(modulo, {}).get("ementa", ""), inicio=resultado["data"], fim=resultado["data"]) 
+                except Exception:
+                    # fallback para HTML gerado programaticamente
+                    rendered = html_content
+            else:
+                # para módulos normais, tentar renderizar o template (pode usar estilos externos)
+                try:
+                    rendered = self.render_string("certificado.html", nome=user["username"].upper(), inicio=resultado["data"], fim=resultado["data"], modulo=modulo, ementa=MODULOS_INFO.get(modulo, {}).get("ementa", ""))
+                except Exception:
+                    rendered = html_content
+
+            if HTML is None:
+                raise RuntimeError('WeasyPrint não disponível')
+
+            page_css = CSS(string='@page { size: A4 landscape; margin: 0 }') if CSS else None
+            if page_css and font_config:
+                pdf_bytes = HTML(string=rendered, base_url=base_url).write_pdf(stylesheets=[page_css], font_config=font_config, presentational_hints=True)
+            elif page_css:
+                pdf_bytes = HTML(string=rendered, base_url=base_url).write_pdf(stylesheets=[page_css])
+            else:
+                pdf_bytes = HTML(string=rendered, base_url=base_url).write_pdf()
+        except Exception as e:
+            print(f"Erro ao gerar PDF do certificado: {e}")
+            try:
+                pdf_bytes = HTML(string=html_content).write_pdf()
+            except Exception as e2:
+                print(f"Fallback PDF também falhou: {e2}")
+                self.set_status(500)
+                self.write("Erro ao gerar PDF do certificado.")
+                return
 
         # ✅ Registrar download bem-sucedido
         registrar_acesso_certificado(user_id, token, ip_address, "download_pdf")
@@ -413,37 +547,90 @@ class CertificadoPDFHandler(tornado.web.RequestHandler):
         )
         self.write(pdf_bytes)
 
-    def _obter_ou_criar_certificado(self, user_id, modulo, nota, data_conclusao):
-        """
-        Obtém o certificado existente ou cria um novo com token único.
-        """
-        conn = conectar()
-        cursor = conn.cursor()
 
-        # Verificar se já existe certificado
-        cursor.execute("""
-            SELECT id, token FROM certificados
-            WHERE user_id = ? AND modulo = ?
-            LIMIT 1
-        """, (user_id, modulo))
+class CertificadoPDFChromeHandler(tornado.web.RequestHandler):
+    """Gera PDF usando headless Chromium (pyppeteer) para máxima fidelidade visual.
+    URL: /certificado/pdf_chrome/<modulo>
+    """
+    def get_current_user(self):
+        uid = self.get_secure_cookie("user_id")
+        return int(uid.decode()) if uid else None
 
-        existente = cursor.fetchone()
+    @tornado.web.authenticated
+    def get(self, modulo_id):
+        if pyppeteer_launch is None:
+            self.set_status(500)
+            self.write('pyppeteer não instalado. Instale com: pip install pyppeteer')
+            return
 
-        if existente:
-            conn.close()
-            return {
-                "id": existente[0],
-                "token": existente[1]
-            }
-
-        # Criar novo certificado com segurança
+        user_id = self.get_current_user()
+        # basic checks (reuse CertificadoPDFHandler logic minimally)
         try:
-            cert_info = registrar_certificado(user_id, modulo, nota, data_conclusao)
-            conn.close()
-            return cert_info
+            modulo = int(modulo_id)
+        except:
+            self.set_status(400); self.write('Módulo inválido'); return
+
+        # build URL to the certificate HTML view so Chromium renders same page
+        proto = 'http'
+        host = self.request.host
+        url = f"{proto}://{host}/certificado/{modulo}"
+
+        async def _render():
+            browser = await pyppeteer_launch(headless=True, args=['--no-sandbox'])
+            page = await browser.newPage()
+            await page.setViewport({'width': 1200, 'height': 800})
+            # Forward the user's secure cookie so the headless browser is authenticated
+            try:
+                cookie_obj = self.request.cookies.get('user_id')
+                if cookie_obj:
+                    cookie_value = cookie_obj.value
+                    domain = host.split(':')[0]
+                    await page.setCookie({
+                        'name': 'user_id',
+                        'value': cookie_value,
+                        'domain': domain,
+                        'path': '/',
+                        'httpOnly': False,
+                        'secure': False,
+                    })
+            except Exception:
+                pass
+
+            await page.goto(url, {'waitUntil': 'networkidle0'})
+            pdf_bytes = await page.pdf({
+                'format': 'A4',
+                'landscape': True,
+                'printBackground': True,
+                'scale': 1.0,
+                'preferCSSPageSize': True
+            })
+            await browser.close()
+            return pdf_bytes
+
+        try:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            print(f"[cert_pdf_chrome] Rendering URL: {url} for user_id={user_id}")
+            # debug: show if cookie exists in incoming request
+            try:
+                cookie_obj = self.request.cookies.get('user_id')
+                print(f"[cert_pdf_chrome] incoming cookie user_id present: {bool(cookie_obj)}")
+            except Exception:
+                pass
+            pdf_bytes = loop.run_until_complete(_render())
+            loop.close()
         except Exception as e:
-            conn.close()
-            print(f"Erro ao criar certificado: {e}")
-            return None
+            import traceback
+            traceback.print_exc()
+            print(f"[cert_pdf_chrome] exception: {e}")
+            self.set_status(500)
+            self.write(f'Erro ao renderizar PDF via Chromium: {e}')
+            return
+
+        self.set_header('Content-Type', 'application/pdf')
+        self.set_header('Content-Disposition', f'attachment; filename=Certificado_Modulo_{modulo}.pdf')
+        self.write(pdf_bytes)
+
+    # usa `obter_ou_criar_certificado` (definida no módulo)
 
 

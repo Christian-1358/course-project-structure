@@ -38,10 +38,34 @@ def forcar_notas_teste(user_id):
         c.execute("DELETE FROM provas_resultado WHERE user_id = ?", (uid,))
         for m in range(1, 6):
             c.execute("INSERT INTO provas_resultado (user_id, modulo, nota, aprovado, data) VALUES (?, ?, 10.0, 1, ?)", (uid, m, agora))
-            c.execute(f"UPDATE users SET fim_modulo{m} = ? WHERE id = ?", (agora, uid))
+            try:
+                c.execute(f"UPDATE users SET fim_modulo{m} = ? WHERE id = ?", (agora, uid))
+            except Exception:
+                # coluna não existe no esquema atual, ignora
+                pass
+
+        # Tenta definir flags de módulos e nota final / certificado e marcar como pago
+        agora_iso = agora
+        try:
+            c.execute("UPDATE users SET nota_final = ?, certificado_fin = ?, pago = 1, data_pagamento = ?, inicio_curso = ? WHERE id = ?", (10, 1, agora_iso, agora_iso, uid))
+        except Exception:
+            # tenta menos colunas se esquema diferente
+            try:
+                c.execute("UPDATE users SET certificado_fin = ? WHERE id = ?", (1, uid))
+            except Exception:
+                pass
+        try:
+            c.execute("UPDATE users SET modulo_1 = 1, modulo_2 = 1, modulo_3 = 1, modulo_4 = 1, modulo_5 = 1 WHERE id = ?", (uid,))
+        except Exception:
+            pass
         conn.commit(); conn.close()
-        return True
-    except: return False
+        return True, None
+    except Exception as e:
+        try:
+            conn.close()
+        except Exception:
+            pass
+        return False, str(e)
 
 def listar_usuarios(filtro=""):
     conn = conectar(); c = conn.cursor()
@@ -135,8 +159,12 @@ class LoginDevHandler(tornado.web.RequestHandler):
 
 class ForcarNotasHandler(tornado.web.RequestHandler):
     def post(self):
-        if forcar_notas_teste(self.get_argument("id")): self.write({"sucesso": True})
-        else: self.write({"sucesso": False})
+        uid = self.get_argument("id")
+        ok, msg = forcar_notas_teste(uid)
+        if ok:
+            self.write({"sucesso": True, "mensagem": "🚀 FULL 10 APLICADO!"})
+        else:
+            self.write({"sucesso": False, "mensagem": msg or "Erro desconhecido ao aplicar FULL 10"})
 
 class AlterarStatusHandler(tornado.web.RequestHandler):
     def post(self):
@@ -152,8 +180,79 @@ class ComprasHandler(tornado.web.RequestHandler):
         conn = conectar(); c = conn.cursor(); c.execute("SELECT * FROM purchases ORDER BY id DESC")
         vendas = [dict(row) for row in c.fetchall()]; conn.close(); self.write({"purchases": vendas})
 
+
+class CheckFinalStatusHandler(tornado.web.RequestHandler):
+    def get_current_user(self):
+        uid = self.get_secure_cookie("user_id")
+        return int(uid.decode()) if uid else None
+
+    def get(self):
+        user_id = self.get_current_user()
+        if not user_id:
+            self.set_status(401); self.write({"can_access": False}); return
+
+        try:
+            conn = conectar(); c = conn.cursor()
+            # verifica nota_final ou maior nota por modulo
+            try:
+                c.execute("SELECT nota_final, certificado_fin FROM users WHERE id = ?", (user_id,))
+                row = c.fetchone()
+                if row and row.get('certificado_fin') == 1:
+                    conn.close(); self.write({"can_access": True}); return
+                if row and row.get('nota_final') and int(row['nota_final']) >= 6:
+                    conn.close(); self.write({"can_access": True}); return
+            except Exception:
+                pass
+
+            # fallback: checar provas_resultado maiores notas por modulo
+            c.execute("SELECT modulo, MAX(nota) as maior_nota FROM provas_resultado WHERE user_id = ? GROUP BY modulo", (user_id,))
+            rows = c.fetchall()
+            resultados = {r['modulo']: r['maior_nota'] for r in rows}
+            required = [1,2,3,4,5]
+            aprovado = all(resultados.get(m, 0) >= 6 for m in required)
+            conn.close()
+            self.write({"can_access": bool(aprovado)})
+        except Exception as e:
+            try: conn.close()
+            except: pass
+            self.set_status(500); self.write({"can_access": False, "error": str(e)})
+
 def criar_tabela(): pass
 def criar_usuario_admin_se_nao_existe(): pass
+def criar_tabela():
+    """
+    Inicializa as tabelas adicionais necessárias para o sistema.
+    Chama o gerador de tabelas de segurança (certificados, auditoria, ips_bloqueados).
+    """
+    try:
+        from app.utils.certificado_security import criar_tabelas_seguranca
+        criar_tabelas_seguranca()
+    except Exception as e:
+        print(f"Erro ao criar tabelas de segurança: {e}")
+    try:
+        from app.utils.recuperacao_utils import criar_tabelas_recuperacao
+        criar_tabelas_recuperacao()
+    except Exception as e:
+        print(f"Erro ao criar tabelas de segurança: {e}")
+    # MIGRAÇÃO SIMPLES: adiciona coluna nota_final se não existir (compatibilidade entre esquemas)
+    try:
+        conn = conectar(); c = conn.cursor()
+        c.execute("PRAGMA table_info(users)")
+        cols = [r['name'] for r in c.fetchall()]
+        if 'nota_final' not in cols:
+            try:
+                c.execute("ALTER TABLE users ADD COLUMN nota_final INTEGER")
+                conn.commit()
+                print('Coluna nota_final adicionada à tabela users')
+            except Exception as e:
+                print(f"Falha ao adicionar nota_final: {e}")
+        conn.close()
+    except Exception as e:
+        try:
+            conn.close()
+        except Exception:
+            pass
+    return
 
 
 # ------------------ HANDLERS ADICIONAIS DE ADMIN ------------------

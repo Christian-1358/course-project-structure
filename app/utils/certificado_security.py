@@ -8,17 +8,7 @@ import hashlib
 import secrets
 from datetime import datetime, timedelta
 import os
-
-
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DB_PATH = os.path.join(BASE_DIR, "usuarios.db")
-
-
-def conectar():
-    """Cria conexão com banco de dados"""
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
+from app.utils.admin_tools import conectar
 
 
 def gerar_token_certificado():

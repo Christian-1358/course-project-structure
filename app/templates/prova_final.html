@@ -331,8 +331,23 @@ function finalizar() {
 
     if (acertos >= NOTA_MINIMA) {
         document.getElementById("statusFinal").textContent = "🚀 PARABÉNS, ESPECIALISTA!";
-        document.getElementById("btnCertificado").style.display = "block";
         document.getElementById("listaBeneficios").style.display = "block";
+
+        // envia resultado para o servidor para registrar aprovação e gerar certificado
+        const form = new URLSearchParams();
+        form.append('acertos', acertos);
+        form.append('total', perguntas.length);
+
+        fetch('/prova/final', { method: 'POST', body: form })
+            .then(r => r.text())
+            .then(txt => {
+                // redireciona para certificado final caso backend confirme
+                window.location.href = '/certificado/6';
+            }).catch(e => {
+                console.error('Erro ao enviar nota final', e);
+                document.getElementById("btnCertificado").style.display = "block";
+            });
+
     } else {
         document.getElementById("statusFinal").textContent = "❌ REPROVADO";
         document.getElementById("msgReprovado").style.display = "block";

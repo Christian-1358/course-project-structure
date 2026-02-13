@@ -278,7 +278,7 @@
     <div class="sidebar" id="sidebar">
         <div class="modules-wrapper" id="moduleContainer"></div>
         <div class="final-exam-area">
-            <button class="btn-accent" style="width:100%" onclick="window.location.href='/prova/final'" id="finalBtn" disabled>🎓 ATIVIDADE FINAL (BLOQUEADA)</button>
+            <button class="btn-accent" style="width:100%" onclick="window.location.href='/start/prova/final'" id="finalBtn" disabled>🎓 ATIVIDADE FINAL (BLOQUEADA)</button>
         </div>
     </div>
 </main>
@@ -339,6 +339,7 @@ const course = [
 
 let current = { m:0, l:0 };
 let progress = JSON.parse(localStorage.getItem('mm_progress')) || { lessons:{}, exams:{} };
+let server_final_allowed = false; // marcado pelo /admin/check_final_status
 
 function moduloCompleto(mIndex){
     return course[mIndex].lessons.every(l => progress.lessons[l.v]);
@@ -383,10 +384,19 @@ function init(){
     });
 
     updateProgressUI();
+
+    // Verifica no servidor se o usuário já tem direito à prova final (ex: FULL 10 aplicado)
+    fetch('/admin/check_final_status').then(r=>r.json()).then(j=>{
+        const btn = document.getElementById('finalBtn');
+        if(j && j.can_access){
+            btn.disabled = false;
+            btn.innerText = ' ACESSAR PROVA FINAL';
+        }
+    }).catch(()=>{});
 }
 
 function acessarProva(mIdx){
-    window.location.href=`/prova/${mIdx+1}`;
+    window.location.href=`/start/prova/${mIdx+1}`;
 }
 
 function acessarProvaFinal(){
@@ -394,7 +404,7 @@ function acessarProvaFinal(){
         alert("Conclua todas as provas dos módulos!");
         return;
     }
-    window.location.href="/prova-final";
+    window.location.href="/start/prova/final";
 }
 
 function play(m,l){
@@ -430,11 +440,10 @@ function updateProgressUI(){
     document.getElementById('prog-txt').innerText=`${percent}% Concluído`;
 
     const btn=document.getElementById('finalBtn');
-    const liberado=todasProvasFeitas();
-    btn.disabled=!liberado;
-    btn.innerText=liberado?
-        " ACESSAR PROVA FINAL":
-        " PROVA FINAL BLOQUEADA";
+    const liberadoClient=todasProvasFeitas();
+    const liberado = server_final_allowed || liberadoClient;
+    btn.disabled = !liberado;
+    btn.innerText = liberado ? " ACESSAR PROVA FINAL" : " PROVA FINAL BLOQUEADA";
 }
 
 init();

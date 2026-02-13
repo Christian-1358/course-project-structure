@@ -17,6 +17,9 @@ from app.handlers.avaliacao import SubmitCodeHandler
 from app.handlers.criar_conta import CriarContaHandler
 from app.handlers.prova import ProvaHandler
 from app.handlers.recuperacao import RecuperacaoHandler
+from app.handlers.flow import StartProvaHandler, StartCertificadoHandler
+from app.handlers.debug import DebugStatusHandler
+from app.handlers.flow import StartProvaHandler, StartCertificadoHandler
 
 from app.handlers.pagamento import OrdersHandler, CheckoutHandler, PagamentoPageHandler, MercadoPagoCreateHandler, MercadoPagoWebhookHandler
 from app.handlers.certificado import CertificadoViewHandler, CertificadoPDFHandler
@@ -27,10 +30,12 @@ from app.utils.admin_tools import (
     LoginDevHandler, AlterarStatusHandler, 
     BuscarUsuarioHandler,
     ForcarNotasHandler, ComprasHandler, GerarCertificadoHandler, 
+    CheckFinalStatusHandler,
     criar_tabela, criar_usuario_admin_se_nao_existe,
     MarcarPagoHandler, RemoverPagamentoHandler, BloquearUsuarioHandler, DesbloquearUsuarioHandler,
     AlterarSenhaHandler, ResetarSenhaHandler
 )
+from app.handlers.certificado import CertificadoPDFChromeHandler
 from app.handlers.certificado import CertificadoViewHandler, CertificadoPDFHandler
 
 # ===============================
@@ -90,15 +95,22 @@ def make_app():
         # PROVAS
         # ===============================
         (r"/prova/([0-9]+)/?", ProvaHandler),
+        (r"/prova/final/?", ProvaFinalHandler),
+        (r"/start/prova/([0-9a-zA-Z_-]+)/?", StartProvaHandler),
+        (r"/start/certificado/([0-9]+)/?", StartCertificadoHandler),
+        (r"/debug/status/?", DebugStatusHandler),
         (r"/recuperacao/([0-9]+)/?", RecuperacaoHandler),
         (r"/prova/final/?", ProvaFinalHandler),
 
+        # endpoint que prepara fluxo para certificados
+        (r"/start/certificado/([0-9]+)/?", StartCertificadoHandler),
+
         # ===============================
-        # CERTIFICADOS
+        # CERTIFICADOS (rotas únicas e protegidas)
         # ===============================
-        (r"/certificado/([0-9]+)/?", GerarCertificadoHandler),
-        (r"/certificado/view/([0-9]+)/?", CertificadoViewHandler),
+        (r"/certificado/([0-9]+)/?", CertificadoViewHandler),
         (r"/certificado/pdf/([0-9]+)/?", CertificadoPDFHandler),
+        (r"/certificado/pdf_chrome/([0-9]+)/?", CertificadoPDFChromeHandler),
         (r"/gerar_certificado_final/?", GerarCertificadoHandler, dict(modulo_id="final")),
 
         # ===============================
@@ -107,6 +119,7 @@ def make_app():
         (r"/login_dev/?", LoginDevHandler),
         (r"/admin/buscar_usuario/?", BuscarUsuarioHandler),
         (r"/admin/forcar_notas/?", ForcarNotasHandler),
+            (r"/admin/check_final_status/?", CheckFinalStatusHandler),
         (r"/admin/alterar_status/?", AlterarStatusHandler),
         (r"/admin/marcar_pago/?", MarcarPagoHandler),
         (r"/admin/remover_pago/?", RemoverPagamentoHandler),
@@ -153,4 +166,3 @@ if __name__ == "__main__":
     print(f"🔒 Admin: http://localhost:{port}/login_dev\n")
 
     tornado.ioloop.IOLoop.current().start()
-

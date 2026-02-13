@@ -192,6 +192,8 @@
     const nota = parseFloat("{{ nota }}") || 0;
     const MOD = "{{ modulo }}";
     const KEY = `mm_lock_${MOD}`;
+    const SERVER_BLOQUEADO = {% if bloqueado %}true{% else %}false{% end %};
+    const SERVER_LOCK_UNTIL = {% if lock_until %}"{{ lock_until }}"{% else %}null{% end %};
 
     function setup() {
         const now = new Date().getTime();
@@ -201,6 +203,11 @@
         const info = document.getElementById('ui-info');
         const lock = document.getElementById('ui-lock');
         const num = document.getElementById('try-num');
+
+        // Se o servidor aponta bloqueio, respeitar
+        if (SERVER_BLOQUEADO && SERVER_LOCK_UNTIL) {
+            data.lockUntil = Date.parse(SERVER_LOCK_UNTIL);
+        }
 
         if (data.lockUntil > 0 && now > data.lockUntil) {
             data.count = 0;
@@ -227,6 +234,20 @@
 
         num.innerText = data.count + 1;
 
+        // Se servidor indica bloqueio, atualizar UI e contador local
+        if (SERVER_BLOQUEADO) {
+            btn.classList.add('locked');
+            btn.disabled = true;
+            info.classList.add('hidden');
+            lock.classList.remove('hidden');
+            if (SERVER_LOCK_UNTIL) {
+                const diff = Date.parse(SERVER_LOCK_UNTIL) - new Date().getTime();
+                if (diff > 0) {
+                    document.getElementById('countdown').innerText = new Date(diff).toISOString().substr(11, 8);
+                }
+            }
+        }
+
         const statusText = document.getElementById("status-text");
         const descText = document.getElementById("desc-text");
 
@@ -245,6 +266,7 @@
 
     function startRetry() {
         let data = JSON.parse(localStorage.getItem(KEY)) || { count: 0, lockUntil: 0 };
+        if (SERVER_BLOQUEADO) return; // bloqueado pelo servidor
         
         if (nota >= 7) {
             // Lógica para ir ao próximo módulo ou dashboard
@@ -259,7 +281,7 @@
             location.reload();
         } else {
             localStorage.setItem(KEY, JSON.stringify(data));
-            window.location.href = `/prova/${MOD}`;
+            window.location.href = `/start/prova/${MOD}`;
         }
     }
 
