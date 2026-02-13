@@ -20,7 +20,6 @@ from app.handlers.recuperacao import RecuperacaoHandler
 
 from app.handlers.pagamento import OrdersHandler, CheckoutHandler, PagamentoPageHandler, MercadoPagoCreateHandler, MercadoPagoWebhookHandler
 from app.handlers.certificado import CertificadoViewHandler, CertificadoPDFHandler
-
 # ===============================
 # ADMIN
 # ===============================
@@ -148,8 +147,10 @@ if __name__ == "__main__":
 
     app.listen(port)
 
+
     print(f"\n🚀 Servidor Online: http://localhost:{port}")
     print(f"🔑 Google Login Ativo: {GOOGLE_CLIENT_ID[:15]}...")
     print(f"🔒 Admin: http://localhost:{port}/login_dev\n")
 
     tornado.ioloop.IOLoop.current().start()
+

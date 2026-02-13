@@ -9,6 +9,15 @@ try:
 except ImportError:
     HTML = None
 
+from app.utils.certificado_security import (
+    registrar_certificado,
+    registrar_acesso_certificado,
+    validar_token_certificado,
+    ip_esta_bloqueado,
+    detectar_acesso_suspeito,
+    bloquear_ip
+)
+
 # ================== CONFIG ==================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "usuarios.db")
@@ -56,7 +65,7 @@ def obter_dados_certificado(user_id, modulo):
         "modulo": modulo
     }
 
-def render_html_certificado(nome, email, nota, data_conclusao, modulo, is_pdf=False):
+def render_html_certificado(nome, email, nota, data_conclusao, modulo, is_pdf=False, token=None):
     """
     Renderiza HTML do certificado com dados reais.
     """
@@ -86,6 +95,11 @@ def render_html_certificado(nome, email, nota, data_conclusao, modulo, is_pdf=Fa
     ''' if not is_pdf else ''
 
     zoom_style = "zoom: 0.75;" if is_pdf else ""
+    
+    # Token de verificação (mostrado apenas se disponível)
+    token_display = f"""
+    <div class="codigo">ID Único: {token[:8] if token else ''}</div>
+    """ if token and not is_pdf else ""
 
     return f"""
 <!DOCTYPE html>
@@ -152,7 +166,7 @@ def render_html_certificado(nome, email, nota, data_conclusao, modulo, is_pdf=Fa
                 
                 <div class="footer">
                     <div class="data">Concluído em: {data_formatada}</div>
-                    <div class="codigo">ID: {modulo}-{nome[:3].upper()}-{int(nota)}</div>
+                    {token_display}
                 </div>
             </div>
         </div>
@@ -168,10 +182,24 @@ class CertificadoViewHandler(tornado.web.RequestHandler):
         uid = self.get_secure_cookie("user_id")
         return int(uid.decode()) if uid else None
 
+    def get_ip_address(self):
+        """Obtém o IP real do cliente (considerando proxies)"""
+        ip = self.request.headers.get("X-Forwarded-For")
+        if ip:
+            return ip.split(",")[0].strip()
+        return self.request.remote_ip
+
     @tornado.web.authenticated
     def get(self, modulo_id):
 
         user_id = self.current_user
+        ip_address = self.get_ip_address()
+
+        # 🔒 Verificar se IP está bloqueado
+        if ip_esta_bloqueado(ip_address):
+            self.set_status(403)
+            self.write("<h1>Acesso Negado (403)</h1><p>Seu IP foi bloqueado por atividade suspeita.</p>")
+            return
 
         # 🔒 Validar módulo permitido
         try:
@@ -197,6 +225,7 @@ class CertificadoViewHandler(tornado.web.RequestHandler):
             conn.close()
             self.set_status(403)
             self.write("<h1>Acesso Negado (403)</h1><p>Conta inativa ou pagamento pendente.</p>")
+            registrar_acesso_certificado(user_id, None, ip_address, "denied_acesso_restrito")
             return
 
         # 🔒 Buscar resultado da prova (somente do próprio usuário)
@@ -212,7 +241,21 @@ class CertificadoViewHandler(tornado.web.RequestHandler):
         if not resultado or resultado["aprovado"] != 1:
             self.set_status(403)
             self.write("<h1>Acesso Negado (403)</h1><p>Você ainda não foi aprovado neste módulo.</p>")
+            registrar_acesso_certificado(user_id, None, ip_address, "denied_nao_aprovado")
             return
+
+        # ✅ Registrar ou obter token do certificado
+        cert_info = self._obter_ou_criar_certificado(user_id, modulo, resultado["nota"], resultado["data"])
+        
+        if not cert_info:
+            self.set_status(500)
+            self.write("<h1>Erro ao processar certificado</h1>")
+            return
+
+        token = cert_info["token"]
+
+        # ✅ Registrar acesso bem-sucedido
+        registrar_acesso_certificado(user_id, token, ip_address, "view")
 
         html = render_html_certificado(
             nome=self.get_user_nome(user_id),
@@ -220,10 +263,44 @@ class CertificadoViewHandler(tornado.web.RequestHandler):
             nota=resultado["nota"],
             data_conclusao=resultado["data"],
             modulo=modulo,
-            is_pdf=False
+            is_pdf=False,
+            token=token
         )
 
         self.write(html)
+
+    def _obter_ou_criar_certificado(self, user_id, modulo, nota, data_conclusao):
+        """
+        Obtém o certificado existente ou cria um novo com token único.
+        """
+        conn = conectar()
+        cursor = conn.cursor()
+
+        # Verificar se já existe certificado
+        cursor.execute("""
+            SELECT id, token FROM certificados
+            WHERE user_id = ? AND modulo = ?
+            LIMIT 1
+        """, (user_id, modulo))
+
+        existente = cursor.fetchone()
+
+        if existente:
+            conn.close()
+            return {
+                "id": existente[0],
+                "token": existente[1]
+            }
+
+        # Criar novo certificado com segurança
+        try:
+            cert_info = registrar_certificado(user_id, modulo, nota, data_conclusao)
+            conn.close()
+            return cert_info
+        except Exception as e:
+            conn.close()
+            print(f"Erro ao criar certificado: {e}")
+            return None
 
     def get_user_nome(self, user_id):
         conn = conectar()
@@ -240,10 +317,24 @@ class CertificadoPDFHandler(tornado.web.RequestHandler):
         uid = self.get_secure_cookie("user_id")
         return int(uid.decode()) if uid else None
 
+    def get_ip_address(self):
+        """Obtém o IP real do cliente (considerando proxies)"""
+        ip = self.request.headers.get("X-Forwarded-For")
+        if ip:
+            return ip.split(",")[0].strip()
+        return self.request.remote_ip
+
     @tornado.web.authenticated
     def get(self, modulo_id):
 
         user_id = self.current_user
+        ip_address = self.get_ip_address()
+
+        # 🔒 Verificar se IP está bloqueado
+        if ip_esta_bloqueado(ip_address):
+            self.set_status(403)
+            self.write("Acesso bloqueado por atividade suspeita.")
+            return
 
         try:
             modulo = int(modulo_id)
@@ -287,7 +378,18 @@ class CertificadoPDFHandler(tornado.web.RequestHandler):
         if not resultado or resultado["aprovado"] != 1:
             self.set_status(403)
             self.write("Você não foi aprovado neste módulo.")
+            registrar_acesso_certificado(user_id, None, ip_address, "denied_pdf_nao_aprovado")
             return
+
+        # ✅ Obter ou criar certificado com token
+        cert_info = self._obter_ou_criar_certificado(user_id, modulo, resultado["nota"], resultado["data"])
+        
+        if not cert_info:
+            self.set_status(500)
+            self.write("Erro ao processar certificado.")
+            return
+
+        token = cert_info["token"]
 
         html_content = render_html_certificado(
             nome=user["username"].upper(),
@@ -295,10 +397,14 @@ class CertificadoPDFHandler(tornado.web.RequestHandler):
             nota=resultado["nota"],
             data_conclusao=resultado["data"],
             modulo=modulo,
-            is_pdf=True
+            is_pdf=True,
+            token=token
         )
 
         pdf_bytes = HTML(string=html_content).write_pdf()
+
+        # ✅ Registrar download bem-sucedido
+        registrar_acesso_certificado(user_id, token, ip_address, "download_pdf")
 
         self.set_header("Content-Type", "application/pdf")
         self.set_header(
@@ -306,3 +412,36 @@ class CertificadoPDFHandler(tornado.web.RequestHandler):
             f"attachment; filename=Certificado_Modulo_{modulo}.pdf"
         )
         self.write(pdf_bytes)
+
+    def _obter_ou_criar_certificado(self, user_id, modulo, nota, data_conclusao):
+        """
+        Obtém o certificado existente ou cria um novo com token único.
+        """
+        conn = conectar()
+        cursor = conn.cursor()
+
+        # Verificar se já existe certificado
+        cursor.execute("""
+            SELECT id, token FROM certificados
+            WHERE user_id = ? AND modulo = ?
+            LIMIT 1
+        """, (user_id, modulo))
+
+        existente = cursor.fetchone()
+
+        if existente:
+            conn.close()
+            return {
+                "id": existente[0],
+                "token": existente[1]
+            }
+
+        # Criar novo certificado com segurança
+        try:
+            cert_info = registrar_certificado(user_id, modulo, nota, data_conclusao)
+            conn.close()
+            return cert_info
+        except Exception as e:
+            conn.close()
+            print(f"Erro ao criar certificado: {e}")
+            return None

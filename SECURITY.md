@@ -1,14 +1,16 @@
-# Documentação de Segurança - Proteção de URLs
+# Documentação de Segurança
 
-## Problema: URL Traversal / Acesso Não Autorizado
+## 1️⃣ Proteção de URLs - Validação de Acesso
+
+### Problema: URL Traversal / Acesso Não Autorizado
 Usuários maliciosos poderiam acessar diretamente URLs de recursos que não pertencem a eles, como:
 - `/certificado/view/123` (ver certificado de outro usuário)
 - `/prova/456` (acessar prova de outro usuário)
 - `/recuperacao/789` (tentar recuperação de outro usuário)
 
-## Solução Implementada
+### Solução Implementada
 
-### 1. **Decorator `@require_owner`** (em `app/handlers/base.py`)
+#### 1. **Decorator `@require_owner`** (em `app/handlers/base.py`)
 Valida que o usuário logado é o proprietário do recurso antes de permitir acesso.
 
 **Como funciona:**
