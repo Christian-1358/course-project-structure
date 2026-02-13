@@ -445,3 +445,5 @@ class CertificadoPDFHandler(tornado.web.RequestHandler):
             conn.close()
             print(f"Erro ao criar certificado: {e}")
             return None
+
+

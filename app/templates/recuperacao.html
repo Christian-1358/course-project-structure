@@ -1,166 +1,152 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>Resultado | Mestre das Milhas</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <title>Resultado | Mestre das Milhas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&display=swap" rel="stylesheet">
 
-<style>
-:root {
-    --gold: #d4af37;
-    --gold-light: #e5c06d;
-    --bg: #050505;
-    --card: #0f0f0f;
-    --danger: #ff3b30;
-    --success: #00c853;
-}
+    <style>
+        :root {
+            --gold: #d4af37;
+            --gold-light: #e5c06d;
+            --bg: #050505;
+            --card: #0f0f0f;
+            --danger: #ff3b30;
+            --success: #00c853;
+            --text-muted: #888;
+        }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Inter', sans-serif;
-}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
 
-body {
-    background: radial-gradient(circle at top, #111 0%, #050505 60%);
-    color: #fff;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: 0.3s ease;
-}
+        body {
+            background: radial-gradient(circle at top, #111 0%, #050505 60%);
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.5s ease;
+        }
 
-.card {
-    background: var(--card);
-    width: 90%;
-    max-width: 420px;
-    padding: 60px 40px;
-    border-radius: 28px;
-    text-align: center;
-    border: 1px solid rgba(255,255,255,0.04);
-    box-shadow: 0 40px 120px rgba(0,0,0,0.9);
-    animation: fadeUp 0.8s ease;
-}
+        .card {
+            background: var(--card);
+            width: 90%;
+            max-width: 420px;
+            padding: 60px 40px;
+            border-radius: 28px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.04);
+            box-shadow: 0 40px 120px rgba(0,0,0,0.9);
+            animation: fadeUp 0.8s ease;
+        }
 
-@keyframes fadeUp {
-    from { opacity: 0; transform: translateY(40px); }
-    to { opacity: 1; transform: translateY(0); }
-}
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-.badge {
-    display: inline-block;
-    padding: 6px 18px;
-    border-radius: 50px;
-    border: 1px solid var(--gold);
-    color: var(--gold);
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 1.5px;
-    margin-bottom: 30px;
-}
+        .badge {
+            display: inline-block;
+            padding: 6px 18px;
+            border-radius: 50px;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            margin-bottom: 30px;
+        }
 
-.status {
-    font-size: 26px;
-    font-weight: 900;
-    margin-bottom: 20px;
-    letter-spacing: 2px;
-}
+        .status {
+            font-size: 26px;
+            font-weight: 900;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
 
-.desc {
-    color: #888;
-    font-size: 14px;
-    margin-bottom: 40px;
-    line-height: 1.6;
-}
+        .desc {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
 
-.btn {
-    width: 100%;
-    background: linear-gradient(135deg, var(--gold-light), var(--gold));
-    color: #000;
-    padding: 18px;
-    border-radius: 14px;
-    font-weight: 800;
-    border: none;
-    cursor: pointer;
-    transition: 0.25s ease;
-}
+        .btn-primary {
+            width: 100%;
+            background: linear-gradient(135deg, var(--gold-light), var(--gold));
+            color: #000;
+            padding: 18px;
+            border-radius: 14px;
+            font-weight: 800;
+            border: none;
+            cursor: pointer;
+            transition: 0.25s ease;
+            margin-bottom: 20px;
+        }
 
-.btn:hover:not(.locked) {
-    transform: translateY(-3px);
-    box-shadow: 0 15px 40px rgba(212,175,55,0.4);
-}
+        .btn-primary:hover:not(.locked) {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(212,175,55,0.4);
+        }
 
-.locked {
-    background: #1a1a1a !important;
-    color: #444 !important;
-    cursor: not-allowed;
-}
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: none;
+            border: none;
+            color: #a0a0a0;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: color 0.2s ease;
+            text-decoration: none;
+            margin: 10px 0;
+            width: 100%;
+        }
 
-.back-btn,
-.course-btn {
-    margin-top: 12px;
-    width: 100%;
-    background: transparent;
-    padding: 14px;
-    border-radius: 14px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
+        .back-link:hover {
+            color: #fff;
+        }
 
-.back-btn {
-    border: 1px solid rgba(212,175,55,0.4);
-    color: var(--gold);
-    font-weight: 700;
-}
+        .back-link svg {
+            width: 18px;
+            height: 18px;
+            transition: transform 0.2s ease;
+        }
 
-.course-btn {
-    border: 1px solid rgba(255,255,255,0.08);
-    color: #ccc;
-    font-weight: 600;
-}
+        .back-link:hover svg {
+            transform: translateX(-4px);
+        }
 
-.back-btn span,
-.course-btn span {
-    display: inline-block;
-    transition: transform 0.3s ease;
-}
+        .locked {
+            background: #1a1a1a !important;
+            color: #444 !important;
+            cursor: not-allowed;
+        }
 
-.back-btn:hover {
-    background: rgba(212,175,55,0.08);
-}
+        .timer {
+            color: var(--gold);
+            font-weight: 800;
+            font-size: 24px;
+            margin-top: 10px;
+        }
 
-.course-btn:hover {
-    background: rgba(255,255,255,0.05);
-    color: #fff;
-}
+        .hidden { display: none; }
 
-.back-btn:hover span,
-.course-btn:hover span {
-    transform: translateX(-5px);
-}
-
-.timer {
-    color: var(--gold);
-    font-weight: 800;
-    font-size: 24px;
-    margin-top: 10px;
-}
-
-.hidden { display: none; }
-
-.tries {
-    margin-top: 25px;
-    font-size: 12px;
-    color: #666;
-}
-</style>
+        .tries {
+            margin-top: 25px;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
 </head>
 <body>
 
@@ -178,16 +164,22 @@ body {
         <div class="timer" id="countdown">24:00:00</div>
     </div>
 
-    <button id="main-btn" class="btn" onclick="startRetry()">
+    <button id="main-btn" class="btn-primary" onclick="startRetry()">
         Continuar
     </button>
 
-    <button class="back-btn" onclick="goLogin()">
-        <span>←</span> Voltar ao login
+    <button class="back-link" onclick="goCourse()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
+        </svg>
+        Voltar ao curso
     </button>
 
-    <button class="course-btn" onclick="goCourse()">
-        <span>↩</span> Voltar ao curso
+    <button class="back-link" onclick="goLogin()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        Sair da conta
     </button>
 
     <div class="tries">
@@ -196,91 +188,93 @@ body {
 </div>
 
 <script>
-const nota = parseFloat("{{ nota }}");
-const MOD = "{{ modulo }}";
-const KEY = `mm_lock_${MOD}`;
+    // Variáveis dinâmicas (certifique-se que o backend as preenche)
+    const nota = parseFloat("{{ nota }}") || 0;
+    const MOD = "{{ modulo }}";
+    const KEY = `mm_lock_${MOD}`;
 
-function setup() {
-    const now = new Date().getTime();
-    let data = JSON.parse(localStorage.getItem(KEY)) || { count: 0, lockUntil: 0 };
+    function setup() {
+        const now = new Date().getTime();
+        let data = JSON.parse(localStorage.getItem(KEY)) || { count: 0, lockUntil: 0 };
 
-    const btn = document.getElementById('main-btn');
-    const info = document.getElementById('ui-info');
-    const lock = document.getElementById('ui-lock');
-    const num = document.getElementById('try-num');
+        const btn = document.getElementById('main-btn');
+        const info = document.getElementById('ui-info');
+        const lock = document.getElementById('ui-lock');
+        const num = document.getElementById('try-num');
 
-    if (data.lockUntil > 0 && now > data.lockUntil) {
-        data.count = 0;
-        data.lockUntil = 0;
-        localStorage.setItem(KEY, JSON.stringify(data));
+        if (data.lockUntil > 0 && now > data.lockUntil) {
+            data.count = 0;
+            data.lockUntil = 0;
+            localStorage.setItem(KEY, JSON.stringify(data));
+        }
+
+        if (data.lockUntil > 0) {
+            btn.classList.add('locked');
+            btn.innerText = "Aguarde";
+            btn.disabled = true;
+            info.classList.add('hidden');
+            lock.classList.remove('hidden');
+
+            setInterval(() => {
+                const diff = data.lockUntil - new Date().getTime();
+                if (diff <= 0) return location.reload();
+                const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
+                const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+                const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+                document.getElementById('countdown').innerText = `${h}:${m}:${s}`;
+            }, 1000);
+        }
+
+        num.innerText = data.count + 1;
+
+        const statusText = document.getElementById("status-text");
+        const descText = document.getElementById("desc-text");
+
+        if (nota >= 7) {
+            statusText.innerText = "APROVADO";
+            statusText.style.color = "var(--success)";
+            descText.innerText = "Parabéns! Você concluiu este módulo com sucesso.";
+            btn.innerText = "Próximo Módulo";
+        } else {
+            statusText.innerText = "REPROVADO";
+            statusText.style.color = "var(--danger)";
+            descText.innerText = "Você não atingiu a nota mínima. Revise o conteúdo.";
+            btn.innerText = "Refazer Avaliação";
+        }
     }
 
-    if (data.lockUntil > 0) {
-        btn.classList.add('locked');
-        btn.innerText = "Aguarde";
-        btn.disabled = true;
-        info.classList.add('hidden');
-        lock.classList.remove('hidden');
+    function startRetry() {
+        let data = JSON.parse(localStorage.getItem(KEY)) || { count: 0, lockUntil: 0 };
+        
+        if (nota >= 7) {
+            // Lógica para ir ao próximo módulo ou dashboard
+            window.location.href = "/dashboard"; 
+            return;
+        }
 
-        setInterval(() => {
-            const diff = data.lockUntil - new Date().getTime();
-            if (diff <= 0) return location.reload();
-            const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
-            const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
-            const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
-            document.getElementById('countdown').innerText = `${h}:${m}:${s}`;
-        }, 1000);
+        data.count++;
+        if (data.count >= 2) {
+            data.lockUntil = new Date().getTime() + (24 * 60 * 60 * 1000);
+            localStorage.setItem(KEY, JSON.stringify(data));
+            location.reload();
+        } else {
+            localStorage.setItem(KEY, JSON.stringify(data));
+            window.location.href = `/prova/${MOD}`;
+        }
     }
 
-    num.innerText = data.count + 1;
-
-    const statusText = document.getElementById("status-text");
-    const descText = document.getElementById("desc-text");
-
-    if (nota >= 7) {
-        statusText.innerText = "APROVADO";
-        statusText.style.color = "#00c853";
-        descText.innerText = "Parabéns. Você concluiu este módulo com sucesso.";
-        btn.innerText = "Ir para próximo módulo";
-    } else {
-        statusText.innerText = "REPROVADO";
-        statusText.style.color = "#ff3b30";
-        descText.innerText = "Revise o conteúdo e tente novamente.";
-        btn.innerText = "Fazer Recuperação";
+    function goLogin() {
+        document.body.style.opacity = "0";
+        setTimeout(() => { window.location.href = "/login"; }, 300);
     }
-}
 
-function startRetry() {
-    let data = JSON.parse(localStorage.getItem(KEY)) || { count: 0, lockUntil: 0 };
-    data.count++;
-
-    if (data.count >= 2) {
-        data.lockUntil = new Date().getTime() + (24 * 60 * 60 * 1000);
-        localStorage.setItem(KEY, JSON.stringify(data));
-        location.reload();
-    } else {
-        localStorage.setItem(KEY, JSON.stringify(data));
-        window.location.href = `/prova/${MOD}`;
+    function goCourse() {
+        document.body.style.opacity = "0";
+        // ALTERAÇÃO AQUI: Mudamos de "curso.html" para a rota "/curso" ou "/"
+        setTimeout(() => { window.location.href = "/curso"; }, 300);
     }
-}
 
-function goLogin() {
-    document.body.style.opacity = "0";
-    document.body.style.transform = "translateY(10px)";
-    setTimeout(() => {
-        window.location.href = "/login";
-    }, 300);
-}
-
-function goCourse() {
-    document.body.style.opacity = "0";
-    document.body.style.transform = "translateY(10px)";
-    setTimeout(() => {
-        window.location.href = "curso.html";
-    }, 300);
-}
-
-document.addEventListener('DOMContentLoaded', setup);
+    document.addEventListener('DOMContentLoaded', setup);
 </script>
 
 </body>
