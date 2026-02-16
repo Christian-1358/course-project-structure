@@ -12,9 +12,8 @@ from app.utils.pagamento_utils import usuario_pagou, marcar_como_pago
 from app.handlers.base import BaseHandler
 
 # MercadoPago token (use sandbox access token). Set via env var `MP_ACCESS_TOKEN`.
-MP_ACCESS_TOKEN = os.environ.get("MP_ACCESS_TOKEN", "")
-mp_client = None
-
+MP_ACCESS_TOKEN = "APP_USR-2389431682625478-021615-6fbe7fc838c104cb7b16f23f966ba6da-3207195955"
+mp_client = mercadopago.SDK(MP_ACCESS_TOKEN)
 # Tentar importar e inicializar MercadoPago se disponível
 try:
     import mercadopago

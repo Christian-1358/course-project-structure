@@ -233,6 +233,68 @@
 
     /* Check de Sucesso (opcional, aparece no final) */
     .success-icon { color: #22c55e; font-size: 40px; display: none; margin-bottom: 20px; }
+
+
+
+
+    /* ÁREA DE COMENTÁRIOS */
+.comments-section {
+    margin-top: 50px;
+    padding-top: 30px;
+    border-top: 1px solid var(--border);
+}
+
+.comments-section h3 {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    font-weight: 700;
+    color: var(--gold-solid);
+}
+
+.comment-input {
+    width: 100%;
+    min-height: 90px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 15px;
+    color: white;
+    font-family: 'Inter', sans-serif;
+    resize: vertical;
+}
+
+.comment-btn {
+    margin-top: 12px;
+}
+
+.comment-item {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    padding: 15px;
+    border-radius: 12px;
+    margin-top: 15px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+.reply-box {
+    margin-top: 10px;
+    margin-left: 30px;
+}
+
+.reply-btn {
+    font-size: 12px;
+    color: var(--gold-solid);
+    cursor: pointer;
+    margin-top: 8px;
+    display: inline-block;
+}
+
+.reply-comment {
+    margin-left: 30px;
+    border-left: 2px solid var(--border);
+    padding-left: 15px;
+}
+
 </style>
     </style>
     </style>
@@ -265,6 +327,14 @@
             <button class="toggle-sidebar-btn" onclick="toggleSidebar()">❮</button>
         </div>
         <div class="lesson-body">
+            <!-- COMENTÁRIOS -->
+<div class="comments-section">
+    <h3>💬 Comentários da Aula</h3>
+    <textarea id="commentInput" class="comment-input" placeholder="Escreva sua dúvida ou comentário..."></textarea>
+    <button class="btn-accent comment-btn" onclick="salvarComentario()">Publicar Comentário</button>
+    <div id="commentList"></div>
+</div>
+
             <div id="videoExternalLink"></div>
             <h2 id="currentTitle">Carregando...</h2>
             <div id="currentDesc"></div>
@@ -377,7 +447,7 @@ function init(){
                 ${lessonsHTML}
                 <div class="lesson-item is-quiz ${quizLiberado?'':'locked'}"
                      onclick="${quizLiberado?`acessarProva(${mIdx})`:'alert(\'Conclua todas as aulas primeiro!\')'}">
-                    <span>${quizLiberado?'📝 Fazer Prova':'🔒 Prova Bloqueada'}</span>
+                    <span>${quizLiberado?' Fazer Prova':' Prova Bloqueada'}</span>
                 </div>
             </div>`;
         container.appendChild(div);
@@ -477,6 +547,70 @@ function executarSaida() {
         }, 1000);
     }, 1500);
 }
+
+let replyingTo = null;
+
+function salvarComentario(parentId=null){
+    const texto = document.getElementById("commentInput").value.trim();
+    if(!texto) return;
+
+    const lessonId = course[current.m].lessons[current.l].v;
+
+    fetch("/api/comment",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+            lesson_id: lessonId,
+            content: texto,
+            parent_id: parentId
+        })
+    })
+    .then(()=> {
+        document.getElementById("commentInput").value="";
+        replyingTo = null;
+        carregarComentarios();
+    });
+}
+
+function responderComentario(id){
+    replyingTo = id;
+    document.getElementById("commentInput").focus();
+}
+
+function carregarComentarios(){
+    const lessonId = course[current.m].lessons[current.l].v;
+
+    fetch("/api/comment?lesson_id="+lessonId)
+    .then(r=>r.json())
+    .then(data=>{
+        const list = document.getElementById("commentList");
+        list.innerHTML="";
+
+        const comments = data.filter(c => !c.parent_id);
+        const replies = data.filter(c => c.parent_id);
+
+        comments.forEach(c=>{
+            const div = document.createElement("div");
+            div.className="comment-item";
+            div.innerHTML=`
+                ${c.content}
+                <div class="reply-btn" onclick="responderComentario(${c.id})">Responder</div>
+            `;
+
+            replies
+                .filter(r => r.parent_id === c.id)
+                .forEach(r=>{
+                    const replyDiv = document.createElement("div");
+                    replyDiv.className="comment-item reply-comment";
+                    replyDiv.innerText = r.content;
+                    div.appendChild(replyDiv);
+                });
+
+            list.appendChild(div);
+        });
+    });
+}
+
 </script>
 
 </body>

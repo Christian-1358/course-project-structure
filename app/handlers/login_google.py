@@ -12,8 +12,8 @@ class GoogleLoginHandler(tornado.web.RequestHandler,
     async def get(self):
         if not self.get_argument("code", False):
             await self.authorize_redirect(
-                redirect_uri="http://localhost:8080/auth/google",
-                client_id=self.settings["google_oauth"]["key"],
+        redirect_uri="http://milhaspro.home/auth/google",
+          client_id=self.settings["google_oauth"]["key"],
                 scope=["profile", "email"],
                 response_type="code"
             )

@@ -23,9 +23,7 @@ from app.handlers.flow import StartProvaHandler, StartCertificadoHandler
 
 from app.handlers.pagamento import OrdersHandler, CheckoutHandler, PagamentoPageHandler, MercadoPagoCreateHandler, MercadoPagoWebhookHandler
 from app.handlers.certificado import CertificadoViewHandler, CertificadoPDFHandler
-# ===============================
-# ADMIN
-# ===============================
+
 from app.utils.admin_tools import (
     LoginDevHandler, AlterarStatusHandler, 
     BuscarUsuarioHandler,
@@ -38,9 +36,8 @@ from app.utils.admin_tools import (
 from app.handlers.certificado import CertificadoPDFChromeHandler
 from app.handlers.certificado import CertificadoViewHandler, CertificadoPDFHandler
 
-# ===============================
-# CONFIG
-# ===============================
+from app.handlers.comentarios import CommentHandler
+from app.handlers.pagamento import MercadoPagoCreateHandler, PagamentoPageHandler
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "usuarios.db")
 
@@ -139,30 +136,29 @@ def make_app():
         (r"/pagamento/?", PagamentoPageHandler),
 
         (r"/certificado/([0-9]+)", CertificadoViewHandler),
-(r"/certificado/pdf/([0-9]+)", CertificadoPDFHandler),
-
-
-
-(r"/gerar-certificado/([0-9a-zA-Z_-]+)", GerarCertificadoHandler),
-
+        (r"/certificado/pdf/([0-9]+)", CertificadoPDFHandler),
+        (r"/gerar-certificado/([0-9a-zA-Z_-]+)", GerarCertificadoHandler),
+    (r"/pagamento", PagamentoPageHandler),
+    (r"/pagamento/criar", MercadoPagoCreateHandler),
+        (r"/curso/?", CursoHandler),
+        (r"/sobre/?", Sobre),
+        (r"/submit/?", SubmitCodeHandler),
+        (r"/api/comment/?", CommentHandler),
     ], **settings)
 
 
 if __name__ == "__main__":
-    try:
-        criar_tabela()
-        criar_usuario_admin_se_nao_existe()
-    except Exception as e:
-        print(f"Erro ao iniciar DB: {e}")
-
+    port = 8080
     app = make_app()
-    port = 8080 
-
     app.listen(port)
 
-
-    print(f"\n🚀 Servidor Online: http://localhost:{port}")
-    print(f"🔑 Google Login Ativo: {GOOGLE_CLIENT_ID[:15]}...")
-    print(f"🔒 Admin: http://localhost:{port}/login_dev\n")
+    print("\n" + "=" * 40)
+    print("🚀 SISTEMA MILHAS PRO ONLINE")
+    print("🔗 http://milhaspro.home")
+    print("=" * 40 + "\n")
 
     tornado.ioloop.IOLoop.current().start()
+
+#key  mercadopago = 
+
+
