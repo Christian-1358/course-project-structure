@@ -73,3 +73,4 @@ class CommentHandler(tornado.web.RequestHandler):
             {"content": r[0], "created_at": r[1]}
             for r in rows
         ]))
+terminar o pagamnto usando o git

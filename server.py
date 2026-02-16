@@ -127,22 +127,20 @@ def make_app():
         (r"/admin/compras/?", ComprasHandler),
         (r"/emails_logados/?", EmailsLogadosHandler),
 
-
-        (r"/pagamentotrue/?", PagamentoPageHandler),
+        # ===============================
+        # PAGAMENTO (MercadoPago)
+        # ===============================
+        (r"/pagamento/?", PagamentoPageHandler),
         (r"/pagamento/criar/?", MercadoPagoCreateHandler),
         (r"/pagamento/webhook/?", MercadoPagoWebhookHandler),
-        (r"/checkout/([a-zA-Z]+)", CheckoutHandler),
-        (r"/orders", OrdersHandler),
-        (r"/pagamento/?", PagamentoPageHandler),
+        (r"/checkout/([a-zA-Z]+)/?", CheckoutHandler),
+        (r"/orders/?", OrdersHandler),
 
-        (r"/certificado/([0-9]+)", CertificadoViewHandler),
-        (r"/certificado/pdf/([0-9]+)", CertificadoPDFHandler),
-        (r"/gerar-certificado/([0-9a-zA-Z_-]+)", GerarCertificadoHandler),
-    (r"/pagamento", PagamentoPageHandler),
-    (r"/pagamento/criar", MercadoPagoCreateHandler),
-        (r"/curso/?", CursoHandler),
-        (r"/sobre/?", Sobre),
-        (r"/submit/?", SubmitCodeHandler),
+        # ===============================
+        # CERTIFICADOS & MISC
+        # ===============================
+        (r"/certificado/([0-9]+)/?", CertificadoViewHandler),
+        (r"/certificado/pdf/([0-9]+)/?", CertificadoPDFHandler),
         (r"/api/comment/?", CommentHandler),
     ], **settings)
 

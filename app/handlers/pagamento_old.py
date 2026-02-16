@@ -169,7 +169,7 @@ class MercadoPagoCreateHandler(BaseHandler):
         try:
             data = json.loads(self.request.body.decode())
         except Exception:
-            return self.write_json({"error": "JSON inválido"})
+            data = {k: self.get_argument(k) for k in self.request.arguments}
 
         user_id = data.get("user_id")
         amount = float(data.get("amount", 200.0))
@@ -373,4 +373,3 @@ class OrdersHandler(BaseHandler):
         orders = [dict(row) for row in cursor.fetchall()]
         conn.close()
         self.write_json({"orders": orders, "total": len(orders)})
-

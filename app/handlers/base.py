@@ -100,13 +100,50 @@ def require_auth(func):
     """
     Decorator simples que exige autenticação e pagamento.
     Redireciona para login se não estiver autenticado.
+    Se tiver autenticado mas não pagou, o get_current_user() retorna None.
     """
     @wraps(func)
     def wrapper(self, *args, **kwargs):
         current_user = self.get_current_user()
         if not current_user:
-            self.redirect("/login")
+            self.redirect("/pagamento")
             return
+        return func(self, *args, **kwargs)
+
+    return wrapper
+
+
+def require_payment(func):
+    """
+    Decorator que verifica se o usuário autenticado já pagou pelo curso.
+    
+    Uso:
+        @require_payment
+        def get(self):
+            # seu código aqui
+            self.render("curso.html")
+    
+    Se não pagou, redireciona para /pagamento
+    Se não está autenticado, redireciona para /pagamento também
+    """
+    @wraps(func)
+    def wrapper(self, *args, **kwargs):
+        current_user = self.get_current_user()
+        if not current_user:
+            # Tenta obter user_id sem a verificação de pagamento
+            user_id = self.get_secure_cookie("user_id")
+            if user_id:
+                try:
+                    uid = int(user_id.decode())
+                    # Não pagou
+                    self.redirect("/pagamento")
+                    return
+                except Exception:
+                    pass
+            # Não autenticado também
+            self.redirect("/pagamento")
+            return
+        
         return func(self, *args, **kwargs)
 
     return wrapper
