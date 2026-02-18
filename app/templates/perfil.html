@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil | MestreMilhas Premium</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --gold-primary: #d4af37;
+            --gold-secondary: #f1d592;
+            --dark-deep: #050505;
+            --card-bg: rgba(20, 20, 20, 0.85);
+            --border-soft: rgba(212, 175, 55, 0.2);
+            --danger: #ff4d4d;
+            --text-muted: #a0a0a0;
+        }
+
+        /* RESET & BASE */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body {
+            background: radial-gradient(circle at top right, #1a1a1a 0%, #050505 100%);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* ANIMAÇÃO DE FUNDO */
+        body::before {
+            content: "";
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.08), transparent 70%);
+            top: -200px;
+            right: -100px;
+            z-index: -1;
+            animation: float 10s ease-in-out infinite;
+        }
+
+        @keyframes float { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-30px, 40px); } }
+
+        /* CONTAINER PRINCIPAL */
+        .container {
+            max-width: 1100px;
+            width: 92%;
+            margin: 100px auto 60px;
+            padding: 50px;
+            background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            border-radius: 24px;
+            border: 1px solid var(--border-soft);
+            box-shadow: 0 50px 100px rgba(0,0,0,0.9);
+            animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+        .page-title {
+            text-align: center;
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary), var(--gold-primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 60px;
+            letter-spacing: -1px;
+        }
+
+        /* SEÇÃO DE AVATAR */
+        .profile-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 60px;
+        }
+
+        .avatar-wrapper {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .profile-avatar {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--gold-primary);
+            padding: 5px;
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.25);
+            transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .avatar-wrapper:hover .profile-avatar { transform: rotate(3deg) scale(1.05); }
+
+        /* BOTÕES */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            gap: 8px;
+        }
+
+        .btn-gold {
+            background: linear-gradient(90deg, var(--gold-primary), var(--gold-secondary));
+            color: #000;
+            border: none;
+        }
+
+        .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3); }
+
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid #4da6ff;
+            color: #4da6ff;
+        }
+
+        .btn-outline:hover { background: rgba(77, 166, 255, 0.1); }
+
+        .btn-danger-text { color: var(--danger); border: 1.5px solid var(--danger); background: transparent; }
+        .btn-danger-text:hover { background: var(--danger); color: #fff; }
+
+        /* FORMULÁRIOS */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+        }
+
+        .section-card {
+            background: rgba(30, 30, 30, 0.4);
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid #222;
+        }
+
+        .section-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 25px;
+            color: var(--gold-secondary);
+        }
+
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px; }
+
+        input, textarea {
+            width: 100%;
+            background: #0d0d0d;
+            border: 1px solid #2a2a2a;
+            color: #fff;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: 0.3s;
+        }
+
+        input:focus, textarea:focus {
+            border-color: var(--gold-primary);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1);
+        }
+
+        /* FOOTER */
+        .profile-footer {
+            margin-top: 60px;
+            padding-top: 40px;
+            border-top: 1px solid #222;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        /* MODAL */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(8px);
+        }
+
+        .modal-content {
+            background: #111;
+            padding: 40px;
+            border-radius: 24px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            border: 1px solid #333;
+        }
+
+        @media(max-width: 850px) {
+            .profile-grid { grid-template-columns: 1fr; }
+            .container { padding: 30px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 class="page-title">Meu Perfil</h1>
+
+    <div class="profile-header">
+        <div class="avatar-wrapper">
+            <img src="{{ photo if photo else '/static/img/default.png' }}" class="profile-avatar" id="avatarPreview">
+        </div>
+        
+        <div class="profile-buttons">
+            <label class="btn btn-gold">
+                Trocar Foto
+                <input type="file" name="photo" id="photoInput" form="formPerfil" hidden accept="image/*">
+            </label>
+            <button class="btn btn-outline" onclick="removerFoto()">Remover</button>
+            <button class="btn btn-danger-text" onclick="toggleModal(true)">Excluir Conta</button>
+        </div>
+    </div>
+
+    <div class="profile-grid">
+        <div class="section-card">
+            <h3>Dados Pessoais</h3>
+            <form id="formPerfil" method="POST" action="/perfil" enctype="multipart/form-data">
+                <input type="hidden" name="action" value="update_info">
+                <div class="form-group">
+                    <label>Nome de Usuário</label>
+                    <input type="text" name="username" value="{{ username }}" required>
+                </div>
+                <div class="form-group">
+                    <label>E-mail</label>
+                    <input type="email" name="email" value="{{ email }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Sua Bio</label>
+                    <textarea name="bio" rows="4">{{ bio if bio else "" }}</textarea>
+                </div>
+                <button type="submit" class="btn btn-gold" style="width: 100%;">Atualizar Perfil</button>
+            </form>
+        </div>
+
+        <div class="section-card">
+            <h3>Segurança</h3>
+            <form method="POST" action="/perfil">
+                <input type="hidden" name="action" value="change_password">
+                <div class="form-group">
+                    <label>Senha Atual</label>
+                    <input type="password" name="old" required>
+                </div>
+                <div class="form-group">
+                    <label>Nova Senha</label>
+                    <input type="password" name="new" required>
+                </div>
+                <div class="form-group">
+                    <label>Confirmar Senha</label>
+                    <input type="password" name="confirm" required>
+                </div>
+                <button type="submit" class="btn btn-gold" style="width: 100%;">Mudar Senha</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="profile-footer">
+        <a href="/curso" class="btn btn-outline">Voltar ao Curso</a>
+        <a href="/logout" class="btn btn-danger-text">Sair da Conta</a>
+    </div>
+</div>
+
+<div class="modal" id="modalExcluir">
+    <div class="modal-content">
+        <h3 style="color: var(--danger); margin-bottom: 15px;">Atenção!</h3>
+        <p style="color: #ccc; margin-bottom: 30px;">A exclusão da conta é permanente e você perderá todo o seu progresso.</p>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            <button class="btn btn-danger-text" onclick="confirmarExclusao()">Confirmar Exclusão</button>
+            <button class="btn btn-outline" style="border-color: #555; color: #fff;" onclick="toggleModal(false)">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const toggleModal = (show) => document.getElementById("modalExcluir").style.display = show ? "flex" : "none";
+
+const notify = (msg, type = 'success') => {
+    const toast = document.createElement("div");
+    toast.style.cssText = `position:fixed; bottom:30px; right:30px; padding:16px 30px; background:#111; border:1px solid ${type === 'success' ? '#d4af37' : '#ff4d4d'}; border-radius:12px; z-index:9999; box-shadow:0 10px 30px rgba(0,0,0,0.5);`;
+    toast.innerText = msg;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+};
+
+document.getElementById('photoInput').addEventListener("change", async function(e) {
+    const formData = new FormData(document.getElementById("formPerfil"));
+    try {
+        const res = await fetch("/perfil", { method: "POST", body: formData });
+        if(res.ok) {
+            notify("Foto atualizada! ✨");
+            setTimeout(() => location.reload(), 1000);
+        }
+    } catch (e) { notify("Erro ao carregar foto.", "error"); }
+});
+
+async function removerFoto() {
+    if(!confirm("Remover foto de perfil?")) return;
+    const res = await fetch("/perfil", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "action=remove_photo"
+    });
+    if(res.ok) location.reload();
+}
+
+async function confirmarExclusao() {
+    const res = await fetch("/delete-account", { method: "POST" });
+    if(res.ok) window.location.href = "/";
+    else notify("Erro ao excluir conta.", "error");
+}
+</script>
+
+</body>
+</html>

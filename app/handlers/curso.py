@@ -12,28 +12,16 @@ class CursoHandler(BaseHandler):
         conn.row_factory = sqlite3.Row
         return conn
 
-    @tornado.web.authenticated
+    # página agora aberta para qualquer pessoa; comentários requerem login
     def get(self):
-        user_id_cookie = self.get_secure_cookie("user_id")
-        if not user_id_cookie:
-            self.redirect("/login")
-            return
-        user_id = user_id_cookie.decode()
-
-        # 🔒 Bloqueio se não pagou
-        if not usuario_pagou(user_id):
-            self.redirect("/pagamento")
-            return
+        user_id = self.get_current_user()  # só retorna se logado e pagou
 
         conn = self.get_db_connection()
-        user = conn.execute("SELECT * FROM users WHERE id=?", (user_id,)).fetchone()
-        if not user:
-            conn.close()
-            self.clear_all_cookies()
-            self.redirect("/login")
-            return
-
-        notas = conn.execute("SELECT modulo, nota, data FROM provas_resultado WHERE user_id=? ORDER BY modulo ASC", (user_id,)).fetchall()
+        user = None
+        notas = []
+        if user_id:
+            user = conn.execute("SELECT * FROM users WHERE id=?", (user_id,)).fetchone()
+            notas = conn.execute("SELECT modulo, nota, data FROM provas_resultado WHERE user_id=? ORDER BY modulo ASC", (user_id,)).fetchall()
         conn.close()
 
-        self.render("curso.html", usuario=user["nome"] or user["username"], user=user, notas=notas)
+        self.render("curso.html", usuario=(user["nome"] or user["username"]) if user else "Visitante", user=user, notas=notas)

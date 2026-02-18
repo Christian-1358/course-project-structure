@@ -55,6 +55,26 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+        .header-links {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .header-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        .header-links a:hover { color: var(--gold-solid); }
+        .header-link {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 14px;
+            margin-right: 20px;
+            transition: color 0.2s;
+        }
+        .header-link:hover { color: var(--gold-solid); }
 
         .btn-test { 
             background: rgba(239, 68, 68, 0.1); 
@@ -251,6 +271,12 @@
     color: var(--gold-solid);
 }
 
+.comment-perm {
+    font-size: 14px;
+    color: var(--text-gray);
+    margin-bottom: 10px;
+}
+
 .comment-input {
     width: 100%;
     min-height: 90px;
@@ -276,6 +302,23 @@
     font-size: 14px;
     line-height: 1.5;
 }
+.comment-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--gold-solid);
+    font-size: 14px;
+}
+.comment-user { color: var(--gold-solid); text-decoration: none; }
+.comment-user:hover { text-decoration: underline; }
+.comment-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+}
 .reply-box {
     margin-top: 10px;
     margin-left: 30px;
@@ -289,6 +332,19 @@
     display: inline-block;
 }
 
+#replyingLabel {
+    color: var(--gold-solid);
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+#replyingLabel button {
+    background: none;
+    border: none;
+    color: #f59e0b;
+    cursor: pointer;
+    font-size: 13px;
+}
+
 .reply-comment {
     margin-left: 30px;
     border-left: 2px solid var(--border);
@@ -296,8 +352,6 @@
 }
 
 </style>
-    </style>
-    </style>
 </head>
 <body>
 
@@ -313,8 +367,13 @@
 
         <div class="logo">✈️ MESTRE DAS <span>MILHAS</span></div>
     <div class="header-actions">
-        <div id="prog-txt">100% CONCLUÍDO</div>
-        <button class="btn-sair" onclick="executarSaida()">SAIR</button>
+        {% if user %}
+            <a href="/perfil" class="header-link">Meu Perfil</a>
+            <div id="prog-txt">100% CONCLUÍDO</div>
+            <button class="btn-sair" onclick="executarSaida()">SAIR</button>
+        {% else %}
+            <a href="/login" class="header-link">Entrar</a>
+        {% end %}
     </div>
         </div>
     
@@ -328,10 +387,17 @@
         </div>
         <div class="lesson-body">
             <!-- COMENTÁRIOS -->
-<div class="comments-section">
-    <h3>💬 Comentários da Aula</h3>
+<button id="toggleCommentsBtn" class="btn btn-gold" style="margin-bottom:12px;">Mostrar comentários</button>
+<div class="comments-section" id="commentsContainer" style="display:none;">
+    <h3> Comentários da Aula</h3>
+    <p class="comment-perm">Você pode publicar dúvidas e respostas; sua foto de perfil aparece ao lado de cada post. Apenas usuários logados e com acesso podem comentar.</p>
+    <div id="commentNotice" class="message error" style="display:none; margin-bottom:10px;">Você precisa estar logado para comentar.</div>
+    <div id="replyingLabel" style="display:none; margin-bottom:8px; font-size:14px; color:var(--gold-solid);">
+        Respondendo ao comentário <span id="replyTarget"></span>
+        <button style="background:none;border:none;color:#f59e0b;cursor:pointer;" onclick="cancelReply()">[Cancelar]</button>
+    </div>
     <textarea id="commentInput" class="comment-input" placeholder="Escreva sua dúvida ou comentário..."></textarea>
-    <button class="btn-accent comment-btn" onclick="salvarComentario()">Publicar Comentário</button>
+    <button class="btn-accent comment-btn" onclick="salvarComentario(replyingTo)">Publicar Comentário</button>
     <div id="commentList"></div>
 </div>
 
@@ -354,6 +420,20 @@
 </main>
 
 <script>
+// flag set by server whether the current viewer is logged+pago
+window.USER_LOGGED = {{ 1 if user else 0 }};
+
+document.addEventListener('DOMContentLoaded', () => {
+    if(!window.USER_LOGGED){
+        const input = document.getElementById("commentInput");
+        if(input) input.disabled = true;
+        const btn = document.querySelector(".comment-btn");
+        if(btn) btn.disabled = true;
+        const notice = document.getElementById("commentNotice");
+        if(notice) notice.style.display = "block";
+    }
+});
+
 const course = [
     { name: "1. Fundamentos e CPM", lessons: [
         {t:"Visão Geral 2026",d:"Entenda o mercado atual e as novas oportunidades do setor.",v:"3r6Q9tCzX4k"},
@@ -485,6 +565,11 @@ function play(m,l){
     document.getElementById('currentTitle').innerText=les.t;
     document.getElementById('currentDesc').innerText=les.d;
     init();
+    // if comments panel is open, reload comments for the new lesson
+    const commentsCont = document.getElementById('commentsContainer');
+    if(commentsCont && commentsCont.style.display !== 'none'){
+        carregarComentarios();
+    }
 }
 
 function toggleLesson(videoId){
@@ -550,11 +635,26 @@ function executarSaida() {
 
 let replyingTo = null;
 
+function cancelReply(){
+    replyingTo = null;
+    const input = document.getElementById("commentInput");
+    input.placeholder = "Escreva sua dúvida ou comentário...";
+    document.getElementById("replyingLabel").style.display = "none";
+}
+
 function salvarComentario(parentId=null){
-    const texto = document.getElementById("commentInput").value.trim();
+    if(!window.USER_LOGGED){
+        document.getElementById("commentNotice").style.display = "block";
+        return;
+    }
+    const input = document.getElementById("commentInput");
+    const texto = input.value.trim();
     if(!texto) return;
 
     const lessonId = course[current.m].lessons[current.l].v;
+
+    // se não foi passado pai, tente usar variável global
+    if(!parentId) parentId = replyingTo;
 
     fetch("/api/comment",{
         method:"POST",
@@ -563,53 +663,155 @@ function salvarComentario(parentId=null){
             lesson_id: lessonId,
             content: texto,
             parent_id: parentId
-        })
+        })                                                                                                                                                       
     })
-    .then(()=> {
-        document.getElementById("commentInput").value="";
+    .then(res => {
+        if(res.status === 401){
+            alert("Você precisa estar logado para comentar.");
+            return;
+        } else if(res.status === 403) {
+            alert("Você precisa ter feito o pagamento para comentar.");
+            return;
+        }
+        return res.json();
+    })
+    .then(data=>{
+        if(!data) return;
+        input.value="";
+        input.placeholder = "Escreva sua dúvida ou comentário...";
         replyingTo = null;
+        document.getElementById("replyingLabel").style.display = "none";
         carregarComentarios();
     });
 }
 
-function responderComentario(id){
+function responderComentario(id, username, avatar){
     replyingTo = id;
-    document.getElementById("commentInput").focus();
+    const input = document.getElementById("commentInput");
+    input.placeholder = "Escreva sua resposta...";
+    const targetEl = document.getElementById("replyTarget");
+    if(avatar){
+        targetEl.innerHTML = `<img src="${avatar}" class="comment-avatar" style="width:24px;height:24px;"> ${username || ('#'+id)}`;
+    } else {
+        targetEl.innerText = username ? username : ('#'+id);
+    }
+    document.getElementById("replyingLabel").style.display = "block";
+    input.focus();
 }
 
 function carregarComentarios(){
+    // make sure lesson index exists (video may not be loaded yet)
+    if(typeof current === 'undefined' || !course[current.m]) return;
     const lessonId = course[current.m].lessons[current.l].v;
 
+    // enable/disable comment UI according to login
+    if(!window.USER_LOGGED){
+        document.getElementById("commentInput").disabled = true;
+        document.querySelector(".comment-btn").disabled = true;
+        document.getElementById("commentNotice").style.display = "block";
+    }
     fetch("/api/comment?lesson_id="+lessonId)
     .then(r=>r.json())
-    .then(data=>{
+    .then(items=>{
         const list = document.getElementById("commentList");
-        list.innerHTML="";
+        list.innerHTML = "";
 
-        const comments = data.filter(c => !c.parent_id);
-        const replies = data.filter(c => c.parent_id);
-
-        comments.forEach(c=>{
+        // items already nested: each has replies array
+        function renderNode(node, container, depth=0){
             const div = document.createElement("div");
-            div.className="comment-item";
-            div.innerHTML=`
-                ${c.content}
-                <div class="reply-btn" onclick="responderComentario(${c.id})">Responder</div>
-            `;
+            div.className = depth === 0 ? "comment-item" : "reply-comment";
 
-            replies
-                .filter(r => r.parent_id === c.id)
-                .forEach(r=>{
-                    const replyDiv = document.createElement("div");
-                    replyDiv.className="comment-item reply-comment";
-                    replyDiv.innerText = r.content;
-                    div.appendChild(replyDiv);
-                });
+            // header with avatar, name and optional collapse
+            const header = document.createElement("div");
+            header.className = "comment-header";
 
-            list.appendChild(div);
+            const avatarImg = document.createElement("img");
+            avatarImg.className = "comment-avatar";
+            avatarImg.src = node.photo || 'https://via.placeholder.com/32?text=?';
+
+            if(node.user_id){
+                const link = document.createElement("a");
+                link.href = "/user/" + node.user_id;
+                link.appendChild(avatarImg);
+                header.appendChild(link);
+            } else {
+                header.appendChild(avatarImg);
+            }
+
+            const nameSpan = document.createElement("span");
+            if(node.user_id){
+                const nameLink = document.createElement("a");
+                nameLink.href = "/user/" + node.user_id;
+                nameLink.className = "comment-user";
+                nameLink.textContent = node.username || "Usuário";
+                nameSpan.appendChild(nameLink);
+            } else {
+                nameSpan.textContent = node.username || "Usuário";
+            }
+            header.appendChild(nameSpan);
+
+            if(node.replies && node.replies.length){
+                const btn = document.createElement("span");
+                btn.className = "toggle-thread";
+                btn.textContent = "[–]";
+                btn.onclick = () => toggleThread(btn);
+                header.appendChild(btn);
+            }
+
+            div.appendChild(header);
+
+            const textDiv = document.createElement("div");
+            textDiv.className = "comment-text";
+            textDiv.textContent = node.content;
+            div.appendChild(textDiv);
+
+            const replyDiv = document.createElement("div");
+            replyDiv.className = "reply-btn";
+            replyDiv.textContent = "Responder";
+            replyDiv.onclick = () => responderComentario(node.id, node.username, node.photo);
+            div.appendChild(replyDiv);
+
+            if(node.replies && node.replies.length){
+                const repliesContainer = document.createElement('div');
+                repliesContainer.className = 'replies-container';
+                div.appendChild(repliesContainer);
+                node.replies.forEach(r=> renderNode(r, repliesContainer, depth+1));
+            }
+
+            container.appendChild(div);
+        }
+
+        items.forEach(c=> renderNode(c, list));
         });
+    };
+
+    // button to show/hide comments section
+    document.getElementById('toggleCommentsBtn').addEventListener('click', function(){
+        const cont = document.getElementById('commentsContainer');
+        if(cont.style.display === 'none'){
+            cont.style.display = '';
+            this.innerText = 'Ocultar comentários';
+            carregarComentarios();
+        } else {
+            cont.style.display = 'none';
+            this.innerText = 'Mostrar comentários';
+        }
     });
-}
+
+    function toggleThread(el){
+        const commentDiv = el.closest('.comment-item, .reply-comment');
+        if(!commentDiv) return;
+        const replies = commentDiv.querySelector('.replies-container');
+        if(!replies) return;
+        if(replies.style.display === 'none'){
+            replies.style.display = '';
+            el.innerText = '[–]';
+        } else {
+            replies.style.display = 'none';
+            el.innerText = '[+]';
+        }
+    }
+
 
 </script>
 

@@ -18,9 +18,24 @@ Seu sistema de pagamento foi completamente atualizado com:
 - **Public Key**: `APP_USR-19b62fa6-1ef6-4489-a96f-35bd1bdc46fe`
 - **Access Token**: `APP_USR-2389431682625478-021615-6fbe7fc838c104cb7b16f23f966ba6da-3207195955`
 
-Essas chaves estão configuradas automáticamente em:
-- `app/handlers/pagamento.py` (hard-coded para desenvolvimento)
-- `app/.ENV` (para referência)
+As chaves de sandbox já vêm definidas como valores padrão no arquivo
+`app/handlers/pagamento.py`, mas você poderá sobrescrevê‑las via
+variáveis de ambiente (`MP_PUBLIC_KEY` e `MP_ACCESS_TOKEN`) ao rodar o
+servidor. Isso facilita alternar entre teste e produção sem alterar o
+código.
+
+Exemplo de execução com credenciais reais (produ‑
+ção):
+
+```bash
+MP_PUBLIC_KEY="APP_USR-..." \
+MP_ACCESS_TOKEN="APP_USR-..." \
+python server.py
+```
+
+O frontend e o handler irão automaticamente escolher o `sandbox_init_point`
+quando estiver usando as chaves de teste, de modo que você possa
+fazer um pagamento completo e ver a notificação webhook funcionar localmente.
 
 ---
 
@@ -50,26 +65,57 @@ Login → Verifica pagamento
     ↓
 ✅ Pagou → Acesso ao curso
 ```
+O frontend de `/pagamento` carrega a chave pública do MercadoPago e
+renderiza o formulário correspondente ao método escolhido. Para cartão,
+o JavaScript utiliza a biblioteca oficial (`<script
+src="https://sdk.mercadopago.com/js/v2"></script>`) e gera um token
+via `mpInstance.card.createToken(...)`. Esse token é enviado ao servidor
+que faz o `mp_client.payment().create(...)` internamente e já marca o
+usuário como pago quando o status estiver `approved`.
 
+Esse fluxo funciona tanto com as chaves de sandbox quanto com as chaves
+reais: basta iniciar o servidor com as variáveis de ambiente ou deixar as
+valores padrões para teste, e usar os cartões de sandbox listados
+antes.
 ### 3. **Endpoints Disponíveis**
 
 #### **GET /pagamento**
 Mostra a página de pagamento
 - Se o usuário já pagou: redireciona para `/curso`
-- Se não pagou: mostra formulário de pagamento
+- Se não pagou: mostra formulário de pagamento (com integração via
+  MercadoPago ou simulação local)
 
 #### **POST /pagamento/criar**
-Cria uma preferência de pagamento no MercadoPago
+Cria uma preferência de pagamento no MercadoPago ou processa um
+pagamento cartão direto quando o frontend enviar um token.
 
-**Request:**
+**Request (preferência / redirecionamento):**
 ```json
 {
     "user_id": 123,
     "amount": 200.0,
     "title": "Mentoria Mestre das Milhas",
-    "method": "pix"  // opcional: pix, card, paypal, boleto
+    "method": "pix"        // ou card, paypal, boleto
 }
 ```
+
+**Request (pagamento direto por cartão com token gerado pelo SDK):**
+```json
+{
+    "user_id": 123,
+    "amount": 200.0,
+    "title": "Mentoria Mestre das Milhas",
+    "method": "card",
+    "card_token": "TOKEN_GERADO_PELO_SDK",
+    "installments": 1,
+    "payer_email": "teste@example.com"
+}
+```
+
+A resposta conterá `preference` (e opcionalmente `url`) para o caso de
+checkout redirecionando ou `payment` com o objeto de pagamento criado
+quando for pagamento direto.
+
 
 **Response:**
 ```json
@@ -152,6 +198,43 @@ async function processPayment(method) {
 ---
 
 ## 🧪 Testando Localmente
+
+### 🔒 Acessando um site privado/staging
+
+Se você hospedar a aplicação na web mas ainda quiser mantê‑la
+privada (por exemplo, enquanto desenvolve o pagamento), basta definir
+duas variáveis de ambiente antes de iniciar o servidor:
+
+```bash
+export PRIVATE_USER="meuusuario"
+export PRIVATE_PASS="minhasenha"
+python server.py
+```
+
+Com isso, **toda a aplicação ficará protegida por HTTP Basic Auth**;
+qualquer navegador que aceda ao endereço será solicitado a fornecer o
+usuário e a senha acima. esse mecanismo é implementado em
+`app/handlers/base.py` e é ativado somente se as variáveis existirem.
+
+Você pode colocar as credenciais em um `.env` ou no painel do seu
+provedor, e removê‑las quando estiver pronto para abrir o site ao público.
+
+Esta técnica permite apontar o MercadoPago para um domínio real enquanto
+mantém o conteúdo inacessível a usuários não autorizados.
+
+
+### 🧑‍💻 Área do usuário
+
+Além do login, criamos páginas para o próprio usuário gerenciar sua
+conta:
+
+* `/perfil` – mostra nome de usuário e e‑mail, permite alterar ambos ou
+  trocar a senha. o layout usa o mesmo CSS limpo das demais páginas.
+* `/me/orders` – histórico de compras já realizadas (PIX, cartão, boleto,
+  etc.). serve para o estudante conferir que o pagamento foi processado.
+
+Ambas as rotas exigem autenticação e pagamento.
+
 
 ### A. Instalar Dependências
 

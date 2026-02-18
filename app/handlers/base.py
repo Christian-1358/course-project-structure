@@ -1,9 +1,43 @@
+import os
 import tornado.web
 from app.utils.pagamento_utils import usuario_pagou
 from functools import wraps
 
 
 class BaseHandler(tornado.web.RequestHandler):
+    def prepare(self):
+        """Optional basic‑auth gate which protects the whole application.
+
+        Set the environment variables `PRIVATE_USER` and `PRIVATE_PASS`
+        to any value and every request will require HTTP Basic
+        authentication before hitting any handler logic.  This is handy
+        for exposing a staging site to the web while keeping it private.
+        If the variables are unset the gate is disabled.
+        """
+        user = os.environ.get("PRIVATE_USER")
+        pw = os.environ.get("PRIVATE_PASS")
+        if user and pw:
+            auth_header = self.request.headers.get("Authorization")
+            if not auth_header or not auth_header.startswith("Basic "):
+                self._require_auth()
+                return
+            import base64
+            try:
+                encoded = auth_header.split(" ", 1)[1]
+                decoded = base64.b64decode(encoded).decode()
+                u, p = decoded.split(":", 1)
+            except Exception:
+                self._require_auth()
+                return
+            if u != user or p != pw:
+                self._require_auth()
+                return
+
+    def _require_auth(self):
+        self.set_status(401)
+        self.set_header("WWW-Authenticate", "Basic realm=\"Staging\"")
+        self.finish("Unauthorized")
+
     def get_current_user(self):
         user_id = self.get_secure_cookie("user_id")
         if not user_id:

@@ -4,10 +4,22 @@ import os
 BASE_DIR = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 )
-DB = os.path.join(BASE_DIR, "usuarios.db")
+# root do projeto (um nível acima de app)
+PROJECT_ROOT = BASE_DIR
+DB = os.path.join(PROJECT_ROOT, "usuarios.db")
+# banco usado para tabelas de checkout/pedidos (separa do das contas)
+DB_CHECKOUT = os.path.join(PROJECT_ROOT, "checkout.db")
 
 def conectar():
+    """Conecta ao banco de usuários"""
     conn = sqlite3.connect(DB)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def conectar_checkout():
+    """Conecta ao banco de checkout/pedidos"""
+    conn = sqlite3.connect(DB_CHECKOUT)
     conn.row_factory = sqlite3.Row
     return conn
 

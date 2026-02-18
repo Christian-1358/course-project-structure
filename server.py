@@ -10,6 +10,8 @@ from datetime import datetime
 from app.handlers.prova_final import ProvaFinalHandler
 from app.handlers.sobre import Sobre
 from app.handlers.login import LoginHandler, LogoutHandler, GoogleLoginHandler
+from app.handlers.perfil import PerfilHandler
+from app.handlers.user_orders import UserOrdersHandler
 from app.handlers.curso import CursoHandler
 from app.handlers.recuperar_senha import RecuperarSenhaHandler
 from app.handlers.emails_logados import EmailsLogadosHandler
@@ -37,6 +39,7 @@ from app.handlers.certificado import CertificadoPDFChromeHandler
 from app.handlers.certificado import CertificadoViewHandler, CertificadoPDFHandler
 
 from app.handlers.comentarios import CommentHandler
+from app.handlers.public_profile import PublicProfileHandler
 from app.handlers.pagamento import MercadoPagoCreateHandler, PagamentoPageHandler
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "usuarios.db")
@@ -79,6 +82,8 @@ def make_app():
         (r"/auth/google/?", GoogleLoginHandler),
         (r"/criar_conta/?", CriarContaHandler),
         (r"/recuperar_senha/?", RecuperarSenhaHandler),
+        (r"/perfil/?", PerfilHandler),
+        (r"/me/orders/?", UserOrdersHandler),
 
 
         # ===============================
@@ -141,6 +146,7 @@ def make_app():
         # ===============================
         (r"/certificado/([0-9]+)/?", CertificadoViewHandler),
         (r"/certificado/pdf/([0-9]+)/?", CertificadoPDFHandler),
+        (r"/user/([0-9]+)/?", PublicProfileHandler),
         (r"/api/comment/?", CommentHandler),
     ], **settings)
 
@@ -151,8 +157,8 @@ if __name__ == "__main__":
     app.listen(port)
 
     print("\n" + "=" * 40)
-    print("🚀 SISTEMA MILHAS PRO ONLINE")
-    print("🔗 http://milhaspro.home")
+    print(" SISTEMA MILHAS PRO ONLINE")
+    print(" http://milhaspro.home")
     print("=" * 40 + "\n")
 
     tornado.ioloop.IOLoop.current().start()

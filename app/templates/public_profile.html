@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil de {{ username }} | MestreMilhas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/login.css">
+    <style>
+        body { background:#050505; color:#fff; }
+        .container { max-width:600px; margin:120px auto; padding:30px; background:#111; border-radius:15px; box-shadow:0 20px 40px rgba(0,0,0,0.5); }
+        .avatar { width:120px; height:120px; border-radius:50%; object-fit:cover; border:3px solid #d4af37; display:block; margin:0 auto 20px; }
+        h2 { text-align:center; color:#d4af37; }
+        .bio { margin-top:20px; line-height:1.5; color:#ccc; }
+        a.back { color:#4da6ff; display:inline-block; margin-top:20px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    {% if photo %}
+        <img src="{{ photo }}" class="avatar" />
+    {% end %}
+    <h2>{{ username }}</h2>
+    {% if bio %}<p class="bio">{{ bio }}</p>{% end %}
+    <a href="/curso" class="back">← voltar ao curso</a>
+</div>
+</body>
+</html>

@@ -2,8 +2,8 @@
 
 
 
-<!-- esse é o html que eu quero usar nas apis    <!DOCTYPE html>
-    <html lang="pt-BR">
+
+<html lang="pt-BR">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -239,6 +239,10 @@ body {
             <div class="timer-badge">⏱ Oferta expira em: <span id="timer">10:00</span></div>
             <div class="product-name">Mentoria Mestre das Milhas</div>
             <div class="price-tag">R$ 200,00</div>
+            <p style="color:var(--text-dim); font-size:0.8rem; margin-top:10px;">
+                🔧 Ambiente <strong>Sandbox</strong> ativo – use cartão de teste
+                <code>4111 1111 1111 1111</code> ou selecione PIX no checkout.
+            </p>
         </div>
 
         <div class="methods-tabs">
@@ -275,6 +279,9 @@ body {
 </button>
     </main> 
 
+    <!-- MercadoPago JavaScript SDK (v2) -->
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+
     <script>
         // =====================================
         // VARIÁVEIS GLOBAIS (injetadas do template)
@@ -282,23 +289,37 @@ body {
         const USER_ID = {{ user_id if user_id else "null" }};
         const DEFAULT_AMOUNT = {{ amount if amount else 200.0 }};
         const MP_SDK_AVAILABLE = {{ mp_available }};
+        const MP_PUBLIC_KEY = "{{ mp_public_key }}";
+
+        // instanciação do SDK (apenas se disponível)
+        let mpInstance = null;
+        if (MP_SDK_AVAILABLE && MP_PUBLIC_KEY) {
+            // importado abaixo via tag <script>
+            mpInstance = new MercadoPago(MP_PUBLIC_KEY, { locale: 'pt-BR' });
+        }
 
         // =====================================
         // CONTEÚDO DE PAGAMENTO POR ABA
         // =====================================
         const content = {
             pix: `
-                <div class="pix-container">
-                    <div class="qr-code">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=CHAVE_PIX_EXEMPLO" style="width:100%">
-                    </div>
-                    <label>Código Pix Copia e Cola</label>
-                    <div style="background:#111; padding:15px; border-radius:12px; display:flex; align-items:center; border:1px solid var(--border); cursor:pointer" onclick="copyPix()">
-                        <span id="p-code" style="font-family:monospace; font-size:0.75rem; color:var(--gold-solid); overflow:hidden; text-overflow:ellipsis; flex:1">00020126330014BR.GOV.BCB.PIX011100000000000</span>
-                        <small style="margin-left:15px; font-weight:800; color:#fff">COPIAR</small>
-                    </div>
+                <div style="padding:20px 0">
+                    <p style="color:var(--text-dim); font-size:0.9rem; margin-bottom:20px">
+                        Ao clicar em pagar, o sistema criará um pedido PIX e exibirá o QR
+                        code diretamente nesta página. Não há redirecionamento – funcio-
+                        na com a chave de teste.
+                    </p>
+                    <button class="btn-pay" onclick="processPayment('pix')">Pagar com PIX</button>
                 </div>`,
             card: `
+                <div class="form-group">
+                    <label>Nome no Cartão</label>
+                    <input type="text" placeholder="Nome completo" id="card-name">
+                </div>
+                <div class="form-group">
+                    <label>E-mail</label>
+                    <input type="email" placeholder="email@exemplo.com" id="card-email">
+                </div>
                 <div class="form-group">
                     <label>Número do Cartão</label>
                     <input type="text" placeholder="0000 0000 0000 0000" id="card-number">
@@ -316,8 +337,8 @@ body {
                 <div class="form-group">
                     <label>Parcelamento</label>
                     <select id="installments">
-                        <option>1x de R$ 200,00 (Sem juros)</option>
-                        <option>12x de R$ 21,50</option>
+                        <option value="1">1x de R$ 200,00 (Sem juros)</option>
+                        <option value="12">12x de R$ 21,50</option>
                     </select>
                 </div>
                 <button class="btn-pay" onclick="processPayment('card')">Finalizar Pagamento</button>`,
@@ -355,15 +376,42 @@ body {
                 btn.style.opacity = "0.6";
                 btn.disabled = true;
 
+                let bodyData = {
+                    user_id: USER_ID,
+                    amount: DEFAULT_AMOUNT,
+                    title: "Mentoria Mestre das Milhas",
+                    method: method
+                };
+
+                // fluxo especial para cartão usando token do SDK
+                if (method === 'card' && mpInstance) {
+                    try {
+                        const number = document.getElementById('card-number').value.replace(/\s+/g, '');
+                        const [m, y] = document.getElementById('card-expiry').value.split('/');
+                        const tokenResp = await mpInstance.card.createToken({
+                            cardNumber: number,
+                            cardholderName: document.getElementById('card-name').value || "Test User",
+                            expirationMonth: m.trim(),
+                            expirationYear: y.trim(),
+                            securityCode: document.getElementById('card-cvv').value
+                        });
+
+                        bodyData.card_token = tokenResp.id;
+                        bodyData.installments = parseInt(document.getElementById('installments').value) || 1;
+                        bodyData.payer_email = document.getElementById('card-email').value;
+                    } catch (err) {
+                        showError(`Erro ao gerar token: ${err.message}`);
+                        btn.innerText = originalText;
+                        btn.style.opacity = "1";
+                        btn.disabled = false;
+                        return;
+                    }
+                }
+
                 const response = await fetch('/pagamento/criar', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        user_id: USER_ID,
-                        amount: DEFAULT_AMOUNT,
-                        title: "Mentoria Mestre das Milhas",
-                        method: method
-                    })
+                    body: JSON.stringify(bodyData)
                 });
 
                 const data = await response.json();
@@ -372,12 +420,14 @@ body {
                     // SDK não configurado - usar fallback local
                     showWarning("⚠️ Pagamento via MercadoPago não configurado (sem token). Usando modo local...");
                     simulatePaymentLocal(method);
+                } else if (response.ok && data.payment) {
+                    // pagamento PIX criado com sucesso
+                    displayPixQr(data.payment);
                 } else if (response.ok && data.preference) {
-                    // SDK configurado e preferência criada com sucesso
-                    const preference = data.preference;
-                    if (preference.init_point) {
-                        // Redireciona para checkout do MercadoPago
-                        window.location.href = preference.init_point;
+                    // preferência (cartão, boleto, paypal) criada com sucesso
+                    const redirectUrl = data.url || data.preference.init_point;
+                    if (redirectUrl) {
+                        window.location.href = redirectUrl;
                     }
                 } else {
                     showError(`Erro ao criar preferência: ${data.error || 'Desconhecido'}`);
@@ -392,6 +442,37 @@ body {
                 btn.style.opacity = "1";
                 btn.disabled = false;
             }
+        }
+
+        /**
+         * Exibe o QR code retornado pelo MercadoPago em caso de pagamento PIX.
+         * O objeto `payment` segue a estrutura do SDK e contém o campo
+         * `point_of_interaction.transaction_data` com `qr_code` e
+         * `qr_code_base64`.
+         */
+        function displayPixQr(payment) {
+            const tx = payment.point_of_interaction && payment.point_of_interaction.transaction_data;
+            if (!tx) {
+                showError('Resposta inválida do servidor para PIX');
+                return;
+            }
+            const imgBase64 = tx.qr_code_base64;
+            const rawCode = tx.qr_code;
+            // monta conteúdo dinâmico substituindo o #payment-content
+            document.getElementById('payment-content').innerHTML = `
+                <div class="pix-container">
+                    <div class="qr-code">
+                        <img src="data:image/png;base64,${imgBase64}" style="width:100%" />
+                    </div>
+                    <label>Código Pix Copia e Cola</label>
+                    <div style="background:#111; padding:15px; border-radius:12px; display:flex; align-items:center; border:1px solid var(--border); cursor:pointer" onclick="copyPix()">
+                        <span id="p-code" style="font-family:monospace; font-size:0.75rem; color:var(--gold-solid); overflow:hidden; text-overflow:ellipsis; flex:1">${rawCode}</span>
+                        <small style="margin-left:15px; font-weight:800; color:#fff">COPIAR</small>
+                    </div>
+                    <p style="margin-top:20px; color:var(--text-dim); font-size:0.8rem;">
+                        A qualquer momento você pode voltar e clicar em outra aba caso queira outro método.
+                    </p>
+                </div>`;
         }
 
         /**

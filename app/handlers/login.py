@@ -16,7 +16,7 @@ BASE_DIR = os.path.dirname(
 )
 DB = os.path.join(BASE_DIR, "usuarios.db")
 
-
+mensagem = "Quero Começar agora, para poder entrar no curso" #mensagem do pagamento
 def conectar():
     conn = sqlite3.connect(DB)
     conn.row_factory = sqlite3.Row
@@ -26,6 +26,8 @@ def conectar():
 def hash_senha(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
+
+mensagem = "pagamento pendente" #mensagem do pagamento 
 
 # ===============================
 # LOGIN NORMAL
@@ -99,7 +101,7 @@ class LoginHandler(tornado.web.RequestHandler):
             conn.close()
             self.render(
                 "login.html",
-                erro="Conta não liberada: pagamento pendente",
+                erro="Conta não liberada: Pagamento pedente",
                 mensagem=None,
                 usuario_prefill=username
             )
@@ -174,7 +176,7 @@ class GoogleLoginHandler(
             conn.close()
             # 🔒 BLOQUEIO SE NÃO PAGOU (verifica antes de criar cookies)
             if not usuario_pagou(user_id):
-                self.write("Conta não liberada: pagamento pendente")
+                self.write(f"Conta não liberada: pagamento pendente")
                 return
 
             self.set_secure_cookie("user", username)

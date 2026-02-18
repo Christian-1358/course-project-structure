@@ -12,8 +12,18 @@ from app.handlers.base import BaseHandler
 # ===============================
 # CREDENCIAIS MERCADOPAGO
 # ===============================
-MP_PUBLIC_KEY = "APP_USR-19b62fa6-1ef6-4489-a96f-35bd1bdc46fe"
-MP_ACCESS_TOKEN = "APP_USR-2389431682625478-021615-6fbe7fc838c104cb7b16f23f966ba6da-3207195955"
+# por padrão usamos as chaves de sandbox (ambiente de testes) que já
+# estão configuradas aqui para simplificar o desenvolvimento. em
+# produção você deve sobrescrever essas variáveis via ambiente
+# (ou outro mecanismo de configuração) com as chaves reais.
+MP_PUBLIC_KEY = os.environ.get(
+    "MP_PUBLIC_KEY",
+    "APP_USR-19b62fa6-1ef6-4489-a96f-35bd1bdc46fe"  # sandbox
+)
+MP_ACCESS_TOKEN = os.environ.get(
+    "MP_ACCESS_TOKEN",
+    "APP_USR-2389431682625478-021615-6fbe7fc838c104cb7b16f23f966ba6da-3207195955"  # sandbox
+)
 
 mp_client = None
 # Tentar importar e inicializar MercadoPago se disponível
@@ -21,18 +31,20 @@ try:
     import mercadopago
     if MP_ACCESS_TOKEN:
         mp_client = mercadopago.SDK(MP_ACCESS_TOKEN)
-        print("[pagamento] ✅ MercadoPago SDK inicializado com sucesso!")
+        print("[pagamento] MercadoPago SDK inicializado com sucesso!")
 except ImportError:
-    print("[pagamento] ⚠️  mercadopago SDK não instalado. Instale com: pip install mercado-pago")
+    print("[pagamento]   mercadopago SDK não instalado. Instale com: pip install mercado-pago")
 except Exception as e:
-    print(f"[pagamento] ❌ erro ao inicializar MercadoPago: {e}")
+    print(f"[pagamento]  erro ao inicializar MercadoPago: {e}")
 
 # ===============================
 # CONFIGURAÇÃO DE BANCO
 # ===============================
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DB_USUARIOS = os.path.join(os.path.dirname(BASE_DIR), "usuarios.db")
-DB_CHECKOUT = os.path.join(os.path.dirname(BASE_DIR), "checkout.db")
+# o diretório raiz do projeto (um nível acima de app)
+PROJECT_ROOT = os.path.dirname(BASE_DIR)
+DB_USUARIOS = os.path.join(PROJECT_ROOT, "usuarios.db")
+DB_CHECKOUT = os.path.join(PROJECT_ROOT, "checkout.db")
 
 def conectar_usuarios():
     """Conecta ao banco de dados de usuários"""
@@ -179,6 +191,41 @@ class MercadoPagoCreateHandler(BaseHandler):
         if not user_id:
             return self.write_json({"error": "user_id é obrigatório"})
 
+        # tokens enviados pelo frontend (SDK JS) são usados para pagamentos
+        # diretos no cartão, sem redirecionamento. caso contrário criamos
+        # uma preferência que envia o cliente para a página do MP.
+        card_token = data.get("card_token")
+        installments = int(data.get("installments", 1))
+        payer_email = data.get("payer_email", "" )
+
+        if method == "card" and card_token:
+            # pagamento direto com token
+            try:
+                payment_data = {
+                    "transaction_amount": amount,
+                    "token": card_token,
+                    "description": title,
+                    "installments": installments,
+                    "payment_method_id": "credit_card",
+                    "payer": {"email": payer_email or "test_user@example.com"}
+                }
+                payment = mp_client.payment().create(payment_data)
+                resp = payment.get('response', {})
+                print(f"[pagamento] pagamento direto criado: {resp}")
+
+                # se aprovado, marcamos o usuário
+                if resp.get('status') == 'approved':
+                    try:
+                        marcar_como_pago(int(user_id))
+                    except Exception as e:
+                        print(f"[pagamento] erro ao marcar como pago: {e}")
+
+                return self.write_json({"payment": resp})
+            except Exception as e:
+                print(f"[pagamento] erro ao processar pagamento direto: {e}")
+                return self.write_json({"error": str(e)})
+
+        # caso contrário construímos preferência normal
         preference_data = {
             "items": [
                 {
@@ -198,13 +245,33 @@ class MercadoPagoCreateHandler(BaseHandler):
         }
 
         try:
-            preference = mp_client.preference().create(preference_data)
-            res = preference.get('response', {})
-            
-            # Log da preferência criada
-            print(f"[pagamento] Preferência criada para user_id={user_id}, init_point={res.get('init_point')}")
-            
-            return self.write_json({"preference": res})
+            if method == 'pix':
+                # criar pagamento direto para PIX (não usamos preferência)
+                payment_data = {
+                    "transaction_amount": float(amount),
+                    "description": title,
+                    "payment_method_id": "pix",
+                    # alguns campos básicos para o pagador
+                    "payer": {"id": str(user_id)}
+                }
+                payment = mp_client.payment().create(payment_data)
+                pay_resp = payment.get('response', {})
+                print(f"[pagamento] Pagamento PIX criado user_id={user_id}, id={pay_resp.get('id')}")
+                return self.write_json({"payment": pay_resp})
+            else:
+                preference = mp_client.preference().create(preference_data)
+                res = preference.get('response', {})
+
+                # determinar url que será usada pelo frontend; em sandbox o SDK
+                # retorna também um campo `sandbox_init_point`, então vamos
+                # privilegiar esse valor quando estiver presente (chave de teste).
+                init_url = res.get('sandbox_init_point') or res.get('init_point')
+
+                # Log da preferência criada
+                print(f"[pagamento] Preferência criada para user_id={user_id}, url={init_url}")
+
+                # devolvemos a url já selecionada para simplificar o front
+                return self.write_json({"preference": res, "url": init_url})
         except Exception as e:
             print(f"[pagamento] erro ao criar preferência: {e}")
             return self.write_json({"error": str(e)})
