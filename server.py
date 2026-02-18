@@ -4,9 +4,7 @@ import tornado.web
 import tornado.ioloop
 from datetime import datetime   
 
-# ===============================
-# HANDLERS DO USUÁRIO
-# ===============================
+
 from app.handlers.prova_final import ProvaFinalHandler
 from app.handlers.sobre import Sobre
 from app.handlers.login import LoginHandler, LogoutHandler, GoogleLoginHandler
@@ -66,16 +64,11 @@ def make_app():
     
     return tornado.web.Application([
 
-        # ===============================
-        # ARQUIVOS ESTÁTICOS
-        # ===============================
         (r"/static/(.*)", tornado.web.StaticFileHandler, {
             "path": settings["static_path"]
         }),
 
-        # ===============================
-        # LOGIN / AUTENTICAÇÃO
-        # ===============================
+    
         (r"/?", LoginHandler),
         (r"/login/?", LoginHandler),
         (r"/logout/?", LogoutHandler),
@@ -85,17 +78,11 @@ def make_app():
         (r"/perfil/?", PerfilHandler),
         (r"/me/orders/?", UserOrdersHandler),
 
-
-        # ===============================
-        # CONTEÚDO (BLOQUEADO SE NÃO PAGOU)
-        # ===============================
         (r"/curso/?", CursoHandler),
         (r"/sobre/?", Sobre),
         (r"/submit/?", SubmitCodeHandler),
 
-        # ===============================
-        # PROVAS
-        # ===============================
+
         (r"/prova/([0-9]+)/?", ProvaHandler),
         (r"/prova/final/?", ProvaFinalHandler),
         (r"/start/prova/([0-9a-zA-Z_-]+)/?", StartProvaHandler),
@@ -104,24 +91,17 @@ def make_app():
         (r"/recuperacao/([0-9]+)/?", RecuperacaoHandler),
         (r"/prova/final/?", ProvaFinalHandler),
 
-        # endpoint que prepara fluxo para certificados
         (r"/start/certificado/([0-9]+)/?", StartCertificadoHandler),
 
-        # ===============================
-        # CERTIFICADOS (rotas únicas e protegidas)
-        # ===============================
         (r"/certificado/([0-9]+)/?", CertificadoViewHandler),
         (r"/certificado/pdf/([0-9]+)/?", CertificadoPDFHandler),
         (r"/certificado/pdf_chrome/([0-9]+)/?", CertificadoPDFChromeHandler),
         (r"/gerar_certificado_final/?", GerarCertificadoHandler, dict(modulo_id="final")),
 
-        # ===============================
-        # ADMIN
-        # ===============================
         (r"/login_dev/?", LoginDevHandler),
         (r"/admin/buscar_usuario/?", BuscarUsuarioHandler),
         (r"/admin/forcar_notas/?", ForcarNotasHandler),
-            (r"/admin/check_final_status/?", CheckFinalStatusHandler),
+        (r"/admin/check_final_status/?", CheckFinalStatusHandler),
         (r"/admin/alterar_status/?", AlterarStatusHandler),
         (r"/admin/marcar_pago/?", MarcarPagoHandler),
         (r"/admin/remover_pago/?", RemoverPagamentoHandler),
@@ -132,18 +112,13 @@ def make_app():
         (r"/admin/compras/?", ComprasHandler),
         (r"/emails_logados/?", EmailsLogadosHandler),
 
-        # ===============================
-        # PAGAMENTO (MercadoPago)
-        # ===============================
+
         (r"/pagamento/?", PagamentoPageHandler),
         (r"/pagamento/criar/?", MercadoPagoCreateHandler),
         (r"/pagamento/webhook/?", MercadoPagoWebhookHandler),
         (r"/checkout/([a-zA-Z]+)/?", CheckoutHandler),
         (r"/orders/?", OrdersHandler),
 
-        # ===============================
-        # CERTIFICADOS & MISC
-        # ===============================
         (r"/certificado/([0-9]+)/?", CertificadoViewHandler),
         (r"/certificado/pdf/([0-9]+)/?", CertificadoPDFHandler),
         (r"/user/([0-9]+)/?", PublicProfileHandler),

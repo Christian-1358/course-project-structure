@@ -421,8 +421,8 @@
 
 <script>
 // flag set by server whether the current viewer is logged+pago
-window.USER_LOGGED = {{ 1 if user else 0 }};
-
+window.USER_LOGGED = {{ 1if user else 0 }};
+ 
 document.addEventListener('DOMContentLoaded', () => {
     if(!window.USER_LOGGED){
         const input = document.getElementById("commentInput");
