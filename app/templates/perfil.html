@@ -16,6 +16,8 @@
             --border-soft: rgba(212, 175, 55, 0.2);
             --danger: #ff4d4d;
             --text-muted: #a0a0a0;
+            --success: #00ff88;
+            --warning: #ffcc00;
         }
 
         /* RESET & BASE */
@@ -44,11 +46,10 @@
 
         @keyframes float { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-30px, 40px); } }
 
-        /* CONTAINER PRINCIPAL */
         .container {
             max-width: 1100px;
             width: 92%;
-            margin: 100px auto 60px;
+            margin: 80px auto 60px;
             padding: 50px;
             background: var(--card-bg);
             backdrop-filter: blur(15px);
@@ -67,21 +68,21 @@
             background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary), var(--gold-primary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 60px;
+            margin-bottom: 40px;
             letter-spacing: -1px;
         }
 
-        /* SEÇÃO DE AVATAR */
+        /* PERFIL & BADGE */
         .profile-header {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-bottom: 60px;
+            margin-bottom: 50px;
         }
 
         .avatar-wrapper {
             position: relative;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .profile-avatar {
@@ -95,7 +96,35 @@
             transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .avatar-wrapper:hover .profile-avatar { transform: rotate(3deg) scale(1.05); }
+        .badge-premium {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background: var(--gold-primary);
+            color: #000;
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        /* NÍVEL DO USUÁRIO */
+        .level-card {
+            width: 100%;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .level-info { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; }
+        .progress-bar { height: 8px; background: #222; border-radius: 10px; overflow: hidden; }
+        .progress-fill { width: 65%; height: 100%; background: var(--gold-primary); box-shadow: 0 0 15px var(--gold-primary); }
 
         /* BOTÕES */
         .btn {
@@ -110,48 +139,37 @@
             transition: all 0.3s;
             text-decoration: none;
             gap: 8px;
+            border: none;
         }
 
         .btn-gold {
             background: linear-gradient(90deg, var(--gold-primary), var(--gold-secondary));
             color: #000;
-            border: none;
         }
 
-        .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3); }
+        .btn-gold:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3); opacity: 0.9; }
+        .btn-gold:disabled { background: #333; color: #666; cursor: not-allowed; opacity: 0.5; }
 
-        .btn-outline {
-            background: transparent;
-            border: 1.5px solid #4da6ff;
-            color: #4da6ff;
-        }
-
+        .btn-outline { background: transparent; border: 1.5px solid #4da6ff; color: #4da6ff; }
         .btn-outline:hover { background: rgba(77, 166, 255, 0.1); }
 
         .btn-danger-text { color: var(--danger); border: 1.5px solid var(--danger); background: transparent; }
         .btn-danger-text:hover { background: var(--danger); color: #fff; }
 
-        /* FORMULÁRIOS */
-        .profile-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 30px;
-        }
-
+        /* GRID E CARDS */
+        .profile-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; }
         .section-card {
             background: rgba(30, 30, 30, 0.4);
-            padding: 40px;
+            padding: 35px;
             border-radius: 20px;
-            border: 1px solid #222;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: 0.3s;
         }
+        .section-card:hover { border-color: var(--border-soft); }
 
-        .section-card h3 {
-            font-size: 1.25rem;
-            margin-bottom: 25px;
-            color: var(--gold-secondary);
-        }
+        .section-card h3 { font-size: 1.25rem; margin-bottom: 25px; color: var(--gold-secondary); display: flex; align-items: center; gap: 10px; }
 
-        .form-group { margin-bottom: 20px; }
+        .form-group { margin-bottom: 20px; position: relative; }
         label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px; }
 
         input, textarea {
@@ -165,13 +183,62 @@
             transition: 0.3s;
         }
 
-        input:focus, textarea:focus {
-            border-color: var(--gold-primary);
-            outline: none;
-            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1);
+        input:focus, textarea:focus { border-color: var(--gold-primary); outline: none; box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1); }
+
+        /* PASSWORD TOGGLE STYLES */
+        .password-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .password-container input {
+            padding-right: 50px; /* Espaço para o ícone */
+        }
+        .toggle-password {
+            position: absolute;
+            right: 16px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            padding: 5px;
+        }
+        .toggle-password:hover { color: var(--gold-secondary); }
+        .toggle-password svg { width: 20px; height: 20px; fill: currentColor; }
+
+        /* CAMPOS BLOQUEADOS */
+        input[readonly] {
+            background: rgba(255, 255, 255, 0.02);
+            border-color: #222;
+            color: #666;
+            cursor: not-allowed;
+        }
+        .lock-notice {
+            font-size: 0.75rem;
+            color: #555;
+            margin-top: 5px;
+            display: block;
         }
 
-        /* FOOTER */
+        /* BARRA DE FORÇA DA SENHA */
+        .strength-meter {
+            height: 4px;
+            width: 100%;
+            background: #222;
+            margin-top: 8px;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: 0.4s;
+        }
+        .strength-text { font-size: 0.75rem; margin-top: 5px; display: block; }
         .profile-footer {
             margin-top: 60px;
             padding-top: 40px;
@@ -203,13 +270,38 @@
             border: 1px solid #333;
         }
 
+        /* TOAST NOTIFICATION */
+        .toast-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+        }
+
+        .toast {
+            background: #111;
+            border-left: 4px solid var(--gold-primary);
+            padding: 15px 25px;
+            border-radius: 8px;
+            margin-top: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
         @media(max-width: 850px) {
             .profile-grid { grid-template-columns: 1fr; }
-            .container { padding: 30px 20px; }
+            .container { padding: 30px 20px; margin-top: 40px; }
         }
     </style>
 </head>
 <body>
+
+<div class="toast-container" id="toastContainer"></div>
 
 <div class="container">
     <h1 class="page-title">Meu Perfil</h1>
@@ -217,8 +309,20 @@
     <div class="profile-header">
         <div class="avatar-wrapper">
             <img src="{{ photo if photo else '/static/img/default.png' }}" class="profile-avatar" id="avatarPreview">
+            <span class="badge-premium">Membro Premium</span>
         </div>
-        
+
+        <!--
+        <div class="level-card">
+            <div class="level-info">
+                <span style="color: var(--gold-secondary); font-weight: 700;">Nível Executiva</span>
+                <span style="color: var(--text-muted);">650 / 1000 XP</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+        </div>
+        -->
         <div class="profile-buttons">
             <label class="btn btn-gold">
                 Trocar Foto
@@ -231,59 +335,85 @@
 
     <div class="profile-grid">
         <div class="section-card">
-            <h3>Dados Pessoais</h3>
+            <h3> Dados Pessoais</h3>
             <form id="formPerfil" method="POST" action="/perfil" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="update_info">
+                
                 <div class="form-group">
                     <label>Nome de Usuário</label>
-                    <input type="text" name="username" value="{{ username }}" required>
+                    <input type="text" name="username" value="{{ username }}" readonly>
+                    <small class="lock-notice"> Bloqueado para membros Premium</small>
                 </div>
+                
                 <div class="form-group">
-                    <label>E-mail</label>
-                    <input type="email" name="email" value="{{ email }}" required>
+                    <label>E-mail da Assinatura</label>
+                    <input type="email" name="email" value="{{ email }}" readonly>
+                    <small class="lock-notice">Para alterar, contate o suporte@mestremilhas.com</small>
                 </div>
+
                 <div class="form-group">
-                    <label>Sua Bio</label>
-                    <textarea name="bio" rows="4">{{ bio if bio else "" }}</textarea>
+                    <label>Sua Bio Profissional</label>
+                    <textarea name="bio" rows="4" placeholder="Conte sua trajetória com milhas...">{{ bio if bio else "" }}</textarea>
                 </div>
-                <button type="submit" class="btn btn-gold" style="width: 100%;">Atualizar Perfil</button>
+                <button type="submit" class="btn btn-gold" style="width: 100%;">Salvar Bio</button>
             </form>
         </div>
 
         <div class="section-card">
-            <h3>Segurança</h3>
-            <form method="POST" action="/perfil">
+            <h3> Segurança e Acesso</h3>
+            <form method="POST" action="/perfil" id="formSenha">
                 <input type="hidden" name="action" value="change_password">
+                
                 <div class="form-group">
                     <label>Senha Atual</label>
-                    <input type="password" name="old" required>
+                    <div class="password-container">
+                        <input type="password" name="old" id="oldPass" required>
+                        <button type="button" class="toggle-password" onclick="togglePasswordVisibility('oldPass', this)">
+                            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                        </button>
+                    </div>
                 </div>
+
                 <div class="form-group">
                     <label>Nova Senha</label>
-                    <input type="password" name="new" required>
+                    <div class="password-container">
+                        <input type="password" name="new" id="newPass" oninput="validarSenha()" required>
+                        <button type="button" class="toggle-password" onclick="togglePasswordVisibility('newPass', this)">
+                            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                        </button>
+                    </div>
+                    <div class="strength-meter"><div id="strengthBar" class="strength-bar"></div></div>
+                    <small id="strengthText" class="strength-text" style="color: #555;">Use 8+ caracteres com letras maiúsculas e números.</small>
                 </div>
+
                 <div class="form-group">
-                    <label>Confirmar Senha</label>
-                    <input type="password" name="confirm" required>
+                    <label>Confirmar Nova Senha</label>
+                    <div class="password-container">
+                        <input type="password" name="confirm" id="confirmPass" oninput="validarSenha()" required>
+                        <button type="button" class="toggle-password" onclick="togglePasswordVisibility('confirmPass', this)">
+                            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                        </button>
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-gold" style="width: 100%;">Mudar Senha</button>
+
+                <button type="submit" id="btnSubmitSenha" class="btn btn-gold" style="width: 100%;" disabled>Atualizar Senha</button>
             </form>
         </div>
     </div>
 
     <div class="profile-footer">
-        <a href="/curso" class="btn btn-outline">Voltar ao Curso</a>
-        <a href="/logout" class="btn btn-danger-text">Sair da Conta</a>
+        <a href="/curso" class="btn btn-outline">← Voltar ao Curso</a>
+        <a href="/logout" class="btn btn-danger-text">Encerrar Sessão</a>
     </div>
 </div>
 
 <div class="modal" id="modalExcluir">
     <div class="modal-content">
-        <h3 style="color: var(--danger); margin-bottom: 15px;">Atenção!</h3>
-        <p style="color: #ccc; margin-bottom: 30px;">A exclusão da conta é permanente e você perderá todo o seu progresso.</p>
+        <h3 style="color: var(--danger); margin-bottom: 15px;">Ação Irreversível</h3>
+        <p style="color: #ccc; margin-bottom: 30px;">Ao excluir sua conta, todos os certificados e milhas acumuladas no painel serão apagados.</p>
         <div style="display: flex; flex-direction: column; gap: 10px;">
-            <button class="btn btn-danger-text" onclick="confirmarExclusao()">Confirmar Exclusão</button>
-            <button class="btn btn-outline" style="border-color: #555; color: #fff;" onclick="toggleModal(false)">Cancelar</button>
+            <button class="btn btn-danger-text" onclick="confirmarExclusao()">Confirmar e Excluir</button>
+            <button class="btn btn-outline" style="border-color: #555; color: #fff;" onclick="toggleModal(false)">Manter minha conta</button>
         </div>
     </div>
 </div>
@@ -291,41 +421,97 @@
 <script>
 const toggleModal = (show) => document.getElementById("modalExcluir").style.display = show ? "flex" : "none";
 
+// MOSTRAR/OCULTAR SENHA
+function togglePasswordVisibility(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const icon = btn.querySelector('svg');
+    
+    if (input.type === "password") {
+        input.type = "text";
+        icon.innerHTML = '<path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.44-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/>';
+    } else {
+        input.type = "password";
+        icon.innerHTML = '<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>';
+    }
+}
+
 const notify = (msg, type = 'success') => {
+    const container = document.getElementById("toastContainer");
     const toast = document.createElement("div");
-    toast.style.cssText = `position:fixed; bottom:30px; right:30px; padding:16px 30px; background:#111; border:1px solid ${type === 'success' ? '#d4af37' : '#ff4d4d'}; border-radius:12px; z-index:9999; box-shadow:0 10px 30px rgba(0,0,0,0.5);`;
-    toast.innerText = msg;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
+    toast.className = 'toast';
+    toast.style.borderColor = type === 'success' ? 'var(--gold-primary)' : 'var(--danger)';
+    toast.innerHTML = `<span>${type === 'success' ? '' : ''}</span> <span>${msg}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 500);
+    }, 4000);
 };
+
+function validarSenha() {
+    const pass = document.getElementById('newPass').value;
+    const confirm = document.getElementById('confirmPass').value;
+    const bar = document.getElementById('strengthBar');
+    const text = document.getElementById('strengthText');
+    const btn = document.getElementById('btnSubmitSenha');
+
+    let forca = 0;
+    if (pass.length >= 8) forca += 33;
+    if (/[A-Z]/.test(pass)) forca += 33;
+    if (/[0-9]/.test(pass)) forca += 34;
+
+    bar.style.width = forca + '%';
+    
+    if (forca < 34) {
+        bar.style.background = 'var(--danger)';
+        text.innerText = "Senha Fraca";
+        text.style.color = 'var(--danger)';
+    } else if (forca < 100) {
+        bar.style.background = 'var(--warning)';
+        text.innerText = "Média (adicione letras maiúsculas e números)";
+        text.style.color = 'var(--warning)';
+    } else {
+        bar.style.background = 'var(--success)';
+        text.innerText = "Senha Forte e Segura";
+        text.style.color = 'var(--success)';
+    }
+
+    btn.disabled = !(forca === 100 && pass === confirm && pass !== "");
+}
 
 document.getElementById('photoInput').addEventListener("change", async function(e) {
     const formData = new FormData(document.getElementById("formPerfil"));
+    notify("Processando imagem...", "success");
     try {
         const res = await fetch("/perfil", { method: "POST", body: formData });
         if(res.ok) {
-            notify("Foto atualizada! ✨");
+            notify("Perfil atualizado com sucesso!");
             setTimeout(() => location.reload(), 1000);
         }
-    } catch (e) { notify("Erro ao carregar foto.", "error"); }
+    } catch (e) { notify("Erro na conexão.", "error"); }
 });
 
 async function removerFoto() {
-    if(!confirm("Remover foto de perfil?")) return;
+    if(!confirm("Deseja realmente remover sua foto oficial?")) return;
     const res = await fetch("/perfil", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: "action=remove_photo"
     });
-    if(res.ok) location.reload();
+    if(res.ok) {
+        notify("Foto removida.");
+        location.reload();
+    }
 }
 
 async function confirmarExclusao() {
     const res = await fetch("/delete-account", { method: "POST" });
     if(res.ok) window.location.href = "/";
-    else notify("Erro ao excluir conta.", "error");
+    else notify("Erro ao processar solicitação.", "error");
 }
 </script>
 
 </body>
 </html>
+
+

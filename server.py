@@ -39,6 +39,14 @@ from app.handlers.certificado import CertificadoViewHandler, CertificadoPDFHandl
 from app.handlers.comentarios import CommentHandler
 from app.handlers.public_profile import PublicProfileHandler
 from app.handlers.pagamento import MercadoPagoCreateHandler, PagamentoPageHandler
+
+from app.handlers.denunciar_like import (
+    CriarComentarioHandler,
+    ListarComentariosHandler,
+    ReagirComentarioHandler,
+    DenunciarUsuarioHandler
+)
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "usuarios.db")
 
@@ -123,6 +131,12 @@ def make_app():
         (r"/certificado/pdf/([0-9]+)/?", CertificadoPDFHandler),
         (r"/user/([0-9]+)/?", PublicProfileHandler),
         (r"/api/comment/?", CommentHandler),
+
+
+        (r"/comentario/criar", CriarComentarioHandler),
+(r"/comentarios", ListarComentariosHandler),
+(r"/comentario/reagir", ReagirComentarioHandler),
+(r"/usuario/denunciar", DenunciarUsuarioHandler),
     ], **settings)
 
 
@@ -136,6 +150,8 @@ if __name__ == "__main__":
     print(" http://milhaspro.home")
     print("=" * 40 + "\n")
 
+
+    print(" http://localhost:8080/login_dev ")
     tornado.ioloop.IOLoop.current().start()
 
 #key  mercadopago = 

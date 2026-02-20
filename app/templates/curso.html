@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -351,6 +350,32 @@
     padding-left: 15px;
 }
 
+yle>
+    /* DESIGN PROFISSIONAL DE AÇÕES */
+    .comment-actions { 
+        display: flex; 
+        gap: 12px; 
+        margin-top: 12px; 
+        padding-top: 12px; 
+        border-top: 1px solid rgba(255,255,255,0.05); 
+    }
+    .action-btn { 
+        display: flex; 
+        align-items: center; 
+        gap: 6px; 
+        background: #1a1a1a; 
+        border: 1px solid #333; 
+        color: #888; 
+        font-size: 11px; 
+        font-weight: 700; 
+        cursor: pointer; 
+        padding: 5px 12px; 
+        border-radius: 6px; 
+        text-transform: uppercase;
+        transition: 0.2s;
+    }
+    .action-btn:hover { background: #222; color: #d4af37; border-color: #d4af37; }
+    .btn-report:hover { color: #ef4444 !important; border-color: #ef4444 !important; background: rgba(239,68,68,0.05) !important; }
 </style>
 </head>
 <body>
@@ -418,6 +443,11 @@
         </div>
     </div>
 </main>
+
+<script>
+window.USER_LOGGED = {{ "true" if user else "false" }};
+window.CURRENT_USER_ID = {{ user["id"] if user else 0 }};
+</script>
 
 <script>
 // flag set by server whether the current viewer is logged+pago
@@ -765,11 +795,48 @@ function carregarComentarios(){
             textDiv.textContent = node.content;
             div.appendChild(textDiv);
 
-            const replyDiv = document.createElement("div");
-            replyDiv.className = "reply-btn";
-            replyDiv.textContent = "Responder";
-            replyDiv.onclick = () => responderComentario(node.id, node.username, node.photo);
-            div.appendChild(replyDiv);
+          // área de ações (like, dislike, responder, denunciar)
+// Função auxiliar para criar botões de ação de forma limpa
+const createActionBtn = (content, onClick, color = 'inherit') => {
+    const btn = document.createElement("span");
+    btn.style.cursor = "pointer";
+    btn.style.color = color;
+    btn.setAttribute("role", "button");
+    btn.innerHTML = content;
+    btn.onclick = onClick;
+    return btn;
+};
+
+const actionsDiv = document.createElement("div");
+Object.assign(actionsDiv.style, {
+    marginTop: "8px",
+    display: "flex",
+    gap: "15px",
+    fontSize: "13px",
+    alignItems: "center"
+});
+
+// LIKE
+const likeBtn = createActionBtn(`👍 ${node.likes || 0}`, () => reagirComentario(node.id, 'like'));
+
+// DISLIKE
+const dislikeBtn = createActionBtn(`👎 ${node.dislikes || 0}`, () => reagirComentario(node.id, 'dislike'));
+
+// RESPONDER
+const replyBtn = createActionBtn("Responder", () => responderComentario(node.id, node.username, node.photo));
+replyBtn.classList.add("reply-btn");
+
+// Montagem inicial das ações
+actionsDiv.append(likeBtn, dislikeBtn, replyBtn);
+
+// DENUNCIAR (Lógica condicional profissional)
+const isOwnPost = window.USER_LOGGED && node.user_id != window.CURRENT_USER_ID;
+if (isOwnPost) {
+    const denunciarBtn = createActionBtn("🚨 Denunciar", () => denunciarUsuario(node.user_id), "red");
+    actionsDiv.appendChild(denunciarBtn);
+}
+
+div.appendChild(actionsDiv);
 
             if(node.replies && node.replies.length){
                 const repliesContainer = document.createElement('div');
@@ -812,7 +879,149 @@ function carregarComentarios(){
         }
     }
 
+function renderComentario(node){
 
+    const wrapper = document.createElement("div");
+    wrapper.style.border = "1px solid #2a2a2a";
+    wrapper.style.padding = "12px";
+    wrapper.style.marginBottom = "15px";
+    wrapper.style.borderRadius = "8px";
+    wrapper.style.background = "#111";
+
+    wrapper.innerHTML = `
+        <div>
+            <strong>${node.username}</strong><br>
+            ${node.conteudo}
+        </div>
+
+        <div style="
+            margin-top:10px;
+            padding-top:8px;
+            border-top:1px solid #333;
+            display:flex;
+            gap:20px;
+            font-size:14px;
+            color:#aaa;
+        ">
+            <button onclick="reagirComentario(${node.id}, 'like')">
+                👍 ${node.likes || 0}
+            </button>
+
+            <button onclick="reagirComentario(${node.id}, 'dislike')">
+                👎 ${node.dislikes || 0}
+            </button>
+
+            ${
+                (window.USER_LOGGED && node.user_id != window.CURRENT_USER_ID)
+                ? `<button style="color:red;"
+                    onclick="denunciarUsuario(${node.user_id})">
+                        🚨 Denunciar
+                   </button>`
+                : ""
+            }
+        </div>
+    `;
+
+    return wrapper;
+}
+function reagirComentario(comentarioId, tipo) {
+    if (!window.USER_LOGGED) {
+        alert("Acesse sua conta para interagir.");
+        return;
+    }
+
+
+    const params = new URLSearchParams();
+    params.append('comentario_id', comentarioId);
+    params.append('tipo', tipo);
+
+    fetch("/comentario/reagir", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: params.toString()
+    })
+    .then(res => {
+        if (res.ok) {
+            carregarComentarios();
+        } else {
+            alert("Erro ao reagir.");
+        }
+    });
+}
+
+function denunciarUsuario(userId, comentarioId) {
+    if (!confirm("Deseja denunciar este comentário?")) return;
+
+    const params = new URLSearchParams();
+    params.append('denunciado_id', userId);
+    params.append('comentario_id', comentarioId);
+
+    fetch("/usuario/denunciar", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: params.toString()
+    })
+    .then(res => {
+        if (res.ok) {
+            alert("Denúncia enviada com sucesso.");
+        } else {
+            alert("Erro ao denunciar.");
+        }
+    });
+}
+function denunciarUsuario(userId){
+    fetch("/usuario/denunciar", {
+        method: "POST",
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: `denunciado_id=${userId}&motivo=Denúncia`
+    }).then(() => alert("Denunciado"));
+}
+
+function enviarReacao(comentarioId, tipo) {
+    const formData = new FormData();
+    formData.append('comentario_id', comentarioId);
+    formData.append('tipo', tipo);
+
+    fetch("/comentario/reagir", {
+        method: "POST",
+        body: formData // Enviando como FormData para melhor compatibilidade
+    })
+    .then(res => {
+        if (res.ok) carregarComentarios();
+        else {
+            console.error("Erro no servidor. Verifique o arquivo denunciar_like.py na linha 76.");
+        }
+
+function enviarDenuncia(userId, comentarioId) {
+    if (!confirm("Confirmar denúncia deste comentário?")) return;
+    
+    const formData = new FormData();
+    formData.append('denunciado_id', userId);
+    formData.append('comentario_id', comentarioId);
+
+    fetch("/usuario/denunciar", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => {
+        if (res.ok) alert("Denúncia enviada com sucesso.");
+    });
+}        
+function enviarDenuncia(userId, comentarioId) {
+    if (!confirm("Confirmar denúncia deste comentário?")) return;
+    
+    const formData = new FormData();
+    formData.append('denunciado_id', userId);
+    formData.append('comentario_id', comentarioId);
+
+    fetch("/usuario/denunciar", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => {
+        if (res.ok) alert("Denúncia enviada com sucesso.");
+    });
+}})}
 </script>
 
 </body>
