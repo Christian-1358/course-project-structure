@@ -131,7 +131,7 @@ def make_app():
         (r"/certificado/pdf/([0-9]+)/?", CertificadoPDFHandler),
         (r"/user/([0-9]+)/?", PublicProfileHandler),
         (r"/api/comment/?", CommentHandler),
-
+        (r"/pagamento", PagamentoPageHandler),
 
         (r"/comentario/criar", CriarComentarioHandler),
 (r"/comentarios", ListarComentariosHandler),

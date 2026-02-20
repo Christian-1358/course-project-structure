@@ -1,0 +1,170 @@
+    /* Reset e Fundo */
+    * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    
+    body {
+        background: #050505;
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', Roboto, Helvetica, sans-serif;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+
+    /* O Certificado - Ajustado para proporção A4 Paisagem */
+    .cert-canvas {
+        width: 1120px; 
+        height: 790px;
+        background: #0d0d0d !important;
+        border: 12px solid #d4af37;
+        padding: 10px;
+        position: relative;
+        box-shadow: 0 0 50px rgba(0,0,0,0.8);
+        color: #fff;
+        overflow: hidden;
+    }
+
+    .inner-border {
+        width: 100%;
+        height: 100%;
+        border: 1px solid #d4af37;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        padding: 50px 60px; /* Ajuste no padding vertical */
+        background: radial-gradient(circle at center, #151515 0%, #0d0d0d 100%) !important;
+    }
+
+    .header .logo {
+        font-size: 28px;
+        font-weight: 900;
+        letter-spacing: 8px;
+        color: #fff;
+        text-transform: uppercase;
+    }
+    .header .logo span { color: #d4af37; }
+    
+    .cert-title {
+        margin-top: 5px;
+        text-align: center;
+    }
+    .cert-title h1 {
+        font-size: 75px;
+        margin: 0;
+        letter-spacing: 12px;
+        color: #d4af37;
+        background: linear-gradient(to bottom, #f1d592, #d4af37, #a68524);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 800;
+    }
+    .cert-title p {
+        font-size: 14px;
+        color: #888;
+        letter-spacing: 5px;
+        text-transform: uppercase;
+        margin-top: 5px;
+    }
+
+    .body-text {
+        text-align: center;
+        width: 85%;
+    }
+    .body-text .intro {
+        font-size: 20px;
+        color: #bbb;
+        font-style: italic;
+    }
+    .body-text .student-name {
+        font-size: 58px;
+        font-weight: 800;
+        color: #fff;
+        margin: 10px 0;
+        border-bottom: 3px solid #d4af37;
+        display: inline-block;
+        padding: 0 40px 10px 40px;
+        text-transform: uppercase;
+    }
+    .body-text .achievement {
+        font-size: 17px;
+        line-height: 1.6;
+        color: #aaa;
+        margin-top: 15px;
+    }
+
+    /* Ementa Profissional */
+    .ementa-box {
+        background: rgba(212, 175, 55, 0.05) !important;
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        padding: 20px 40px;
+        border-radius: 12px;
+        margin-top: 25px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        text-align: left;
+    }
+    .ementa-item {
+        font-size: 12px;
+        color: #d4af37;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 600;
+    }
+
+    /* Rodapé Corrigido */
+    .footer {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center; /* Alinha horizontalmente pelo centro */
+        margin-bottom: 20px; /* Sobe o rodapé para não cortar */
+    }
+    .sign-block {
+        text-align: center;
+        width: 300px;
+    }
+    .sign-line {
+        border-top: 1px solid #d4af37;
+        margin-bottom: 12px;
+        opacity: 0.5;
+    }
+    .sign-name {
+        font-size: 16px;
+        font-weight: bold;
+        color: #fff;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 4px;
+    }
+    .sign-title {
+        font-size: 11px;
+        color: #d4af37;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+
+    .seal {
+        width: 120px;
+        height: 120px;
+        border: 2px double #d4af37;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 10px;
+        color: #d4af37;
+        font-weight: bold;
+        text-align: center;
+        padding: 15px;
+        background: rgba(212, 175, 55, 0.05);
+    }
+
+    @media print {
+        @page { size: landscape; margin: 0; }
+        body { background: #000; }
+        .cert-canvas { box-shadow: none; width: 100vw; height: 100vh; border: 12px solid #d4af37 !important; }
+    }

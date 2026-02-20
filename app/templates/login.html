@@ -101,9 +101,64 @@ header {
 
 /* CTA BUTumaTON */
 .cta-button {
-    background: var(--gold); color: #000; padding: 20px 40px; border-radius: 10px;
-    text-decoration: none; font-weight: 800; text-transform: uppercase;
-    display: inline-flex; align-items: center; gap: 12px; transition: 0.3s;
+    position: relative;
+    overflow: hidden;
+    background: var(--gold);
+    color: #000;
+    padding: 20px 40px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 800;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    transition: 0.3s;
+}
+
+.cta-button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.6), transparent);
+    transition: 0.6s;
+}
+
+.cta-button:hover::before {
+    left: 100%;
+}
+
+.cta-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(212, 175, 55, 0.6);
+}
+body::before {
+    content: "";
+    position: fixed;
+    top: -200px;
+    right: -200px;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(212,175,55,0.15), transparent 70%);
+    animation: pulseGlow 6s infinite alternate;
+    z-index: -1;
+}
+
+@keyframes pulseGlow {
+    from { transform: scale(1); opacity: 0.4; }
+    to { transform: scale(1.2); opacity: 0.7; }
+}
+@keyframes floatCard {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-12px); }
+    100% { transform: translateY(0px); }
+}
+
+.login-card {
+    animation: floatCard 6s ease-in-out infinite;
 }
 .cta-button:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(212, 175, 55, 0.4); }
 
@@ -213,6 +268,63 @@ input:focus { border-color:#d4af37; box-shadow:0 0 0 2px rgba(212,175,55,0.25); 
     .hero-content { margin-bottom: 50px; }
     .hero-visual { margin-top: 30px; }
 }
+
+/* ============================= */
+/* ANIMAÇÕES PREMIUM */
+/* ============================= */
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeRight {
+    from {
+        opacity: 0;
+        transform: translateX(-60px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeLeft {
+    from {
+        opacity: 0;
+        transform: translateX(60px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* HERO animação */
+.hero-content {
+    animation: fadeRight 1s ease forwards;
+}
+
+.hero-visual {
+    animation: fadeLeft 1s ease forwards;
+}
+
+/* Módulos com delay */
+.module-card {
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards;
+}
+
+.module-card:nth-child(1) { animation-delay: 0.2s; }
+.module-card:nth-child(2) { animation-delay: 0.4s; }
+.module-card:nth-child(3) { animation-delay: 0.6s; }
+.module-card:nth-child(4) { animation-delay: 0.8s; }
 </style>
 </head>
 <body>
@@ -226,12 +338,8 @@ input:focus { border-color:#d4af37; box-shadow:0 0 0 2px rgba(212,175,55,0.25); 
     <div class="hero-content">
         <h1>A estratégia que transforma milhas em <span>lucro real.</span></h1>
         <p>Aprenda a acumular milhões de milhas todos os meses, acessar as melhores salas VIP do mundo e viajar com luxo gastando quase zero.</p>
-        
-       <a href="javascript:void(0)" class="cta-button" onclick="irParaPagamento()">
+<a href="/pagamento.html" class="cta-button">
     QUERO COMEÇAR AGORA
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-        <path d="M5 12h14M12 5l7 7-7 7"/>
-    </svg>
 </a>
 
     </div>
